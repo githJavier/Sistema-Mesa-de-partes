@@ -1,0 +1,47 @@
+
+.tema-background {
+    background-color: #FFFFFF;
+}
+
+.card-container {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+}
+
+.txt-titulo {
+    color: #303030;
+}
+.form-control{
+    border:  1px solid #303030;
+}
+
+.txt-label {
+    color: #303030;
+}
+
+.btn-recuperar {
+    background-color: #303030;
+    color: #FFFFFF;
+}
+
+.btn-recuperar:hover {
+    background-color: #FFFFFF;
+    color: #303030;
+    border-color: #303030;
+}
+
+.input-group-text {
+    background-color: #303030;
+    color: #FFFFFF;
+    border: none;
+}
+
+.link-custom {
+    color: #3c8dbc;
+    font-weight: bold;
+}
+
+.link-custom:hover {
+    text-decoration: underline;
+}

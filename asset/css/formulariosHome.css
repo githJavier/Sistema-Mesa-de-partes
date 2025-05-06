@@ -1,0 +1,67 @@
+.btn-enviarTramite{
+    background-color: #303030;
+    color:white;
+  }
+  .btn-enviarTramite:hover  {
+    color: #303030;
+    background-color: white;
+    border: 1px solid #303030;
+  }   
+  .span-input-tramite {
+    background-color: #303030;
+    border: 2px solid #707070; /* Borde para el span */
+    border-right: none; /* Para que no duplique borde con el input */
+  }
+  .input-readonly, 
+  .form-control, 
+  .form-select {
+    border: 1px solid #707070; /* Borde para el input */
+  }
+  .input-readonly:focus, 
+  .form-control:focus, 
+  .form-select:focus {
+    border: 1px solid #707070; /* Borde azul al enfocar */
+    outline: none;
+    box-shadow: none;
+  }
+  .input-group .form-control, 
+  .input-group .form-select {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .input-group .input-group-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .container-custom{
+    position: relative;
+    margin-bottom: 20px;
+    border: 1px solid #909090;
+    border-radius: 10px;
+  }
+  .container-custom .container-titulo{
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 15px;
+    color: #909090;
+  }
+  .separador-titulo {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #303030;
+  }
+  .separador-titulo::before,
+  .separador-titulo::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #303030;
+    margin: 0 10px;
+  }
+
+  /**/
