@@ -16,20 +16,19 @@ class Tramite{
         return $resultado;
     }
 
-    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $numDocumento, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto) {
+    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto) {
         $conexion = Conexion::conectarBD();
-        $sql = "INSERT INTO tramite (tipo_tramite, anio, codigo_generado, num_documento, cod_tipodocumento, hora_reg, fec_reg, remitente, asunto)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO tramite (tipo_tramite, anio, codigo_generado, cod_tipodocumento, hora_reg, fec_reg, remitente, asunto)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
         if (!$stmt) {
             die("Error en la preparación de la consulta: " . $conexion->error);
         }
         $stmt->bind_param(
-            "iisssssss",  // Tipos: i=int, s=string (ajústalo según tus datos)
+            "sissssss",  // Tipos: i=int, s=string (ajústalo según tus datos)
             $tipoTramite,
             $anio,
             $codigoGenerado,
-            $numDocumento,
             $codTipoDocumento,
             $horaReg,
             $fecReg,

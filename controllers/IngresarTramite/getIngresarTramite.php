@@ -133,9 +133,21 @@ class GetIngresarTramite{
     
         return true;
     }
-    
+
 
     public function moverArchivo($archivo, $rutaDestino) {
         return move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+    }
+
+    public function insertarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto){
+        $getIngresarTramite = $this->objTramite;
+        $respuesta = $getIngresarTramite->ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto);
+        if($respuesta){
+            $this->message = "Trámite ingresado correctamente";
+        }else{
+            $this->message = "Ocurrio un problema al ingresar el trámite";
+        }
+
+        return $respuesta;
     }
 }

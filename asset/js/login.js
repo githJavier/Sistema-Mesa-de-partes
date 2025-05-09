@@ -130,6 +130,52 @@ function enviarForm() {
     }
 }
 
+function enviarFormAdmin() {
+    //if (validarFormulario()) {
+        //const documento = document.getElementById("documento")?.value || "";
+        //const contrasena = document.getElementById("password")?.value || "";
+
+        $.ajax({
+            type: "POST",
+            url: "./controllers/AutenticarUsuario/controlAutenticarAdmin.php",
+            data: {
+                //documento: documento,
+                //contrasena: contrasena,
+                //tipoPersona: tipoPersona,
+                btnLogin: "Ingresar"
+            },
+            dataType: "json", // Asegurar que se reciba JSON
+            success: function(response) {
+                if (response.flag == 1) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => window.location.href = response.redirect);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Ocurrió un error desconocido.'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Estado:", status);
+                console.error("Error:", error);
+                console.error("Respuesta del servidor:", xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error en la solicitud: ' + error
+                });
+            }
+        });
+    //}
+}
+
 // Inicializar eventos
 document.addEventListener('DOMContentLoaded', () => {
     tipoPersona();

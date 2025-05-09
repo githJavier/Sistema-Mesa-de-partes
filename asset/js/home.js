@@ -59,6 +59,15 @@ function cargarDesdeLocalStorage() {
             case "ajustes":
                 cargarAjustesDatos();
                 break;
+            case "seguimiento":
+                cargarFormularioSeguimiento();
+                break;
+            case "ayuda":
+                cargarformularioAyuda();
+                break;
+            case "mensajes":
+                cargarformularioMensaje();
+                break;
             default:
                 cargarHome();
         }
@@ -112,6 +121,26 @@ function cargarFormularioTramite() {
     })
 }
 
+function cargarFormularioSeguimiento(){
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/SeguimientoTramite/controlFormSeguimientoTramite.php",
+        dataType: "json",
+        success: function(response){
+            if(response.flag == 1){
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "seguimiento");
+            } else {
+                alert("Ocurrió un problema al cargar el formulario.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error en AJAX: ", error);
+            alert("Error en la comunicación con el servidor.");
+        }
+    });    
+}
+
 function cargarAjustesDatos() {
     $.ajax({
         type: "POST",
@@ -130,6 +159,54 @@ function cargarAjustesDatos() {
         }
     });
 }
+function cargarformularioAyuda(){
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/Ayuda/controlFormAyuda.php",
+        dataType: "json",
+        success: function(response){
+            if(response.flag == 1){
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+            }
+        }
+    })
+}
+
+function cargarformularioMensaje(){
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/Mensaje/controlFormMensaje.php",
+        dataType: "json",
+        success: function(response){
+            if(response.flag == 1){
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "mensajes");
+            }
+        }
+    })
+}
+$(document).on('click', '#botonTramite', function() {
+    cargarFormularioTramite();
+});
+
+$(document).on('click', '#botonSeguimiento', function() {
+    cargarFormularioSeguimiento();
+});
+
+$(document).on('click', '#botonAjustes', function() {
+    cargarAjustesDatos();
+});
+
+$(document).on('click', '#botonAyuda', function() {
+    cargarformularioAyuda();
+});
+
+$(document).on('click', '#botonMensaje', function() {
+    cargarformularioMensaje();
+});
+
+
 
 function cargarDepartamentos(datoDepartamento = null, datoProvincia = null, datoDistrito = null) {
     $.ajax({

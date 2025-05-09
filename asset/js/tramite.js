@@ -102,6 +102,7 @@ function enviarFormTramite() {
         const asunto = document.getElementById("ASUNTO").value.trim();
         const tipoDocumento = document.getElementById("TIPO_DOCUMENTO").value;
         const numeroTramite = document.getElementById("NUMERO_TRAMITE").value.trim();
+        const remitente = document.getElementById("NOMBRE").value.trim();
         const folios = document.getElementById("FOLIOS").value.trim();
         const documentoVirtual = document.getElementById("DOCUMENTO_VIRTUAL").files[0];
 
@@ -110,10 +111,12 @@ function enviarFormTramite() {
         formData.append('asunto', asunto);
         formData.append('tipo_documento', tipoDocumento);
         formData.append('numero_tramite', numeroTramite);
+        formData.append('remitente', remitente);
         formData.append('folios', folios);
         formData.append('DOCUMENTO_VIRTUAL', documentoVirtual);
         formData.append('btnEnviarTramite', "EnviarTramite");
 
+        
         $.ajax({
             type: "POST",
             url: "../../controllers/IngresarTramite/controlIngresarTramite.php",
