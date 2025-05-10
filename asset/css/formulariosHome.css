@@ -1,8 +1,8 @@
-.btn-enviarTramite{
+.btn-enviarTramite, .btn-all{
     background-color: #303030;
     color:white;
   }
-  .btn-enviarTramite:hover  {
+  .btn-enviarTramite:hover, .btn-all:hover  {
     color: #303030;
     background-color: white;
     border: 1px solid #303030;
@@ -64,4 +64,4 @@
     margin: 0 10px;
   }
 
-  /**/
+  /*Estilos de tablas*/
