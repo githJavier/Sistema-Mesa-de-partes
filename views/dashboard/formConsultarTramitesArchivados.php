@@ -13,10 +13,6 @@ class formConsultarTramitesArchivados{
                     <label for="search" class="form-label">Buscar:</label>
                     <input type="text" class="form-control" id="search" placeholder="ID, expediente, área...">
                 </div>
-                <div class="col-12 col-sm-6 col-md-2">
-                    <label class="form-label">Estado:</label>
-                    <input type="text" class="form-control bg-light" value="Archivado" readonly>
-                </div>
                 <div class="col-12 col-sm-6 col-md-3">
                     <label for="date-from" class="form-label">Fecha desde:</label>
                     <input type="date" class="form-control" id="date-from">
@@ -26,8 +22,8 @@ class formConsultarTramitesArchivados{
                     <input type="date" class="form-control" id="date-to">
                 </div>
                 <div class="col-12 col-sm-12 col-md-1 d-flex align-items-end">
-                    <div class="d-flex flex-wrap gap-2 w-100">
-                        <button type="button" class="btn btn-all w-100" id="filter-btn">Filtrar</button>
+                    <div class="d-flex w-100">
+                        <button type="button" class="btn btn-all w-100 me-3" id="filter-btn">Filtrar</button>
                         <button type="button" class="btn btn-all w-100" id="reset-btn">Limpiar</button>
                     </div>
                 </div>
