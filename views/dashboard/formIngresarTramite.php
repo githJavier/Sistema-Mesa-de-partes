@@ -134,8 +134,8 @@ class GetFormIngresarTramite {
             </div>
           </div>
           
-          <div class="text-center mt-4 p-4">
-            <button type="button" class="btn btn-enviarTramite w-25 px-3 py-2" onclick="enviarFormTramite()">ENVIAR TRÁMITE</button>
+          <div class="d-grid gap-2 col-12 col-md-6 col-lg-4 mx-auto mt-4 mb-4">
+            <button type="button" class="btn btn-enviarTramite w-100 px-3 py-2"  onclick="enviarFormTramite()">ENVIAR TRÁMITE</button>
           </div>
 
         </div>

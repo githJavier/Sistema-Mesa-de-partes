@@ -120,6 +120,36 @@ function cargarFormularioTramite() {
         }
     })
 }
+function cargarformularioAyuda(){
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/Ayuda/controlFormAyuda.php",
+        dataType: "json",
+        success: function(response){
+            if(response.flag == 1){
+                if(response.message){
+                     Swal.fire({
+                        icon: 'info',
+                        title: 'Aviso',
+                        text: response.message
+                     }).then(()=>{
+                        $("#contenido-dinamico").html(response.formularioHTML);
+                        guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+                        cargarDepartamentos();
+                     })
+                }else{
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+                    cargarDepartamentos();
+                }
+                
+            }else if(response.flag ==2){
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+            }
+        }
+    })
+}
 
 function cargarFormularioSeguimiento(){
     $.ajax({
@@ -159,19 +189,7 @@ function cargarAjustesDatos() {
         }
     });
 }
-function cargarformularioAyuda(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Ayuda/controlFormAyuda.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
-            }
-        }
-    })
-}
+
 
 function cargarformularioMensaje(){
     $.ajax({

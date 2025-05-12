@@ -21,11 +21,9 @@ class formConsultarTramitesArchivados{
                     <label for="date-to" class="form-label">Fecha hasta:</label>
                     <input type="date" class="form-control" id="date-to">
                 </div>
-                <div class="col-12 col-sm-12 col-md-1 d-flex align-items-end">
-                    <div class="d-flex w-100">
-                        <button type="button" class="btn btn-all w-100 me-3" id="filter-btn">Filtrar</button>
-                        <button type="button" class="btn btn-all w-100" id="reset-btn">Limpiar</button>
-                    </div>
+                <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end gap-2">
+                    <button type="button" class="btn btn-all w-50" id="filter-btn">Filtrar</button>
+                    <button type="button" class="btn btn-all w-50" id="reset-btn">Limpiar</button>
                 </div>
             </form>
 
@@ -75,6 +73,7 @@ class formConsultarTramitesArchivados{
                 </div>
             </div>
         </div>
+        <script src="../../asset/js/tramiteArchivado.js"></script>
         <?php
         return ob_get_clean();
     }
