@@ -4,8 +4,8 @@ class formConsultarTramitesArchivados{
         ob_start();
         //Formularios para ver el seguimiento de los Tramites
         ?>
-        <div class="container my-5 p-4 bg-white rounded shadow">
-            <h1 class="mb-4 border-bottom pb-2 text-dark">CONSULTAR TRÁMITES ARCHIVADOS</h1>
+        <div class="container py-4">
+            <h3 class="mb-4 border-bottom pb-2 text-dark">CONSULTAR TRÁMITES ARCHIVADOS</h3>
 
             <!-- Formulario de filtros -->
             <form class="row g-3 mb-4">

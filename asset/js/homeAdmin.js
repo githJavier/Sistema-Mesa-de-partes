@@ -116,19 +116,25 @@ function cargarHome() {
     });
 }
 
-function cargarformularioAdministracionRemitentes(){
+function cargarformularioAdministracionRemitentes() {
     $.ajax({
         type: "POST",
         url: "../../controllers/Administracion/controlAdministracionRemitentes.php",
         dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
-            }
+        success: function(response) {
+    $("#contenido-dinamico").html(response.formularioHTML);
+    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
+
+    setTimeout(() => {
+        if (typeof window.remitentesPagination !== "undefined") {
+            window.remitentesPagination.init();
         }
-    })
+    }, 100);
 }
+
+    });
+}
+
 function cargarformularioAdministracionUsuarios(){
     $.ajax({
         type: "POST",

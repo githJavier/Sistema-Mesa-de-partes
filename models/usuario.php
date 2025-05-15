@@ -183,6 +183,34 @@ class Usuario
             return false;
         }
     }
+
+    public function listarRemitentes() {
+        $conexion = Conexion::conectarBD();
+        $sql = "SELECT idremite, tipo_remitente, retipo_docu, docu_num, nombres, direccion, departamento, provincia, distrito, telefono_fijo, telefono_celular, correo
+                FROM remitente";
+        $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            Conexion::desconectarBD();
+            return false;
+        }
+
+        if ($stmt->execute()) {
+            $resultado = $stmt->get_result(); // Obtener resultados
+            $remitentes = [];
+
+            while ($fila = $resultado->fetch_assoc()) {
+                $remitentes[] = $fila;
+            }
+            $stmt->close();
+            Conexion::desconectarBD();
+            return $remitentes;
+        } else {
+            $stmt->close();
+            Conexion::desconectarBD();
+            return false;
+        }
+    }
+
     
     
     

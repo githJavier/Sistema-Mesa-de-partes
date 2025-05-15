@@ -1,12 +1,21 @@
 <?php 
 include_once("../../views/dashboard/formAdministrarRemitentes.php");
+include("getAdministracion.php");
 
 $formAdministrarRemitentes = new formAdministrarRemitentes;
-$formulario = $formAdministrarRemitentes->formAdministrarRemitentesShow();
+$getAdministracion = new GetAdministracion();
 
-echo json_encode([
-    'flag' => 1,
-    'formularioHTML' => $formulario
-]);    
+$remitentes = $getAdministracion->listarRemitentes();
 
-?>
+if (!empty($remitentes)) {
+    $formulario = $formAdministrarRemitentes->formAdministrarRemitentesShow($remitentes);
+    echo json_encode([
+        'flag' => 1,
+        'formularioHTML' => $formulario
+    ]);
+} else {
+    echo json_encode([
+        'flag' => 0,
+        'message' => $getAdministracion->message
+    ]);
+}

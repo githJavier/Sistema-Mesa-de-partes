@@ -1,14 +1,10 @@
 <?php 
 class formAdministrarRemitentes {
-    public function formAdministrarRemitentesShow() {
+    public function formAdministrarRemitentesShow($remitentes) {
         ob_start();
         ?>
         <div class="container py-4">
-            <!-- Título con ícono Font Awesome -->
-            <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center text-center mb-4 gap-3">
-                <i class="fas fa-address-book fa-3x text-dark"></i>
-                <h1 class="text-dark mb-0">Listado de Remitentes</h1>
-            </div>
+            <h3 class="mb-4 border-bottom pb-2 text-dark"> <i class="fas fa-address-book text-dark me-2"></i>Listado de Remitentes</h3>
 
             <!-- Filtro y Botones -->
             <div class="row g-3 mb-4">
@@ -24,6 +20,16 @@ class formAdministrarRemitentes {
                     </button>
                 </div>
             </div>
+            <div class="mb-3 d-flex align-items-center gap-2">
+                <label for="select-page-size" class="mb-0">Mostrar:</label>
+                <select id="select-page-size" class="form-select form-select-sm w-auto">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span>registros</span>
+            </div>
 
             <!-- Tabla -->
             <div class="table-responsive">
@@ -38,20 +44,27 @@ class formAdministrarRemitentes {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Remitente 1</td>
-                            <td>994040464</td>
-                            <td>jeampierbarrios04@gmail.com</td>
+                        <?php 
+                        $contador = 1;
+                        foreach ($remitentes as $remitente){?>
+                        <tr> 
+                            <td><?=$contador?></td>
+                            <td><?=$remitente['nombres'];?></td>
+                            <td><?=$remitente['telefono_celular'];?></td>
+                            <td><?=$remitente['correo'];?></td>
                             <td>
-                                <button class="btn btn-sm btn-dark" onclick="editItem(1)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-dark" onclick="deleteItem(1)">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <a href="editar.php?id=<?= urlencode($remitente['idremite']); ?>" title="Editar">
+                                    <i class="fas fa-edit icon-table"></i>
+                                </a>
+                                &nbsp;&nbsp;
+                                <a href="eliminar.php?id=<?= urlencode($remitente['idremite']); ?>" title="Eliminar" onclick="return confirm('¿Estás seguro?');">
+                                    <i class="fas fa-trash-alt icon-table"></i>
+                                </a>
                             </td>
                         </tr>
+                        <?php 
+                        $contador++;
+                        }?>
                     </tbody>
                 </table>
                 <div id="no-results" class="text-center text-muted fst-italic py-3 d-none">
@@ -61,18 +74,20 @@ class formAdministrarRemitentes {
 
             <!-- Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
-                <div id="pagination-info" class="text-muted text-center text-md-start">
-                    Mostrando 0 a 0 de 0 entradas
-                </div>
-                <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-dark disabled" id="prev-page">
-                        <i class="fas fa-arrow-left"></i> Anterior
-                    </button>
-                    <button class="btn btn-dark disabled" id="next-page">
-                        Siguiente <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
+    <div id="pagination-info" class="text-muted text-center text-md-start">
+        <!-- Este contenido se actualizará dinámicamente -->
+    </div>
+
+    <div class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-dark" id="prev-page">
+            <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-dark" id="next-page">
+            Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
         </div>
 
         <!-- Modal Bootstrap para crear remitente -->
