@@ -59,11 +59,15 @@ class formAdministrarRemitentes {
                             <td><?=$remitente['telefono_celular'];?></td>
                             <td><?=$remitente['correo'];?></td>
                             <td>
-                                <a href="editar.php?id=<?= urlencode($remitente['idremite']); ?>" title="Editar">
-                                    <i class="fas fa-edit icon-table"></i>
-                                </a>
-                                &nbsp;&nbsp;
-                                <a href="eliminar.php?id=<?= urlencode($remitente['idremite']); ?>" title="Eliminar" onclick="return confirm('¿Estás seguro?');">
+                              <button
+                                type="button"
+                                title="Editar"
+                                class="btn ms-2"
+                                data-id="<?= $remitente['idremite']; ?>"
+                                onclick="cargarDatosRemitente(<?= $remitente['idremite']; ?>);">
+                                <i class="fas fa-edit icon-table"></i>
+                              </button>
+                                <a href="#" title="Eliminar" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminar">
                                     <i class="fas fa-trash-alt icon-table"></i>
                                 </a>
                             </td>
@@ -170,14 +174,102 @@ class formAdministrarRemitentes {
 
                   <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-dark" onclick="enviarForm()">Guardar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarForm()" id="Registrar" name="Registrar">Guardar</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
         </div>
+        <!-- Modal Confirmar Eliminar -->
+        <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este remitente? Esta acción no se puede deshacer.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnEliminarConfirmado">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <!-- Modal Bootstrap para editar remitente -->
+        <div class="modal fade" id="editarRemitenteModal" tabindex="-1" aria-labelledby="editarRemitenteModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editarRemitenteModalLabel">
+                  <i class="fas fa-user-edit me-2"></i> Editar Remitente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <form id="edit-form">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label class="form-label">Tipo de Documento</label>
+                      <input type="text" class="form-control" id="editTipoDocumento" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="editDocumento" class="form-label">Número de Documento</label>
+                      <input type="text" class="form-control" id="editDocumento" readonly>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="editNombre" class="form-label">Nombre o Razón Social</label>
+                      <input type="text" class="form-control" id="editNombre" readonly>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="editEmail" class="form-label">Correo Electrónico</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="editEmail" placeholder="Ingrese correo electrónico">
+                      </div>
+                      <span id="editEmailError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label for="editTelefono" class="form-label">Teléfono</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                        <input type="text" class="form-control" id="editTelefono" placeholder="Ingrese teléfono">
+                      </div>
+                      <span id="editTelefonoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="editPassword" class="form-label">Contraseña</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                        <input type="password" class="form-control" id="editPassword" placeholder="Ingrese nueva contraseña">
+                      </div>
+                      <span id="editPasswordError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarFormEditar()" id="btnGuardarCambios">Guardar Cambios</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Scripts -->
         <script src="../../asset/js/administrarRemitentes.js"></script>
         

@@ -211,6 +211,32 @@ class Usuario
         }
     }
 
+    public function obtenerInformacionId($id) {
+        $conexion = Conexion::conectarBD();
+        $sql = "SELECT retipo_docu, docu_num, nombres, correo, telefono_celular
+                FROM remitente
+                WHERE idremite = ?";
+        $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            Conexion::desconectarBD();
+            return false;
+        }
+
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $resultado = $stmt->get_result();
+            $remitente = $resultado->fetch_assoc();
+            $stmt->close();
+            Conexion::desconectarBD();
+            return $remitente ? $remitente : false;
+        } else {
+            $stmt->close();
+            Conexion::desconectarBD();
+            return false;
+        }
+    }
+
+
     
     
     

@@ -83,6 +83,17 @@ class GetAjustes {
         }
         return true;
     }
+
+    public function obtenerRemitenteId($id){
+        $getDatosRemitente = new Usuario();
+        $datosRemitente = $getDatosRemitente->obtenerInformacionId($id);
+        if ($datosRemitente) {
+            return $datosRemitente;
+        } else {
+            return null;
+        }
+    }
+
 }
 
 ?>
