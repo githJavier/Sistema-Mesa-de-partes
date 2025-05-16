@@ -28,7 +28,7 @@ class formAdministrarRemitentes {
                                 <input type="text" id="search" placeholder="ID, Nombres, celular..." class="form-control" />
                             </div>
                             <div class="col-12 col-md-auto">
-                                <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#crearRemitenteModal">
+                                <button class="btn btn-dark w-100" data-bs-toggle="modal" data-bs-target="#crearRemitenteModal">
                                     <i class="fas fa-plus"></i> Crear Remitente
                                 </button>
                             </div>
@@ -93,8 +93,9 @@ class formAdministrarRemitentes {
         </div>
 
         <!-- Modal Bootstrap para crear remitente -->
+        <!-- Modal -->
         <div class="modal fade" id="crearRemitenteModal" tabindex="-1" aria-labelledby="crearRemitenteModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="crearRemitenteModalLabel">
@@ -104,81 +105,72 @@ class formAdministrarRemitentes {
               </div>
               <div class="modal-body">
                 <form id="create-form">
-                  <div class="mb-3">
-                    <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
-                    <select class="form-select" id="tipoDocumento">
-                      <option selected>DNI</option>
-                      <option>RUC</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="documento" class="form-label">Número de Documento</label>
-                    <div class="input-group">
-                      <input type="text" class="form-control" id="documento" placeholder="Ingrese DNI o RUC">
-                      <button type="button" class="btn btn-dark input-group-text" onclick="consultarDocumento()">
-                        <i class="fa fa-search"></i>
-                      </button>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                      <select class="form-select" id="tipoDocumento">
+                        <option selected>DNI</option>
+                        <option>RUC</option>
+                      </select>
                     </div>
-                    <div id="documentoError" class="form-text text-danger d-none"></div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre o Razón Social</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fa fa-user"></i></span>
-                      <input type="text" class="form-control" id="nombre" placeholder="Ingrese nombre o razón social" disabled>
+                    <div class="col-md-6">
+                      <label for="documento" class="form-label">Número de Documento</label>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="documento" placeholder="Ingrese DNI o RUC">
+                        <button type="button" class="btn btn-dark input-group-text" onclick="consultarDocumento()">
+                          <i class="fa fa-search"></i>
+                        </button>
+                      </div>
+                      <span id="documentoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
                     </div>
-                    <div id="nombreError" class="form-text text-danger d-none"></div>
+                    
                   </div>
 
-                  <div class="mb-3">
-                    <label for="correo" class="form-label">Correo Electrónico</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                      <input type="email" class="form-control" id="correo" placeholder="Ingrese correo electrónico">
+                  <div class="row mt-3">
+                        <div class="col-md-12">
+                          <label for="nombre" class="form-label">Nombre o Razón Social</label>
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-user"></i></span>
+                            <input type="text" class="form-control" id="nombre" placeholder="Ingrese nombre o razón social" disabled>
+                          </div>
+                          <span id="nombreError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                        </div>
+                  </div>
+                  
+                  <div class="row mt-3">
+                        <div class="col-md-12">
+                          <label for="correo" class="form-label">Correo Electrónico</label>
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                            <input type="text" class="form-control" id="email" placeholder="Ingrese correo electrónico">
+                          </div>
+                          <span id="emailError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                        </div>
+                  </div>
+
+                  <div class="row mt-3">
+                      <div class="col-md-6">
+                          <label for="telefono" class="form-label">Teléfono</label>
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                            <input type="text" class="form-control" id="telefono" placeholder="Ingrese teléfono">
+                          </div>
+                          <span id="telefonoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                        </div>
+
+                        <div class="col-md-6">
+                          <label for="password" class="form-label">Contraseña</label>
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" placeholder="Ingrese contraseña">
+                          </div>
+                          <span id="passwordError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                        </div>
                     </div>
-                    <div id="emailError" class="form-text text-danger d-none"></div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                      <input type="text" class="form-control" id="telefono" placeholder="Ingrese teléfono">
-                    </div>
-                    <div id="telefonoError" class="form-text text-danger d-none"></div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                      <input type="password" class="form-control" id="password" placeholder="Ingrese contraseña">
-                    </div>
-                    <div id="passwordError" class="form-text text-danger d-none"></div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="passwordR" class="form-label">Repetir Contraseña</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                      <input type="password" class="form-control" id="passwordR" placeholder="Repita la contraseña">
-                    </div>
-                    <div id="passwordRError" class="form-text text-danger d-none"></div>
-                  </div>
-
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="termsCheck">
-                    <label class="form-check-label" for="termsCheck">
-                      Acepto los términos y condiciones
-                    </label>
-                    <div id="termsCheckError" class="form-text text-danger d-none"></div>
-                  </div>
 
                   <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-dark">Guardar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarForm()">Guardar</button>
                   </div>
                 </form>
               </div>
@@ -186,17 +178,9 @@ class formAdministrarRemitentes {
           </div>
         </div>
 
-        <!-- Script para manejar el envío del formulario -->
-        <script>
-            document.getElementById('create-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                enviarForm();
-            });
-        </script>
-
         <!-- Scripts -->
-        <script src="../../asset/js/registro.js"></script>
-        <script type="module" src="../../asset/js/administrarRemitentes.js"></script>
+        <script src="../../asset/js/administrarRemitentes.js"></script>
+        
         <?php
         return ob_get_clean();
     }
