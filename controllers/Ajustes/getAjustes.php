@@ -83,6 +83,37 @@ class GetAjustes {
         }
         return true;
     }
+
+    public function obtenerRemitenteId($id){
+        $getDatosRemitente = new Usuario();
+        $datosRemitente = $getDatosRemitente->obtenerInformacionId($id);
+        if ($datosRemitente) {
+            return $datosRemitente;
+        } else {
+            return null;
+        }
+    }
+
+    public function actualizarRegistro($correo, $telefono_celular, $clave, $idremite){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->actualizarDatos($correo, $telefono_celular, $clave, $idremite);
+        if($respuesta){
+            $this->message = "Los datos fueron actualizados correctamente";
+        }else{
+            $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
+    public function eliminarRemitente($id){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->eliminarRemitente($id);
+        if($respuesta){
+            $this->message = "Remitente eliminado correctamente";
+        }else{
+            $this->message = "No se pudo eliminar el registro"; 
+        }
+    }
+
 }
 
 ?>

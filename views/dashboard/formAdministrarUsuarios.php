@@ -1,114 +1,230 @@
 <?php 
 class formAdministrarUsuarios {
-    public function formAdministrarUsuariosShow() {
+    public function formAdministrarUsuariosShow($usuarios) {
         ob_start();
         ?>
         <div class="container py-4">
-            <!-- Título con ícono Font Awesome -->
-            <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center text-center mb-4 gap-3">
-                <i class="fas fa-users fa-3x text-dark"></i>
-                <h1 class="text-dark mb-0">Listado de Usuarios</h1>
-            </div>
+            <h3 class="mb-4 border-bottom pb-2 text-dark">
+                <i class="fas fa-users text-dark me-2"></i>Listado de Usuarios
+            </h3>
 
             <!-- Filtro y Botones -->
-            <div class="row g-3 mb-4">
-                <div class="col-12 col-sm-6 col-md-4">
-                    <input type="text" id="search" placeholder="ID, Nombres, celular..." class="form-control">
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-end gap-2">
-                    <button id="search-btn" class="btn btn-dark flex-fill" onclick="searchItem()">
-                        <i class="fas fa-search me-1"></i> Buscar
-                    </button>
-                    <button id="create-btn" class="btn btn-dark flex-fill" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
-                        <i class="fas fa-plus me-1"></i> Crear
-                    </button>
+            <div class="mb-3">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-auto d-flex align-items-center">
+                        <label for="usuarios-select-page-size" class="me-2 mb-0">Mostrar:</label>
+                        <select id="usuarios-select-page-size" class="form-select form-select-sm w-auto">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="ms-2">registros</span>
+                    </div>
+
+                    <div class="col-12 col-md">
+                        <div class="row justify-content-md-end g-2">
+                            <div class="col-12 col-md-auto">
+                                <input type="text" id="usuarios-search" placeholder="ID, Nombres, tipo, estado..." class="form-control" />
+                            </div>
+                            <div class="col-12 col-md-auto">
+                                <button class="btn btn-dark w-100" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
+                                    <i class="fas fa-user-plus"></i> Crear Usuario
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Tabla -->
             <div class="table-responsive">
-                <table class="table table-hover align-middle" id="data-table">
+                <table class="table table-hover align-middle" id="usuarios-table">
                     <thead class="table-dark text-nowrap">
                         <tr>
                             <th>ID</th>
                             <th>Nombres</th>
-                            <th>Celular</th>
-                            <th>Correo</th>
+                            <th>Tipo</th>
+                            <th>Area</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Usuario 1</td>
-                            <td>987654321</td>
-                            <td>correo1@ejemplo.com</td>
+                        <?php 
+                        $contador = 1;
+                        foreach ($usuarios as $usuario){ ?>
+                        <tr> 
+                            <td><?=$contador?></td>
+                            <td><?php echo $usuario['nombre']." ".$usuario['ap_paterno']." ".$usuario['ap_materno'];?></td>
+                            <td><?=$usuario['tipo'];?></td>
+                            <td><?=$usuario['area'];?></td>
                             <td>
-                                <button class="btn btn-sm btn-dark" onclick="editItem(1)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-dark" onclick="deleteItem(1)">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <?php echo ($usuario['estado'] == 1) ? 'Activo' : 'Inactivo'; ?>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap justify-content-center gap-2">
+                                    <button
+                                    type="button"
+                                    title="Editar"
+                                    class="btn"
+                                    onclick="">
+                                    <i class="fas fa-pen-to-square"></i>
+                                    </button>
+                                    <button 
+                                    type="button"
+                                    title="Eliminar"
+                                    class="btn"
+                                    onclick="">
+                                    <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
+                        <?php 
+                        $contador++;
+                        } ?>
                     </tbody>
                 </table>
-                <div id="no-results" class="text-center text-muted fst-italic py-3 d-none">
+                <div id="usuarios-no-results" class="text-center text-muted fst-italic py-3 d-none">
                     No hay ningún registro
                 </div>
             </div>
 
             <!-- Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
-                <div id="pagination-info" class="text-muted text-center text-md-start">
-                    Mostrando 0 a 0 de 0 entradas
-                </div>
+                <div id="usuarios-pagination-info" class="text-muted text-center text-md-start"></div>
                 <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-dark disabled" id="prev-page">
-                        <i class="fas fa-arrow-left"></i> Anterior
+                    <button class="btn btn-dark" id="usuarios-prev-page">
+                        <i class="fas fa-chevron-left"></i> Anterior
                     </button>
-                    <button class="btn btn-dark disabled" id="next-page">
-                        Siguiente <i class="fas fa-arrow-right"></i>
+                    <button class="btn btn-dark" id="usuarios-next-page">
+                        Siguiente <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Bootstrap para crear usuario -->
+        <!-- Modal Bootstrap para crear remitente -->
         <div class="modal fade" id="crearUsuarioModal" tabindex="-1" aria-labelledby="crearUsuarioModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="crearUsuarioModalLabel"><i class="fas fa-user-plus me-2"></i>Crear Usuario</h5>
+                <h5 class="modal-title" id="crearUsuarioModalLabel">
+                  <i class="fas fa-user-plus me-2"></i> Crear Remitente
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
               </div>
               <div class="modal-body">
                 <form id="create-form">
-                  <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombres</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-user"></i></span>
-                      <input type="text" class="form-control" id="nombre" required>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                      <select class="form-select" id="tipoDocumento">
+                        <option selected>L.E / DNI</option>
+                        <option>CARNET EXT.</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="numeroDocumento" class="form-label">Número de Documento</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                        <input type="text" class="form-control" id="numeroDocumento" placeholder="Ingrese DNI o RUC">
+                      </div>
+                      <span id="numeroDocumentoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
                     </div>
                   </div>
-                  <div class="mb-3">
-                    <label for="celular" class="form-label">Celular</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                      <input type="text" class="form-control" id="celular" required>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="nombreUsuario" class="form-label">Nombre</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                        <input type="text" class="form-control" id="nombreUsuario" placeholder="Ingrese nombre">
+                      </div>
+                      <span id="nombreUsuarioError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
                     </div>
                   </div>
-                  <div class="mb-3">
-                    <label for="correo" class="form-label">Correo</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                      <input type="email" class="form-control" id="correo" required>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                        <input type="text" class="form-control" id="apellidoPaterno" placeholder="Ingrese apellido paterno">
+                      </div>
+                      <span id="apellidoPaternoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                        <input type="text" class="form-control" id="apellidoMaterno" placeholder="Ingrese apellido materno">
+                      </div>
+                      <span id="apellidoMaternoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
                     </div>
                   </div>
-                  <div class="d-flex justify-content-end gap-2">
+
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label for="tipoUsuario" class="form-label">Tipo</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <input type="text" class="form-control" id="tipoUsuario" placeholder="Ingrese tipo de usuario">
+                      </div>
+                      <span id="tipoUsuarioError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="estadoUsuario" class="form-label">Estado</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                        <select class="form-select" id="estadoUsuario">
+                          <option value="1">Activo</option>
+                          <option value="0">Inactivo</option>
+                        </select>
+                      </div>
+                      <span id="estadoUsuarioError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="areaUsuario" class="form-label">Área</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-building"></i></span>
+                        <select class="form-select" id="areaUsuario">
+                          <option value="20">OFICINA TRÁMITE DOCUMENTARIO</option>
+                          <option value="21">JEFE DE SISTEMAS</option>
+                          <option value="22">GERENCIA</option>
+                        </select>
+                      </div>
+                      <span id="areaUsuarioError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label for="usuario" class="form-label">Usuario</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                        <input type="text" class="form-control" id="usuario" placeholder="Ingrese usuario">
+                      </div>
+                      <span id="usuarioError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="password" class="form-label">Contraseña</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <input type="password" class="form-control" id="password" placeholder="Ingrese contraseña">
+                      </div>
+                      <span id="passwordError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-dark">Guardar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarForm()" id="registrarUsuario">Guardar</button>
                   </div>
                 </form>
               </div>
@@ -116,24 +232,100 @@ class formAdministrarUsuarios {
           </div>
         </div>
 
-        <!-- Script para manejar el envío del formulario -->
-        <script>
-            document.getElementById('create-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Usuario creado',
-                    text: 'El usuario se ha creado correctamente.',
-                    confirmButtonColor: '#000000'
-                });
-                const modal = bootstrap.Modal.getInstance(document.getElementById('crearUsuarioModal'));
-                modal.hide();
-            });
-        </script>
+        <!-- Modal Confirmar Eliminar -->
+        <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-triangle-exclamation me-2"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="eliminarRemitenteId">
+                ¿Estás seguro de que deseas eliminar este remitente? Esta acción no se puede deshacer.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-dark" id="btnEliminarConfirmado" onclick="enviarFormEliminar()">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <!-- Script propio -->
+        <!-- Modal Bootstrap para editar remitente -->
+        <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editarUsuarioModalLabel">
+                  <i class="fas fa-user-pen me-2"></i> Editar Remitente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <form id="edit-form">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label class="form-label">Tipo de Documento</label>
+                      <input type="text" class="form-control" id="editTipoDocumento" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="editDocumento" class="form-label">Número de Documento</label>
+                      <input type="text" class="form-control" id="editDocumento" readonly>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="editNombre" class="form-label">Nombre o Razón Social</label>
+                      <input type="text" class="form-control" id="editNombre" readonly>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <label for="editEmail" class="form-label">Correo Electrónico</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="editEmail" placeholder="Ingrese correo electrónico">
+                      </div>
+                      <span id="editEmailError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label for="editTelefono" class="form-label">Teléfono</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                        <input type="text" class="form-control" id="editTelefono" placeholder="Ingrese teléfono">
+                      </div>
+                      <span id="editTelefonoError" class="form-text text-danger" style="display:none;">Este campo es obligatorio.</span>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="editEstado" class="form-label">Estado</label>
+                      <select class="form-select" id="editEstado">
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarFormEditar()" id="Editar" name="Editar">Guardar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script src="../../asset/js/pagination.js"></script>
         <script src="../../asset/js/administrarUsuarios.js"></script>
-        <?php
+        <?php 
         return ob_get_clean();
     }
 }

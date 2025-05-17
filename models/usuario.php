@@ -211,6 +211,67 @@ class Usuario
         }
     }
 
+    public function obtenerInformacionId($id) {
+        $conexion = Conexion::conectarBD();
+        $sql = "SELECT retipo_docu, docu_num, nombres, correo, telefono_celular
+                FROM remitente
+                WHERE idremite = ?";
+        $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            Conexion::desconectarBD();
+            return false;
+        }
+
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $resultado = $stmt->get_result();
+            $remitente = $resultado->fetch_assoc();
+            $stmt->close();
+            Conexion::desconectarBD();
+            return $remitente ? $remitente : false;
+        } else {
+            $stmt->close();
+            Conexion::desconectarBD();
+            return false;
+        }
+    }
+
+    public function actualizarDatos($correo, $telefono_celular, $clave, $idremite) {
+    $conexion = Conexion::conectarBD();
+    $sql = "UPDATE remitente
+            SET correo = ?, telefono_celular = ?, clave = ?
+            WHERE idremite = ?";
+    $stmt = $conexion->prepare($sql);
+    if (!$stmt) {
+        Conexion::desconectarBD();
+        return false;
+    }
+    $stmt->bind_param("sssi", $correo, $telefono_celular, $clave, $idremite);
+    $resultado = $stmt->execute();
+    $stmt->close();
+    Conexion::desconectarBD();
+    return $resultado;
+    }
+
+    public function eliminarRemitente($id){
+    $conexion = Conexion::conectarBD();
+    $sql = "DELETE FROM remitente WHERE idremite = ?;";
+    $stmt = $conexion->prepare($sql);
+    if (!$stmt) {
+        Conexion::desconectarBD();
+        return false;
+    }
+    $stmt->bind_param("i", $id);
+    $resultado = $stmt->execute();
+    $stmt->close();
+    Conexion::desconectarBD();
+    return $resultado;
+    }
+
+
+
+
+
     
     
     

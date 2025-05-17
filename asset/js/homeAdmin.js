@@ -36,37 +36,6 @@ function toggleUserMenu(event) {
 }
 
 window.addEventListener("resize", initializeMenu);
-// ✅ Cargar contenido desde localStorage si existe
-function cargarDesdeLocalStorage() {
-    const vista = localStorage.getItem("vistaActual");
-    if (vista) {
-        switch (vista) {
-            case "home":
-                cargarHome();
-                break;
-            case "tramite":
-                cargarFormularioTramite();
-                break;
-            case "ajustes":
-                cargarAjustesDatos();
-                break;
-            case "seguimiento":
-                cargarFormularioSeguimiento();
-                break;
-            case "ayuda":
-                cargarformularioAyuda();
-                break;
-            case "mensajes":
-                cargarformularioMensaje();
-                break;
-            default:
-                cargarHome();
-        }
-    } else {
-        cargarHome(); // por defecto
-    }
-}
-cargarDesdeLocalStorage();
 
 // ✅ Guardar contenido y vista en localStorage
 function guardarContenidoEnLocalStorage(html, vista) {
@@ -144,10 +113,17 @@ function cargarformularioAdministracionUsuarios(){
             if(response.flag == 1){
                 $("#contenido-dinamico").html(response.formularioHTML);
                 guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
+
+                setTimeout(() => {
+                    if (typeof window.usuariosPagination !== "undefined") {
+                        window.usuariosPagination.init();
+                    }
+                }, 100);
             }
         }
     })
 }
+
 
 function cargarformularioAdministracionAreas(){
     $.ajax({
