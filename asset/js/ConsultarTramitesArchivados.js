@@ -89,7 +89,6 @@ window.TramitesPagination = (function () {
     document.getElementById('reset-btn').addEventListener('click', function () {
         document.getElementById('search').value = '';
         document.getElementById('filtroTipo').value = '';
-        document.getElementById('filtroEstado').value = '';
         document.getElementById('date-from').value = '';
         document.getElementById('date-to').value = '';
 
@@ -109,30 +108,26 @@ window.TramitesPagination = (function () {
 
 window.TramitesPagination.init();
 
-function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, detallestramiteJSON) {
-    const detallestramite = JSON.parse(detallestramiteJSON); // ← ✅ convertirlo a array real
-    console.log("Datos recibidos:", detallestramite);
-
+function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, flujos) {
     document.getElementById('modal-codigo').textContent = codigo;
     document.getElementById('modal-tipodocumento').textContent = tipoDocumento;
     document.getElementById('modal-asunto').textContent = asunto;
     document.getElementById('modal-fecharegistro').textContent = fechaRegistro;
     document.getElementById('modal-remitente').textContent = remitente;
-
     const cuerpoTabla = document.getElementById('tabla-detalles-tramite');
     cuerpoTabla.innerHTML = '';
 
-    if (Array.isArray(detallestramite)) {
-        detallestramite.forEach(detalle => {
+    if (Array.isArray(flujos)) {
+        flujos.forEach(flujo => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
-                <td>${detalle.f_area_origen || ''}</td>
-                <td>${detalle.f_estado || ''}</td>
-                <td>${detalle.f_area_destino || ''}</td>
-                <td>${detalle.f_fec_recep || ''}</td>
-                <td>${detalle.f_hora_recep || ''}</td>
-                <td>${detalle.f_folio || ''}</td>
-                <td>${detalle.f_comentario || ''}</td>
+                <td>${flujo.f_area_origen || ''}</td>
+                <td>${flujo.f_estado || ''}</td>
+                <td>${flujo.f_area_destino || ''}</td>
+                <td>${flujo.f_fec_recep || ''}</td>
+                <td>${flujo.f_hora_recep || ''}</td>
+                <td>${flujo.f_folio || ''}</td>
+                <td>${flujo.f_comentario || ''}</td>
             `;
             cuerpoTabla.appendChild(fila);
         });
@@ -150,7 +145,6 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, de
     modalVentana.classList.remove('animar-salida');
     modalVentana.classList.add('animar-entrada');
 }
-
 
 function cerrarModal() {
     const modalFondo = document.getElementById('modalFondo');
@@ -171,8 +165,7 @@ function validarFiltroTramitesArchivados() {
     if (
         dateFrom === "" &&
         dateTo === "" &&
-        document.getElementById("filtroTipo").value === "" &&
-        document.getElementById("filtroEstado").value === ""
+        document.getElementById("filtroTipo").value === ""
     ) {
         Swal.fire({
             icon: 'info',
@@ -210,7 +203,6 @@ document.getElementById('filter-btn').addEventListener('click', function () {
     if (!validarFiltroTramitesArchivados()) return;
 
     const tipo = document.getElementById('filtroTipo').value.toLowerCase();
-    const estado = document.getElementById('filtroEstado').value.toLowerCase();
     const fechaDesde = document.getElementById('date-from').value;
     const fechaHasta = document.getElementById('date-to').value;
 
@@ -219,13 +211,11 @@ document.getElementById('filter-btn').addEventListener('click', function () {
 
     filas.forEach(fila => {
         const tipoDoc = fila.querySelector('.td-tipo').textContent.toLowerCase();
-        const estadoActual = fila.querySelector('.td-estado').textContent.toLowerCase();
         const fechaRegistro = fila.querySelector('.td-fecha').textContent;
 
         let mostrar = true;
 
         if (tipo && tipo !== tipoDoc) mostrar = false;
-        if (estado && estado !== estadoActual) mostrar = false;
         if (fechaDesde && fechaRegistro < fechaDesde) mostrar = false;
         if (fechaHasta && fechaRegistro > fechaHasta) mostrar = false;
 

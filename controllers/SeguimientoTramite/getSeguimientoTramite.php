@@ -1,22 +1,18 @@
 <?php
-
 include_once("../../models/tramite.php");
-include_once("../../models/tipoDocumento.php");
-include_once("../../models/usuario.php");
-
+session_start();
 
 class GetSeguimientoTramite{
-    public $message = "";
-
     private $objTramite;
 
     public function __construct() {
         $this->objTramite = new Tramite();
     }
 
-    public function obtenerTramites(){
+    public function obtenerMisTramites(){
+        $nombres_usuario = $_SESSION["datos"]["nombres"];
         $getSeguimientoTramite = $this->objTramite;
-        $tramites = $getSeguimientoTramite->obtenerTramites();
+        $tramites = $getSeguimientoTramite->obtenerMisTramites($nombres_usuario);
         return $tramites;
     }
 

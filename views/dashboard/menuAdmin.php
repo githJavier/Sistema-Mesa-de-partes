@@ -56,10 +56,10 @@ class GetMenuAdmin{
 
                     <!-- Contenido colapsable -->
                     <div class="collapse collapse-tramite ms-4" id="collapseConsultar">
-                        <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesArchivados">
+                        <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesArchivados" onclick="cargarformularioConsultarTramitesArchivados()">
                             <i class="fas fa-archive"></i>TRAMITES ARCHIVADOS
                         </button>
-                        <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesDerivados">
+                        <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesDerivados" onclick="cargarformularioConsultarTramitesDerivados()">
                             <i class="fas fa-share-square"></i>TRAMITES DERIVADOS
                         </button>
                     </div>

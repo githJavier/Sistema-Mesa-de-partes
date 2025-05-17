@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Seguir Tramite</h5>
                         <p class="card-text">En esta sección podras ver el estado de tus tramites</p>
-                        <a href="#" class="btn btn-primary w-100">SEGUIMIENTO</a>
+                        <a class="btn btn-primary w-100" onclick="cargarFormularioSeguimiento()">SEGUIMIENTO</a>
                     </div>
                 </div>
             </div>

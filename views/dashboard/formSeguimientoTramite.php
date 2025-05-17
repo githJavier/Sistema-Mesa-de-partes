@@ -64,25 +64,22 @@ class formSeguimientoTramite{
             </form>
 
             <!-- Control de cantidad -->
-            <!-- Control de cantidad -->
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-    <div class="d-flex align-items-center">
-        <label for="cst-items-per-page-top" class="form-text m-0 me-2">Muestra</label>
-        <select class="form-select w-auto" id="cst-items-per-page-top">
-            <option value="5" >5</option>
-            <option value="10" selected>10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-        </select>
-        <span id="total-entries" class="ms-1 form-text">entradas</span>
-    </div>
-    <div class="d-flex gap-2">
-        <button class="btn btn-all" id="prev-page">Anterior</button>
-        <button class="btn btn-all" id="next-page">Siguiente</button>
-    </div>
-</div>
-
-            
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div class="d-flex align-items-center">
+                    <label for="cst-items-per-page-top" class="form-text m-0 me-2">Mostrar:</label>
+                    <select id="cst-items-per-page-top" class="form-select w-auto">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span id="total-entries" class="ms-1 form-text">registros</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-all" id="prev-page">Anterior</button>
+                    <button class="btn btn-all" id="next-page">Siguiente</button>
+                </div>
+            </div>
 
             <!-- Tabla -->
             <div class="table-responsive">
@@ -99,22 +96,22 @@ class formSeguimientoTramite{
                     <tbody id="tablaExpedientes" class="text-center">
                     <?php foreach ($tramites as $tramite): ?>
                         <tr>
-                            <td class="td-codigo"><?= strtoupper($tramite['codigo_generado']) ?></td>
-                            <td class="td-tipo"><?= strtoupper($tramite['tipodocumento']) ?></td>
-                            <td class="td-fecha"><?= strtoupper($tramite['fec_reg']) ?></td>
-                            <td class="td-estado"><?= strtoupper($tramite['estado'] ?? 'NO DEFINIDO') ?></td>
+                            <td class="td-codigo"><?= strtoupper($tramite['dt_codigo_generado']) ?></td>
+                            <td class="td-tipo"><?= strtoupper($tramite['t_tipodocumento']) ?></td>
+                            <td class="td-fecha"><?= strtoupper($tramite['dt_fec_recep']) ?></td>
+                            <td class="td-estado"><?= strtoupper($tramite['dt_estado'] ?? 'NO DEFINIDO') ?></td>
                             <td>
-                            <button class="btn btn-all btn-sm"
-                                onclick="verDetalles(
-                                    '<?= $tramite['codigo_generado'] ?>',
-                                    '<?= addslashes($tramite['tipodocumento']) ?>',
-                                    '<?= addslashes($tramite['asunto']) ?>',
-                                    '<?= $tramite['fec_reg'] ?>',
-                                    '<?= $tramite['remitente'] ?>',
-                                    <?= htmlspecialchars(json_encode($tramite['detallestramite']), ENT_QUOTES, 'UTF-8') ?>
-                                )">
-                                <i class="fas fa-eye me-1"></i> Ver
-                            </button>
+                        <button class="btn btn-all btn-sm"
+                            onclick="verDetalles(
+                                '<?= $tramite['t_codigo_generado'] ?>',
+                                '<?= addslashes($tramite['t_tipodocumento']) ?>',
+                                '<?= addslashes($tramite['t_asunto']) ?>',
+                                '<?= $tramite['t_fec_reg'] ?>',
+                                '<?= addslashes($tramite['t_remitente']) ?>',
+                                '<?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>'
+                            )">
+                            <i class="fas fa-eye me-1"></i> Ver
+                        </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -128,7 +125,6 @@ class formSeguimientoTramite{
             <!-- Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
                 <div id="pagination-info" class="form-text text-muted text-center text-md-start">
-                    Mostrando 0 a 0 de 0 entradas
                 </div>
                 
             </div>

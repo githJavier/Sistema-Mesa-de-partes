@@ -74,9 +74,9 @@ class formAdministrarRemitentes {
 
             <!-- Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
-    <div id="pagination-info" class="text-muted text-center text-md-start">
-        <!-- Este contenido se actualizará dinámicamente -->
-    </div>
+            <div id="pagination-info" class="text-muted text-center text-md-start">
+                <!-- Este contenido se actualizará dinámicamente -->
+            </div>
 
     <div class="d-flex gap-2 justify-content-center">
         <button class="btn btn-dark" id="prev-page">

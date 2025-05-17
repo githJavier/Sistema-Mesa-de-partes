@@ -180,7 +180,7 @@ function cargarformularioAdministracionDocumentos(){
 function cargarformularioConsultarTramitesArchivados(){
     $.ajax({
         type: "POST",
-        url: "../../controllers/Consultar/controlConsultarTramitesArchivados.php",
+        url: "../../controllers/Consultar/controlFormConsultarTramitesArchivados.php",
         dataType: "json",
         success: function(response){
             if(response.flag == 1){
@@ -194,7 +194,7 @@ function cargarformularioConsultarTramitesArchivados(){
 function cargarformularioConsultarTramitesDerivados(){
     $.ajax({
         type: "POST",
-        url: "../../controllers/Consultar/controlConsultarTramitesDerivados.php",
+        url: "../../controllers/Consultar/controlFormConsultarTramitesDerivados.php",
         dataType: "json",
         success: function(response){
             if(response.flag == 1){

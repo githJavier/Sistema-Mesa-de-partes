@@ -21,7 +21,7 @@ class GetMenu{
                         <button type="button" class="menu-item sub-item menu-text" onclick="cargarFormularioTramite()">
                             <i class="fas fa-file-signature"></i>INGRESAR
                         </button>
-                        <button type="button" class="menu-item sub-item menu-text" onclick="location.href='opcion2.php'">
+                        <button type="button" class="menu-item sub-item menu-text" onclick="cargarFormularioSeguimiento()">
                             <i class="fas fa-clipboard-list"></i>SEGUIMIENTO
                         </button>
                     </div>
