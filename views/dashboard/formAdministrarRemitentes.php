@@ -111,6 +111,7 @@ class formAdministrarRemitentes {
                 <form id="create-form">
                   <div class="row">
                     <div class="col-md-6">
+                      <input type="hidden" id="editRemitenteId">
                       <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
                       <select class="form-select" id="tipoDocumento">
                         <option selected>DNI</option>
@@ -174,7 +175,8 @@ class formAdministrarRemitentes {
 
                   <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-dark" onclick="enviarForm()" id="Registrar" name="Registrar">Guardar</button>
+                    <!-- Botón con el atributo 'data-id' -->
+                    <button type="button" class="btn btn-dark" onclick="enviarFormEditar()" id="Registrar" name="Registrar">Guardar</button>
                   </div>
                 </form>
               </div>
@@ -185,7 +187,7 @@ class formAdministrarRemitentes {
         <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-              <div class="modal-header bg-danger text-white">
+              <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i> Confirmar Eliminación</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
               </div>
@@ -194,7 +196,7 @@ class formAdministrarRemitentes {
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnEliminarConfirmado">Eliminar</button>
+                <button type="button" class="btn btn-dark" id="btnEliminarConfirmado">Eliminar</button>
               </div>
             </div>
           </div>

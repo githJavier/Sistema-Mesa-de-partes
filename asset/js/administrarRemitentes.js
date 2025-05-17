@@ -368,6 +368,10 @@ function cargarDatosRemitente(id) {
         .then(data => {
             if (data.success) {
                 const remitente = data.data;
+
+                // Guardar el ID del remitente en un campo oculto
+                document.getElementById('editRemitenteId').value = id;
+
                 document.getElementById('editTipoDocumento').value = remitente.retipo_docu || '';
                 document.getElementById('editDocumento').value = remitente.docu_num || '';
                 document.getElementById('editNombre').value = remitente.nombres || '';
@@ -397,7 +401,8 @@ function cargarDatosRemitente(id) {
 
 
 
-function validarFormularioEdicion() {
+
+function validarFormularioEdicion() {}
     let isValid = true;
 
 
@@ -442,11 +447,7 @@ function validarFormularioEdicion() {
     const passwordError = document.getElementById('editPasswordError');
     const passwordValue = password?.value.trim() || "";
 
-    if (passwordValue === "") {
-        passwordError.textContent = 'Este campo es obligatorio.';
-        passwordError.style.display = 'block';
-        isValid = false;
-    } else if (passwordValue.length < 8) {
+    if (passwordValue.length < 8 && passwordValue.length > 0) {
         passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres.';
         passwordError.style.display = 'block';
         isValid = false;
@@ -458,9 +459,53 @@ function validarFormularioEdicion() {
 }
 
 function enviarFormEditar() {
-     if(validarFormularioEdicion()){
-        console.log("Datos validados correctamente")
-     }
+    if(validarFormularioEdicion()){
+        const id = document.getElementById('editRemitenteId').value;
+        const email = document.getElementById('editEmail').value.trim();
+        const telefono = document.getElementById('editTelefono').value.trim();
+        const password = document.getElementById('editPassword').value.trim();
+        
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Ajustes/controlFormajusteRemitente.php",
+            data: {
+                id: id,
+                email: email,
+                telefono: telefono,
+                password: password,
+                btnEditar: "Editar"
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.flag == 1) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => window.location.href = response.redirect);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Ocurrió un error desconocido.'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Estado:", status);
+                console.error("Error:", error);
+                console.error("Respuesta del servidor:", xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error en la solicitud: ' + error
+                });
+            }
+        });
+
+    }
 }
    
 

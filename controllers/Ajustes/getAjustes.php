@@ -94,6 +94,16 @@ class GetAjustes {
         }
     }
 
+    public function actualizarRegistro($correo, $telefono_celular, $clave, $idremite){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->actualizarDatos($correo, $telefono_celular, $clave, $idremite);
+        if($respuesta){
+            $this->message = "Los datos fueron actualizados correctamente";
+        }else{
+               $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
 }
 
 ?>

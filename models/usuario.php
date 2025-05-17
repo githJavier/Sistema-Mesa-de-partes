@@ -236,6 +236,25 @@ class Usuario
         }
     }
 
+    public function actualizarDatos($correo, $telefono_celular, $clave, $idremite) {
+    $conexion = Conexion::conectarBD();
+
+    $sql = "UPDATE remitente
+            SET correo = ?, telefono_celular = ?, clave = ?
+            WHERE idremite = ?";
+    $stmt = $conexion->prepare($sql);
+    if (!$stmt) {
+        Conexion::desconectarBD();
+        return false;
+    }
+    $stmt->bind_param("sssi", $correo, $telefono_celular, $clave, $idremite);
+    $resultado = $stmt->execute();
+    $stmt->close();
+    Conexion::desconectarBD();
+    return $resultado;
+}
+
+
 
     
     
