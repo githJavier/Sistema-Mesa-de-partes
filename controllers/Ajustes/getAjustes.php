@@ -100,7 +100,17 @@ class GetAjustes {
         if($respuesta){
             $this->message = "Los datos fueron actualizados correctamente";
         }else{
-               $this->message = "No se pudieron actualizar los datos"; 
+            $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
+    public function eliminarRemitente($id){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->eliminarRemitente($id);
+        if($respuesta){
+            $this->message = "Remitente eliminado correctamente";
+        }else{
+            $this->message = "No se pudo eliminar el registro"; 
         }
     }
 

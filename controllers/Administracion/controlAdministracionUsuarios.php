@@ -1,12 +1,24 @@
 <?php 
 include_once("../../views/dashboard/formAdministrarUsuarios.php");
+include_once("getAdministracion.php");
+
 
 $formAdministrarUsuarios = new formAdministrarUsuarios;
-$formulario = $formAdministrarUsuarios->formAdministrarUsuariosShow();
+$getAdministracion = new GetAdministracion;
+$usuarios = $getAdministracion->listarUsuarios();
 
-echo json_encode([
-    'flag' => 1,
-    'formularioHTML' => $formulario
-]);    
+if (!empty($usuarios)) {
+    $formulario = $formAdministrarUsuarios->formAdministrarUsuariosShow($usuarios);
+    echo json_encode([
+        'flag' => 1,
+        'formularioHTML' => $formulario
+    ]);
+} else {
+    echo json_encode([
+        'flag' => 0,
+        'message' => $getAdministracion->message
+    ]);
+}
+ 
 
 ?>

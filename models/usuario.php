@@ -238,7 +238,6 @@ class Usuario
 
     public function actualizarDatos($correo, $telefono_celular, $clave, $idremite) {
     $conexion = Conexion::conectarBD();
-
     $sql = "UPDATE remitente
             SET correo = ?, telefono_celular = ?, clave = ?
             WHERE idremite = ?";
@@ -252,7 +251,24 @@ class Usuario
     $stmt->close();
     Conexion::desconectarBD();
     return $resultado;
-}
+    }
+
+    public function eliminarRemitente($id){
+    $conexion = Conexion::conectarBD();
+    $sql = "DELETE FROM remitente WHERE idremite = ?;";
+    $stmt = $conexion->prepare($sql);
+    if (!$stmt) {
+        Conexion::desconectarBD();
+        return false;
+    }
+    $stmt->bind_param("i", $id);
+    $resultado = $stmt->execute();
+    $stmt->close();
+    Conexion::desconectarBD();
+    return $resultado;
+    }
+
+
 
 
 

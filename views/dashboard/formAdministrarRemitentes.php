@@ -67,9 +67,14 @@ class formAdministrarRemitentes {
                                 onclick="cargarDatosRemitente(<?= $remitente['idremite']; ?>);">
                                 <i class="fas fa-edit icon-table"></i>
                               </button>
-                                <a href="#" title="Eliminar" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminar">
-                                    <i class="fas fa-trash-alt icon-table"></i>
-                                </a>
+                              <button 
+                                  type="button"
+                                  title="Eliminar"
+                                  class="btn"
+                                  onclick="cargarDatosEliminar(<?= $remitente['idremite']; ?>)">
+                                  <i class="fas fa-trash-alt icon-table"></i>
+                              </button>
+
                             </td>
                         </tr>
                         <?php 
@@ -175,8 +180,7 @@ class formAdministrarRemitentes {
 
                   <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <!-- Botón con el atributo 'data-id' -->
-                    <button type="button" class="btn btn-dark" onclick="enviarFormEditar()" id="Registrar" name="Registrar">Guardar</button>
+                    <button type="button" class="btn btn-dark" onclick="enviarForm()" id="Registrar" name="Registrar">Guardar</button>
                   </div>
                 </form>
               </div>
@@ -192,11 +196,12 @@ class formAdministrarRemitentes {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
               </div>
               <div class="modal-body">
+                <input type="hidden" id="eliminarRemitenteId">
                 ¿Estás seguro de que deseas eliminar este remitente? Esta acción no se puede deshacer.
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-dark" id="btnEliminarConfirmado">Eliminar</button>
+                <button type="button" class="btn btn-dark" id="btnEliminarConfirmado" onclick="enviarFormEliminar()">Eliminar</button>
               </div>
             </div>
           </div>
@@ -274,6 +279,7 @@ class formAdministrarRemitentes {
         </div>
         <!-- Scripts -->
         <script src="../../asset/js/administrarRemitentes.js"></script>
+        <script src="../../asset/js/pagination.js"></script>
         
         <?php
         return ob_get_clean();

@@ -1,114 +1,3 @@
-window.remitentesPagination = (function () {
-    let currentPage = 1;
-    let rowsPerPage = 5;
-    let isPaginating = false;
-    let filteredRows = [];
-
-    const savedRowsPerPage = localStorage.getItem('remitentesRowsPerPage');
-    if (savedRowsPerPage) {
-        rowsPerPage = parseInt(savedRowsPerPage, 10);
-    }
-
-    function updatePagination() {
-        const table = document.getElementById("data-table");
-        if (!table) return;
-
-        const allRows = table.querySelectorAll("tbody tr");
-        allRows.forEach(row => row.style.display = "none");
-
-        const totalRows = filteredRows.length;
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-
-        filteredRows.slice(start, end).forEach(row => row.style.display = "");
-
-        document.getElementById("pagination-info").innerText = totalRows > 0
-            ? `Mostrando ${start + 1} a ${Math.min(end, totalRows)} de ${totalRows} entradas`
-            : "Mostrando 0 a 0 de 0 entradas";
-
-        document.getElementById("prev-page").disabled = currentPage === 1;
-        document.getElementById("next-page").disabled = currentPage === totalPages || totalPages === 0;
-    }
-
-    function safePaginate(direction) {
-        if (isPaginating) return;
-        isPaginating = true;
-
-        const totalRows = filteredRows.length;
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-        if (direction === "prev" && currentPage > 1) {
-            currentPage--;
-        } else if (direction === "next" && currentPage < totalPages) {
-            currentPage++;
-        }
-
-        updatePagination();
-
-        setTimeout(() => {
-            isPaginating = false;
-        }, 200);
-    }
-
-    function applyFilterAndPaginate() {
-        const input = document.getElementById("search").value.toLowerCase().trim();
-        const allRows = Array.from(document.querySelectorAll("#data-table tbody tr"));
-        let found = false;
-
-        if (input === "") {
-            filteredRows = allRows;
-            found = true;
-        } else {
-            filteredRows = allRows.filter(row => {
-                const text = row.innerText.toLowerCase();
-                const match = text.includes(input);
-                if (match) found = true;
-                return match;
-            });
-        }
-
-        currentPage = 1;
-        updatePagination();
-
-        document.getElementById("no-results").classList.toggle("d-none", found);
-        document.getElementById("pagination-info").style.display = found ? "block" : "none";
-        document.getElementById("prev-page").style.display = found ? "inline-block" : "none";
-        document.getElementById("next-page").style.display = found ? "inline-block" : "none";
-    }
-
-    function init() {
-        currentPage = 1;
-
-        const allRows = Array.from(document.querySelectorAll("#data-table tbody tr"));
-        filteredRows = allRows;
-
-        document.getElementById("prev-page").addEventListener("click", () => safePaginate("prev"));
-        document.getElementById("next-page").addEventListener("click", () => safePaginate("next"));
-
-        const selectPageSize = document.getElementById("select-page-size");
-        if (selectPageSize) {
-            selectPageSize.value = rowsPerPage;
-
-            selectPageSize.addEventListener("change", function () {
-                rowsPerPage = parseInt(this.value, 10);
-                localStorage.setItem('remitentesRowsPerPage', rowsPerPage);
-                currentPage = 1;
-                updatePagination();
-            });
-        }
-
-        document.getElementById("search").addEventListener("input", applyFilterAndPaginate);
-
-        updatePagination();
-    }
-
-    return {
-        init
-    };
-})();
-
 // Solo permitir números en documento y teléfono
 document.getElementById('documento')?.addEventListener('input', function () {
     this.value = this.value.replace(/[^0-9]/g, '');
@@ -402,7 +291,7 @@ function cargarDatosRemitente(id) {
 
 
 
-function validarFormularioEdicion() {}
+function validarFormularioEdicion() {
     let isValid = true;
 
 
@@ -507,6 +396,70 @@ function enviarFormEditar() {
 
     }
 }
+
+function cargarDatosEliminar(id) {
+    document.getElementById('eliminarRemitenteId').value = id;
+    const eliminarModal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+    eliminarModal.show();
+}
+
+function enviarFormEliminar() {
+    const id = document.getElementById('eliminarRemitenteId').value;
+    console.log(id);
+
+    if (!id) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'ID del remitente no encontrado.'
+        });
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/Ajustes/controlEliminarRemitente.php",
+        data: {
+            id: id,
+            btnEliminar: "Eliminar"
+        },
+        dataType: "json",
+        success: function(response) {
+            if (response.flag == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Eliminado',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => window.location.href = response.redirect);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Ocurrió un error desconocido.'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Estado:", status);
+            console.error("Error:", error);
+            console.error("Respuesta del servidor:", xhr.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error en la solicitud: ' + error
+            });
+        }
+    });
+}
+
+
+
+
+
+
+
    
 
 

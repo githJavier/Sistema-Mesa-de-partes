@@ -113,10 +113,17 @@ function cargarformularioAdministracionUsuarios(){
             if(response.flag == 1){
                 $("#contenido-dinamico").html(response.formularioHTML);
                 guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
+
+                setTimeout(() => {
+                    if (typeof window.usuariosPagination !== "undefined") {
+                        window.usuariosPagination.init();
+                    }
+                }, 100);
             }
         }
     })
 }
+
 
 function cargarformularioAdministracionAreas(){
     $.ajax({

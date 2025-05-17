@@ -14,8 +14,8 @@ if (isset($_GET['id'])) {
         echo json_encode(['success' => false, 'message' => 'No se encontró remitente']);
     }
     exit;
-} else {
-    echo json_encode(['success' => false, 'message' => 'ID no especificado']);
-    exit;
-}
+    } else {
+        echo json_encode(['success' => false, 'message' => 'ID no especificado']);
+        exit;
+    }
 ?>
