@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once("../../models/tramite.php");
 include_once("../../models/tipoDocumento.php");
 include_once("../../models/usuario.php");
@@ -28,20 +28,23 @@ class GetIngresarTramite{
         $codigo_Generado = "";
     
         // Si no existe el último trámite, generamos el primer número de trámite
-        if ($ultimoTramite == null) {
-            $codigo_Generado = $anio . "-DOC" . str_pad(1, 10, "0", STR_PAD_LEFT); // Ejemplo: 2024-EX0000000001
+        if (!$ultimoTramite) {
+            //Antes era DOC
+            $codigo_Generado = $anio . "-EX" . str_pad(1, 10, "0", STR_PAD_LEFT); // Ejemplo: 2024-EX0000000001
         } else {
             // Si existe el último trámite, extraemos el número y lo incrementamos
-            if (preg_match('/(\d{4}-DOC)(\d{10})/', $ultimoTramite, $matches)) {
+            // Antes era DOC
+            if (preg_match('/(\d{4}-EX)(\d{10})/', $ultimoTramite, $matches)) {
+                //Antes era DOC
                 // Usamos la expresión regular para capturar el número
                 $numeroTramite = $matches[2]; // Número de trámite extraído
                 $numeroIncrementado = (int) $numeroTramite + 1; // Incrementamos el número
-                $codigo_Generado = $anio . "-DOC" . str_pad($numeroIncrementado, 10, "0", STR_PAD_LEFT); // Generamos el nuevo número
+                $codigo_Generado = $anio . "-EX" . str_pad($numeroIncrementado, 10, "0", STR_PAD_LEFT); // Generamos el nuevo número
             } else {
-                $codigo_Generado = $anio . "-DOC" . str_pad(1, 10, "0", STR_PAD_LEFT); // Ejemplo: 2024-EX0000000001
+                //Antes era DOC
+                $codigo_Generado = $anio . "-EX" . str_pad(1, 10, "0", STR_PAD_LEFT); // Ejemplo: 2024-EX0000000001
             }
         }
-    
         return $codigo_Generado;
     }
     
@@ -80,7 +83,7 @@ class GetIngresarTramite{
         }
     
         // Validar formato (ej: 2025-DOC0000000123)
-        if (!preg_match('/^\d{4}-DOC\d{10}$/', $numeroTramite)) {
+        if (!preg_match('/^\d{4}-EX\d{10}$/', $numeroTramite)) {
             $this->message = "El formato del número de trámite no es válido.";
             return false;
         }
@@ -139,9 +142,13 @@ class GetIngresarTramite{
         return move_uploaded_file($archivo['tmp_name'], $rutaDestino);
     }
 
-    public function insertarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto){
+    public function insertarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $final_file, $file_type, $new_size){
         $getIngresarTramite = $this->objTramite;
-        $respuesta = $getIngresarTramite->ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto);
+        $getTramite = new Tramite();
+        $num_documento = $getTramite->obtenerNuevoNumeroDocumento();
+        $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento);
+        $id_detalle_tramite = $getTramite->obtenerNuevoIdDetalleTramite();
+        $respuesta = $getIngresarTramite->ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $num_documento, $orden, $id_detalle_tramite, $final_file, $file_type, $new_size);
         if($respuesta){
             $this->message = "Trámite ingresado correctamente";
         }else{

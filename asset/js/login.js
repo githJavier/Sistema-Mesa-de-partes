@@ -22,17 +22,31 @@ document.getElementById('documento')?.addEventListener('input', function () {
     this.value = this.value.replace(/[^0-9]/g, ''); // Elimina caracteres no numéricos
 });
 
-// Mostrar/ocultar contraseña
+// Función para mostrar/ocultar contraseña principal
 function togglePasswordVisibility() {
     const passwordField = document.getElementById('password');
     const passwordIcon = document.getElementById('togglePassword');
 
-    if (!passwordField || !passwordIcon) return; // Evitar errores
+    if (!passwordField || !passwordIcon) return;
 
-    const isPasswordHidden = passwordField.type === 'password';
-    passwordField.type = isPasswordHidden ? 'text' : 'password';
-    passwordIcon.innerHTML = isPasswordHidden 
-        ? '<i class="fa-solid fa-eye-slash"></i>' 
+    const isHidden = passwordField.type === 'password';
+    passwordField.type = isHidden ? 'text' : 'password';
+    passwordIcon.innerHTML = isHidden
+        ? '<i class="fa-solid fa-eye-slash"></i>'
+        : '<i class="fa-solid fa-eye"></i>';
+}
+
+// Función para mostrar/ocultar clave del sistema
+function toggleClaveSistemaVisibility() {
+    const passwordField = document.getElementById('claveSistema');
+    const passwordIcon = document.getElementById('toggleClaveSistema');
+
+    if (!passwordField || !passwordIcon) return;
+
+    const isHidden = passwordField.type === 'password';
+    passwordField.type = isHidden ? 'text' : 'password';
+    passwordIcon.innerHTML = isHidden
+        ? '<i class="fa-solid fa-eye-slash"></i>'
         : '<i class="fa-solid fa-eye"></i>';
 }
 
@@ -83,6 +97,47 @@ function validarFormulario() {
     return isValid;
 }
 
+
+function validarFormularioUsuario() {
+    let isValid = true;
+
+    // Validar usuario
+    const usuario = document.getElementById('usuarioSistema');
+    const usuarioError = document.getElementById('usuarioSistemaError');
+    const usuarioValue = usuario?.value.trim() || "";
+
+    if (!usuario) return false; // Evitar errores
+
+    if (usuarioValue === '') {
+        usuarioError.textContent = 'Este campo es obligatorio.';
+        isValid = false;
+    } else {
+        usuarioError.textContent = '';
+    }
+    usuarioError.style.display = isValid ? 'none' : 'block';
+
+    // Validar contraseña
+    const clave = document.getElementById('claveSistema');
+    const claveError = document.getElementById('claveSistemaError');
+    const claveValue = clave?.value.trim() || "";
+
+    if (!clave) return false; // Evitar errores
+
+    if (claveValue === '') {
+        claveError.textContent = 'Este campo es obligatorio.';
+        isValid = false;
+    } else if (claveValue.length < 4) {
+        claveError.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+        isValid = false;
+    } else {
+        claveError.textContent = '';
+    }
+    claveError.style.display = isValid ? 'none' : 'block';
+
+    return isValid;
+}
+
+
 function enviarForm() {
     if (validarFormulario()) {
         const documento = document.getElementById("documento")?.value || "";
@@ -117,9 +172,9 @@ function enviarForm() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("Estado:", status);
-                console.error("Error:", error);
-                console.error("Respuesta del servidor:", xhr.responseText);
+                //console.error("Estado:", status);
+                //console.error("Error:", error);
+                //console.error("Respuesta del servidor:", xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -130,19 +185,18 @@ function enviarForm() {
     }
 }
 
-function enviarFormAdmin() {
-    //if (validarFormulario()) {
-        //const documento = document.getElementById("documento")?.value || "";
-        //const contrasena = document.getElementById("password")?.value || "";
+function enviarFormUsuario() {
+    if (validarFormularioUsuario()) {
+        const usuario = document.getElementById("usuarioSistema")?.value || "";
+        const clave = document.getElementById("claveSistema")?.value || "";
 
         $.ajax({
             type: "POST",
             url: "./controllers/AutenticarUsuario/controlAutenticarAdmin.php",
             data: {
-                //documento: documento,
-                //contrasena: contrasena,
-                //tipoPersona: tipoPersona,
-                btnLogin: "Ingresar"
+                usuario: usuario,
+                contrasena: clave,
+                btnLogin: "Acceder"
             },
             dataType: "json", // Asegurar que se reciba JSON
             success: function(response) {
@@ -163,9 +217,9 @@ function enviarFormAdmin() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("Estado:", status);
-                console.error("Error:", error);
-                console.error("Respuesta del servidor:", xhr.responseText);
+                //console.error("Estado:", status);
+                //console.error("Error:", error);
+                //console.error("Respuesta del servidor:", xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -173,16 +227,24 @@ function enviarFormAdmin() {
                 });
             }
         });
-    //}
+    }
 }
+
 
 // Inicializar eventos
 document.addEventListener('DOMContentLoaded', () => {
     tipoPersona();
     
+    // Botón para mostrar/ocultar contraseña del login
     const togglePasswordButton = document.getElementById('togglePassword');
     if (togglePasswordButton) {
         togglePasswordButton.addEventListener('click', togglePasswordVisibility);
+    }
+
+    // Botón para mostrar/ocultar contraseña del sistema
+    const toggleClaveSistemaButton = document.getElementById('toggleClaveSistema');
+    if (toggleClaveSistemaButton) {
+        toggleClaveSistemaButton.addEventListener('click', toggleClaveSistemaVisibility);
     }
 
     document.querySelectorAll('input[name="checkboxUsuario"]').forEach(radio => {

@@ -80,78 +80,108 @@ function cargarDesdeLocalStorage() {
 cargarDesdeLocalStorage();
 
 function cargarHome() {
-    $("#contenido-dinamico").load("../../views/dashboard/principalAdmin.php", function() {
-        guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
+
+    verificarSesion(() => {
+        $("#contenido-dinamico").load("../../views/dashboard/principalAdmin.php", function() {
+            guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
+        });
     });
 }
+
 
 function cargarformularioAdministracionRemitentes() {
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Administracion/controlAdministracionRemitentes.php",
-        dataType: "json",
-        success: function(response) {
-    $("#contenido-dinamico").html(response.formularioHTML);
-    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
 
-    setTimeout(() => {
-        if (typeof window.remitentesPagination !== "undefined") {
-            window.remitentesPagination.init();
-        }
-    }, 100);
-}
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Administracion/controlAdministracionRemitentes.php",
+            dataType: "json",
+            success: function(response) {
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
 
+                setTimeout(() => {
+                    if (typeof window.remitentesPagination !== "undefined") {
+                        window.remitentesPagination.init();
+                    }
+                }, 100);
+            },
+            error: function(xhr, status, error) {
+                //console.error("Error al cargar el formulario de remitentes:", error);
+            }
+        });
     });
 }
 
-function cargarformularioAdministracionUsuarios(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Administracion/controlAdministracionUsuarios.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
+function cargarformularioAdministracionUsuarios() {
 
-                setTimeout(() => {
-                    if (typeof window.usuariosPagination !== "undefined") {
-                        window.usuariosPagination.init();
-                    }
-                }, 100);
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Administracion/controlAdministracionUsuarios.php",
+            dataType: "json",
+            success: function(response) {
+                if (response.flag == 1) {
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
+
+                    setTimeout(() => {
+                        if (typeof window.usuariosPagination !== "undefined") {
+                            window.usuariosPagination.init();
+                        }
+                    }, 100);
+                }
+            },
+            error: function(xhr, status, error) {
+                //console.error("Error al cargar el formulario de usuarios:", error);
             }
-        }
-    })
+        });
+    });
 }
 
 
-function cargarformularioAdministracionAreas(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Administracion/controlAdministracionAreas.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionAreas");
+
+function cargarformularioAdministracionAreas() {
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Administracion/controlAdministracionAreas.php",
+            dataType: "json",
+            success: function(response) {
+                if (response.flag == 1) {
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionAreas");
+                }
+            },
+            error: function(xhr, status, error) {
+                //console.error("Error al cargar el formulario de áreas:", error);
             }
-        }
-    })
+        });
+    });
 }
 
-function cargarformularioAdministracionDocumentos(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Administracion/controlAdministracionDocumentos.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionDocumentos");
+
+function cargarformularioAdministracionDocumentos() {
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Administracion/controlAdministracionDocumentos.php",
+            dataType: "json",
+            success: function(response) {
+                if (response.flag == 1) {
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionDocumentos");
+                }
+            },
+            error: function(xhr, status, error) {
+                //console.error("Error al cargar el formulario de documentos:", error);
             }
-        }
-    })
+        });
+    });
 }
+
 
 function cargarformularioConsultarTramitesArchivados(){
     $.ajax({
@@ -206,3 +236,31 @@ document.getElementById("cerrarSesion")?.addEventListener("click", function () {
     localStorage.removeItem("contenidoDinamico");
     localStorage.removeItem("vistaActual");
 });
+
+function verificarSesion(callback) {
+    fetch("../../utils/verificarSesion.php")
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "active") {
+                if (typeof callback === "function") callback();
+            } else if (data.status === "no_session") {
+                // Redirección inmediata, sin modal
+                window.location.href = "../../index.php";
+            } else {
+                // Para 'inactive', 'not_found', etc.
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sesión cerrada',
+                    text: 'Tu sesión ha expirado o tu cuenta ha sido desactivada.',
+                    confirmButtonColor: '#981e25'
+                }).then(() => {
+                    window.location.href = "../../index.php";
+                });
+            }
+        })
+        .catch(error => {
+            //console.error("Error al verificar sesión:", error);
+            window.location.href = "../../index.php";
+        });
+}
+

@@ -182,7 +182,7 @@ function consultarDocumento() {
 
     $.ajax({
         type: "POST",
-        url: "./controllers/CrearUsuario/consultaDocumento.php",
+        url: "./controllers/CrearRemitente/consultaDocumento.php",
         data: { documento: documento },
         dataType: 'json',
         
@@ -203,7 +203,7 @@ function consultarDocumento() {
             }
         },
         error: function(xhr, status, error) {
-            console.error("Error en la consulta: ", error);
+            //console.error("Error en la consulta: ", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -234,7 +234,7 @@ function enviarForm() {
 
         $.ajax({
             type: "POST",
-            url: "./controllers/CrearUsuario/controlCrearUsuario.php",
+            url: "./controllers/CrearRemitente/controlCrearRemitente.php",
             data: {
                 tipoPersona: tipoPersona,
                 tipoDocumento: tipoDocumento,
@@ -266,9 +266,9 @@ function enviarForm() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("Estado:", status);
-                console.error("Error:", error);
-                console.error("Respuesta del servidor:", xhr.responseText);
+                //console.error("Estado:", status);
+                //console.error("Error:", error);
+                //console.error("Respuesta del servidor:", xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',

@@ -12,7 +12,7 @@ if ($getAutenticarUsuario->validarBoton("btnLogin")) {
     if($getAutenticarUsuario->verificarTipoDocumento($tipoPersona)){
         if($getAutenticarUsuario->verificarDocumento($documento,$tipoPersona)){
             if($getAutenticarUsuario->verificarContrasena($contrasena)){
-                if($getAutenticarUsuario->validarUsuario($documento, $tipoPersona)){
+                if($getAutenticarUsuario->validarRemitente($documento, $tipoPersona)){
                     if($getAutenticarUsuario->validarContrasena($documento,$contrasena)){
                         $mes = $getAutenticarUsuario->obtenerMes();
                         $datos = $getAutenticarUsuario->obtenerDatosRemitente($documento, $contrasena);

@@ -160,7 +160,7 @@ function enviarForm() {
 
         $.ajax({
             type: "POST",
-            url: "../../controllers/CrearUsuario/controlCrearUsuarioAdmin.php",
+            url: "../../controllers/CrearRemitente/controlCrearRemitenteAdmin.php",
             data: {
                 tipoPersona: tipoPersona,
                 tipoDocumento: tipoDocumento,
@@ -219,7 +219,7 @@ function consultarDocumento() {
 
     $.ajax({
         type: "POST",
-        url: "../../controllers/CrearUsuario/consultaDocumento.php",
+        url: "../../controllers/CrearRemitente/consultaDocumento.php",
         data: { documento: documento },
         dataType: 'json',
         
@@ -398,14 +398,13 @@ function enviarFormEditar() {
 }
 
 function cargarDatosEliminar(id) {
-    document.getElementById('eliminarRemitenteId').value = id;
+    document.getElementById('eliminarUsuarioId').value = id;
     const eliminarModal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
     eliminarModal.show();
 }
 
 function enviarFormEliminar() {
     const id = document.getElementById('eliminarRemitenteId').value;
-    console.log(id);
 
     if (!id) {
         Swal.fire({

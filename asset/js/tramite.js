@@ -34,7 +34,7 @@ function validarTramite(){
         numeroTramiteError.textContent = 'Este campo es obligatorio.';
         numeroTramiteError.style.display = 'block';
         isValid = false;
-    } else if (!/^\d{4}-DOC\d{10}$/.test(numeroTramiteValue)) {
+    } else if (!/^\d{4}-EX\d{10}$/.test(numeroTramiteValue)) {
         numeroTramiteError.textContent = 'Formato inválido. Ejemplo válido: 2025-DOC0000000001';
         numeroTramiteError.style.display = 'block';
         isValid = false;
@@ -142,9 +142,9 @@ function enviarFormTramite() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("Estado:", status);
-                console.error("Error:", error);
-                console.error("Respuesta del servidor:", xhr.responseText);
+                //console.error("Estado:", status);
+                //console.error("Error:", error);
+                //console.error("Respuesta del servidor:", xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',

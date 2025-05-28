@@ -14,7 +14,7 @@ if($getAjustes->validarBoton("btnGuardarDatos")){
             if($getAjustes->validarProvincia($provincia)){
                 if($getAjustes->validarDistrito($distrito)){
                     if($getAjustes->validarDireccion($direccion)){
-                        if($getAjustes->actualizarUbicacionUsuario($_SESSION['usuario'], $departamento, $provincia, $distrito, $direccion, $celular)){
+                        if($getAjustes->actualizarUbicacionRemitente($_SESSION['usuario'], $departamento, $provincia, $distrito, $direccion, $celular)){
                             echo json_encode([
                                 'flag' => 1,
                                 'message' => $getAjustes->message,

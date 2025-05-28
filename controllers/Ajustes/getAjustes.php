@@ -24,14 +24,14 @@ class GetAjustes {
         return $getDistrito->obtenerDistrito($provincia);
     }
 
-    public function obtenerDatosRemitente($usuario){
+    public function obtenerDatosRemitente($remitente){
         $getDatosRemitente = new Usuario();
-        return $getDatosRemitente->obtenerDatosRemitenteForm($usuario);
+        return $getDatosRemitente->obtenerDatosRemitenteForm($remitente);
     }
 
-    public function actualizarUbicacionUsuario($numeroDocumento, $departamento, $provincia, $distrito, $direccion, $telefono){
+    public function actualizarUbicacionRemitente($numeroDocumento, $departamento, $provincia, $distrito, $direccion, $telefono){
         $getDatosRemitente = new Usuario();
-        if($getDatosRemitente->actualizarUbicacionUsuario($numeroDocumento, $departamento, $provincia, $distrito, $direccion,$telefono)){
+        if($getDatosRemitente->actualizarUbicacionRemitente($numeroDocumento, $departamento, $provincia, $distrito, $direccion,$telefono)){
             $this->message = "Datos guardados correctamente.";
             return true;
         }else{
@@ -86,7 +86,7 @@ class GetAjustes {
 
     public function obtenerRemitenteId($id){
         $getDatosRemitente = new Usuario();
-        $datosRemitente = $getDatosRemitente->obtenerInformacionId($id);
+        $datosRemitente = $getDatosRemitente->obtenerRemitentePorId($id);
         if ($datosRemitente) {
             return $datosRemitente;
         } else {
@@ -94,9 +94,29 @@ class GetAjustes {
         }
     }
 
-    public function actualizarRegistro($correo, $telefono_celular, $clave, $idremite){
+    public function obtenerUsuarioId($id){
+        $getDatosUsuario = new Usuario();
+        $datosUsuario = $getDatosUsuario->obtenerUsuarioPorId($id);
+        if ($datosUsuario) {
+            return $datosUsuario;
+        } else {
+            return null;
+        }
+    }
+
+    public function actualizarRegistroRemitente($correo, $telefono_celular, $clave, $idremite){
         $getUsuario = new Usuario();
-        $respuesta = $getUsuario->actualizarDatos($correo, $telefono_celular, $clave, $idremite);
+        $respuesta = $getUsuario->actualizarDatosRemitente($correo, $telefono_celular, $clave, $idremite);
+        if($respuesta){
+            $this->message = "Los datos fueron actualizados correctamente";
+        }else{
+            $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
+    public function actualizarRegistroUsuario($id, $tipoDocumento, $numeroDocumento, $nombre, $apellidoPaterno, $apellidoMaterno, $tipoUsuario, $estadoUsuario, $areaUsuario, $remitente, $claveHash){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->actualizarDatosUsuario($id, $tipoDocumento, $numeroDocumento, $nombre, $apellidoPaterno, $apellidoMaterno, $tipoUsuario, $estadoUsuario, $areaUsuario, $remitente, $claveHash);
         if($respuesta){
             $this->message = "Los datos fueron actualizados correctamente";
         }else{
@@ -109,6 +129,16 @@ class GetAjustes {
         $respuesta = $getUsuario->eliminarRemitente($id);
         if($respuesta){
             $this->message = "Remitente eliminado correctamente";
+        }else{
+            $this->message = "No se pudo eliminar el registro"; 
+        }
+    }
+
+    public function eliminarUsuario($id){
+        $getUsuario = new Usuario();
+        $respuesta = $getUsuario->eliminarUsuario($id);
+        if($respuesta){
+            $this->message = "Usuario eliminado correctamente";
         }else{
             $this->message = "No se pudo eliminar el registro"; 
         }

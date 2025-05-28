@@ -1,9 +1,4 @@
-<?php 
-if (isset($_SESSION['usuario'])) {
-    session_destroy();
-}
-
-
+<?php
 include_once("head.php");
 include_once("menuRemitente.php");
 include_once("header.php");

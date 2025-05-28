@@ -1,7 +1,7 @@
 <?php
-include_once("getCrearUsuario.php");
+include_once("getCrearRemitente.php");
 
-$getUsuario = new GetCrearUsuario();
+$getUsuario = new GetCrearRemitente();
 
 if ($getUsuario->validarBoton("btnRegistrar")) {
     $tipoPersona = $_POST['tipoPersona'] ?? "";
@@ -24,14 +24,14 @@ if ($getUsuario->validarBoton("btnRegistrar")) {
                                 if($getUsuario->verificarIgualdadContrasena($contrasena,$rContrasena)){
                                     if($getUsuario->verificarTerminos($termsCheck)){
                                         $contrasena = $getUsuario->encriptarContrasena($contrasena);
-                                        if($getUsuario->crearUsuario($tipoPersona,$tipoDocumento,$documento,$nombre,$telefono,$email,$contrasena)){
+                                        if($getUsuario->crearRemitente($tipoPersona,$tipoDocumento,$documento,$nombre,$telefono,$email,$contrasena)){
                                             echo json_encode([
                                                 'flag' => 1,
-                                                'message' => "Usuario creado correctamente",
+                                                'message' => "Remitente creado correctamente",
                                                 'redirect' => "../../views/redireccion/homeAdmin.php"
                                             ]); 
                                         }else{
-                                            echo json_encode(['flag' => 0, 'message' => 'Error al crear su usuario']);
+                                            echo json_encode(['flag' => 0, 'message' => 'Error al crear remitente']);
                                             exit;
                                         }
                                     }else{

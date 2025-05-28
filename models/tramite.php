@@ -6,7 +6,11 @@ class Tramite{
     
     public function obtenerUltimoTramite() {
         $conexion = Conexion::conectarBD();
-        $sql = "SELECT MAX(codigo_generado) AS ultimo_tramite FROM tramite";
+        $sql = "SELECT codigo_generado 
+                FROM tramite 
+                WHERE tipo_tramite = 'EXTERNO' 
+                ORDER BY num_documento DESC 
+                LIMIT 1;";
         $stmt = $conexion->prepare($sql);
         $stmt->execute();
         $resultado = null;
@@ -17,35 +21,164 @@ class Tramite{
         return $resultado;
     }
 
-    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto) {
+    public function obtenerNuevoNumeroDocumento(): int {
         $conexion = Conexion::conectarBD();
-        $sql = "INSERT INTO tramite (tipo_tramite, anio, codigo_generado, cod_tipodocumento, hora_reg, fec_reg, remitente, asunto)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $sql = "SELECT MAX(num_documento) 
+                FROM tramite 
+                WHERE tipo_tramite = 'EXTERNO';";
+
         $stmt = $conexion->prepare($sql);
+
         if (!$stmt) {
-            die("Error en la preparación de la consulta: " . $conexion->error);
+            throw new Exception("Error en la preparación: " . $conexion->error);
         }
-        $stmt->bind_param(
-            "sissssss",  // Tipos: i=int, s=string (ajústalo según tus datos)
-            $tipoTramite,
-            $anio,
-            $codigoGenerado,
-            $codTipoDocumento,
-            $horaReg,
-            $fecReg,
-            $remitente,
-            $asunto
-        );
+
         $stmt->execute();
-        // Puedes retornar true/false o el ID insertado si lo deseas:
-        $resultado = $stmt->affected_rows > 0;
+
+        $resultado = null;
+        $stmt->bind_result($resultado);
+        $stmt->fetch();
+
         $stmt->close();
         Conexion::desconectarBD();
+
+        return $resultado !== null ? (int)$resultado + 1 : 1;
+    }
+
+    public function obtenerSiguienteOrdenPorDocumento(int $numDocu): int {
+        $conexion = Conexion::conectarBD();
+
+        $sql = "SELECT MAX(orden) 
+                FROM flujo 
+                WHERE num_documento = ?";
+
+        $stmt = $conexion->prepare($sql);
+
+        if (!$stmt) {
+            throw new Exception("Error al preparar la consulta: " . $conexion->error);
+        }
+
+        $stmt->bind_param("i", $numDocu);
+        $stmt->execute();
+
+        $resultado = null;
+        $stmt->bind_result($resultado);
+        $stmt->fetch();
+
+        $stmt->close();
+        Conexion::desconectarBD();
+
+        return $resultado !== null ? (int)$resultado + 1 : 1;
+    }
+
+    public function obtenerNuevoIdDetalleTramite(): int {
+        $conexion = Conexion::conectarBD();
+
+        $sql = "SELECT MAX(cod_detalletramite) FROM detalletramite";
+
+        $stmt = $conexion->prepare($sql);
+
+        if (!$stmt) {
+            throw new Exception("Error al preparar la consulta: " . $conexion->error);
+        }
+
+        $stmt->execute();
+
+        $resultado = null;
+        $stmt->bind_result($resultado);
+        $stmt->fetch();
+
+        $stmt->close();
+        Conexion::desconectarBD();
+
+        return $resultado !== null ? (int)$resultado + 1 : 1;
+    }
+
+    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $num_documento, $orden, $id_detalle_tramite, $final_file, $file_type, $new_size) {
+        $conexion = Conexion::conectarBD();
+        $resultado = false;
+
+        try {
+            $conexion->begin_transaction();
+
+            // 1. Insertar en la tabla 'tramite'
+            $sqlTramite = "INSERT INTO tramite (
+                                tipo_tramite, anio, codigo_generado, cod_tipodocumento,
+                                hora_reg, fec_reg, remitente, asunto, num_documento
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt0 = $conexion->prepare($sqlTramite);
+            if (!$stmt0) {
+                throw new Exception("Error al preparar stmt0: " . $conexion->error);
+            }
+
+            $stmt0->bind_param("ssssssssi", $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $num_documento);
+            $stmt0->execute();
+            //error_log("✅ Registro en 'tramite' insertado correctamente: $codigoGenerado");
+
+            // 2. Insertar en la tabla 'detalletramite'
+            $sqlDetalle = "INSERT INTO detalletramite (
+                                fec_recep, hora_recep, folio, comentario,
+                                codigo_generado, area_origen, area_destino,
+                                idusuario, idestadode, urgente
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 11, 'NO')";
+            $stmt1 = $conexion->prepare($sqlDetalle);
+            if (!$stmt1) {
+                throw new Exception("Error al preparar stmt1: " . $conexion->error);
+            }
+
+            $stmt1->bind_param("ssissss", $fecReg, $horaReg, $folios, $comentario, $codigoGenerado, $area_origen, $area_destino);
+            $stmt1->execute();
+            //error_log("✅ Registro en 'detalletramite' insertado correctamente para código: $codigoGenerado");
+
+            // 2. Insertar en la tabla 'flujo'
+            $sqlFlujo = "INSERT INTO flujo (
+                                codigo_generado, fec_recep, hora_recep, 
+                                folio, idestadoflujo, comentario, area_origen, 
+                                area_destino, num_documento, orden
+                        ) VALUES (?, ?, ?, ?, 11, ?, ?, ?, ?, ?)";
+            $stmt2 = $conexion->prepare($sqlFlujo);
+            if (!$stmt2) {
+                throw new Exception("Error al preparar stmt2: " . $conexion->error);
+            }
+
+            $stmt2->bind_param("sssisssii", $codigoGenerado, $fecReg, $horaReg, $folios, $comentario, $area_origen, $area_destino, $num_documento, $orden);
+            $stmt2->execute();
+            //error_log("✅ Registro en 'flujo' insertado correctamente para código: $codigoGenerado");
+
+            // 3. Insertar en la tabla 'adjunto'
+            $sqlAdjunto = "INSERT INTO adjunto (
+                                iddetalletramite, file, type, size
+                        ) VALUES (?, ?, ?, ?)";
+            $stmt3 = $conexion->prepare($sqlAdjunto);
+            if (!$stmt3) {
+                throw new Exception("Error al preparar stmt3: " . $conexion->error);
+            }
+
+            $stmt3->bind_param("isss", $id_detalle_tramite, $final_file, $file_type, $new_size);
+            $stmt3->execute();
+            //error_log("✅ Registro en 'adjunto' insertado correctamente para código: $id_detalle_tramite");
+
+            // Confirmar transacción
+            $conexion->commit();
+            $resultado = true;
+
+        } catch (Exception $e) {
+            $conexion->rollback();
+            //error_log("❌ Error al ingresar trámite: " . $e->getMessage());
+        } finally {
+            if (isset($stmt0)) $stmt0->close();
+            if (isset($stmt1)) $stmt1->close();
+            if (isset($stmt2)) $stmt2->close();
+            if (isset($stmt3)) $stmt3->close();
+            Conexion::desconectarBD();
+        }
+
         return $resultado;
     }
 
+
     public function obtenerMisTramites($nombre_usuario) {
-    error_log('NOMBRE DEL USUARIO ACTUAL => ' . $nombre_usuario);
     $conexion = Conexion::conectarBD();
     $tramites = [];
 
@@ -72,7 +205,7 @@ class Tramite{
         $data_detalle_tramite = $stmt1->get_result();
 
         if ($data_detalle_tramite->num_rows === 0) {
-            error_log("ℹ️ No hay trámites archivados para el área: " . $area_usuario);
+            //error_log("ℹ️ No hay trámites archivados para el área: " . $area_usuario);
             return [];
         }
 
@@ -99,7 +232,7 @@ class Tramite{
             if ($row_tramite = $data_tramite->fetch_assoc()) {
                 $detalle = array_merge($detalle, $row_tramite);
             } else {
-                error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
+                //error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
             }
 
             // 3.2 Obtener historial de flujo
@@ -145,7 +278,7 @@ class Tramite{
             ];
         }
     } catch (Exception $e) {
-        error_log("❌ Error al obtener trámites archivados: " . $e->getMessage());
+        //error_log("❌ Error al obtener trámites archivados: " . $e->getMessage());
         return [];
     } finally {
         if (isset($stmt0)) $stmt0->close();
@@ -247,7 +380,6 @@ class Tramite{
     }
 
 public function obtenerTramitesArchivados($nombre_usuario) {
-    error_log('NOMBRE DEL USUARIO ACTUAL => ' . $nombre_usuario);
     $conexion = Conexion::conectarBD();
     $tramites = [];
 
@@ -265,9 +397,8 @@ public function obtenerTramitesArchivados($nombre_usuario) {
         $area_usuario = null;
         if ($row = $data_usuario->fetch_assoc()) {
             $area_usuario = $row['area'];
-            error_log("AREA USUARIO => " . $area_usuario);
         } else {
-            error_log("⚠️ Usuario no encontrado o sin área asignada.");
+            //error_log("⚠️ Usuario no encontrado o sin área asignada.");
             return [];
         }
 
@@ -290,7 +421,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
         $data_detalle_tramite = $stmt1->get_result();
 
         if ($data_detalle_tramite->num_rows === 0) {
-            error_log("ℹ️ No hay trámites archivados para el área: " . $area_usuario);
+            //error_log("ℹ️ No hay trámites archivados para el área: " . $area_usuario);
             return [];
         }
 
@@ -317,7 +448,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
             if ($row_tramite = $data_tramite->fetch_assoc()) {
                 $detalle = array_merge($detalle, $row_tramite);
             } else {
-                error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
+                //error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
             }
 
             // 3.2 Obtener historial de flujo
@@ -363,7 +494,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
             ];
         }
     } catch (Exception $e) {
-        error_log("❌ Error al obtener trámites archivados: " . $e->getMessage());
+        //error_log("❌ Error al obtener trámites archivados: " . $e->getMessage());
         return [];
     } finally {
         if (isset($stmt0)) $stmt0->close();
@@ -377,7 +508,6 @@ public function obtenerTramitesArchivados($nombre_usuario) {
 }
     
 public function obtenerTramitesDerivados($nombre_usuario) {
-    error_log('NOMBRE DEL USUARIO ACTUAL => ' . $nombre_usuario);
     $conexion = Conexion::conectarBD();
     $tramites = [];
 
@@ -395,9 +525,8 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         $area_usuario = null;
         if ($row = $data_usuario->fetch_assoc()) {
             $area_usuario = $row['area'];
-            error_log("AREA USUARIO => " . $area_usuario);
         } else {
-            error_log("⚠️ Usuario no encontrado o sin área asignada.");
+            //error_log("⚠️ Usuario no encontrado o sin área asignada.");
             return []; // No se continúa sin área
         }
 
@@ -420,7 +549,7 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         $data_detalle_tramite = $stmt1->get_result();
 
         if ($data_detalle_tramite->num_rows === 0) {
-            error_log("ℹ️ No hay trámites derivados para el área: " . $area_usuario);
+            //error_log("ℹ️ No hay trámites derivados para el área: " . $area_usuario);
             return [];
         }
 
@@ -447,7 +576,7 @@ public function obtenerTramitesDerivados($nombre_usuario) {
             if ($row_tramite = $data_tramite->fetch_assoc()) {
                 $detalle = array_merge($detalle, $row_tramite);
             } else {
-                error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
+                //error_log("⚠️ Trámite no encontrado para código: " . $codigo_generado);
             }
 
             // 3.2 Obtener historial del flujo del trámite
@@ -494,7 +623,7 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         }
 
     } catch (Exception $e) {
-        error_log("❌ Error al obtener trámites derivados: " . $e->getMessage());
+        //error_log("❌ Error al obtener trámites derivados: " . $e->getMessage());
         return [];
     } finally {
         // Cierre de conexiones

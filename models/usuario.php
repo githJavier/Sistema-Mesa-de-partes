@@ -1,9 +1,10 @@
-<?php 
+<?php
+require_once __DIR__ . '/../utils/log_config.php';
 include_once("../../config/conexion.php");
 
 class Usuario
 {
-    public function validarUsuario($usuario, $tipoPersona)
+    public function validarRemitente($usuario, $tipoPersona)
     {
         $conexion = Conexion::conectarBD();
         $sql = 'SELECT COUNT(*) 
@@ -52,6 +53,7 @@ class Usuario
         return password_verify($clave, $hashedPassword); // Retorna true o false sin hacer echo
     }
 
+
     public function obtenerDatosRemitente($usuario, $clave) {
         $conexion = Conexion::conectarBD();
         $sql = 'SELECT tipo_remitente, retipo_docu, nombres, clave 
@@ -79,6 +81,7 @@ class Usuario
         Conexion::desconectarBD();
         return $datoRemitente;
     }
+
     public function obtenerDatosRemitenteForm($usuario) {
         $conexion = Conexion::conectarBD();
         $sql = 'SELECT tipo_remitente, retipo_docu, docu_num, nombres, direccion, departamento, provincia, distrito, telefono_celular, correo
@@ -115,7 +118,7 @@ class Usuario
     
     
 
-    public function crearUsuario($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave) {
+    public function crearRemitente($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave) {
         $conexion = Conexion::conectarBD();
         $sql = 'INSERT INTO remitente (tipo_remitente, retipo_docu, docu_num, nombres, telefono_celular, correo, clave)
                 VALUES (?, ?, ?, ?, ?, ?, ?);';
@@ -136,7 +139,7 @@ class Usuario
         }
     }
 
-    public function consultarCorreo($documento) {
+    public function consultarCorreoRemitente($documento) {
         $conexion = Conexion::conectarBD();
         $sql = 'SELECT correo 
                 FROM remitente 
@@ -159,7 +162,7 @@ class Usuario
         return $correo;
     }
 
-    public function actualizarUbicacionUsuario($numeroDocumento, $departamento, $provincia, $distrito, $direccion, $telefono) {
+    public function actualizarUbicacionRemitente($numeroDocumento, $departamento, $provincia, $distrito, $direccion, $telefono) {
         $conexion = Conexion::conectarBD();
         $sql = 'UPDATE remitente 
                 SET departamento = ?, provincia = ?, distrito = ?, direccion = ?, telefono_celular = ?
@@ -211,7 +214,7 @@ class Usuario
         }
     }
 
-    public function obtenerInformacionId($id) {
+    public function obtenerRemitentePorId($id) {
         $conexion = Conexion::conectarBD();
         $sql = "SELECT retipo_docu, docu_num, nombres, correo, telefono_celular
                 FROM remitente
@@ -236,7 +239,66 @@ class Usuario
         }
     }
 
-    public function actualizarDatos($correo, $telefono_celular, $clave, $idremite) {
+    public function obtenerUsuarioPorId($id) {
+        $conexion = Conexion::conectarBD();
+        $usuario = [];
+
+        if (!$conexion) {
+            //error_log("❌ No se pudo conectar a la base de datos.");
+            return [];
+        }
+
+        try {
+            $sql = "SELECT 
+                        u.nombre, 
+                        u.ap_paterno, 
+                        u.ap_materno, 
+                        u.tipo_doc, 
+                        u.num_doc, 
+                        u.cod_area, 
+                        u.tipo, 
+                        u.usuario, 
+                        u.estado 
+                    FROM usuario u 
+                    WHERE u.cod_usuario = ?";
+            $stmt = $conexion->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Error al preparar la consulta.");
+            }
+
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $resultado = $stmt->get_result();
+
+            if ($resultado->num_rows > 0) {
+                $row = $resultado->fetch_assoc();
+                $usuario = [
+                    'nombre'      => $row['nombre'],
+                    'ap_paterno'  => $row['ap_paterno'],
+                    'ap_materno'  => $row['ap_materno'],
+                    'tipo_doc'    => $row['tipo_doc'],
+                    'num_doc'     => $row['num_doc'],
+                    'cod_area'    => $row['cod_area'],
+                    'tipo'        => $row['tipo'],
+                    'usuario'     => $row['usuario'],
+                    'estado'      => $row['estado']
+                ];
+            } else {
+                //error_log("⚠️ No se encontró el usuario con ID: $id");
+            }
+
+        } catch (Exception $e) {
+            //error_log("❌ Error al obtener información del usuario: " . $e->getMessage());
+            return [];
+        } finally {
+            if (isset($stmt)) $stmt->close();
+            Conexion::desconectarBD();
+        }
+
+        return $usuario;
+    }
+
+    public function actualizarDatosRemitente($correo, $telefono_celular, $clave, $idremite) {
     $conexion = Conexion::conectarBD();
     $sql = "UPDATE remitente
             SET correo = ?, telefono_celular = ?, clave = ?
@@ -253,6 +315,60 @@ class Usuario
     return $resultado;
     }
 
+    public function actualizarDatosUsuario($id, $tipoDocumento, $numeroDocumento, $nombre, $apellidoPaterno, $apellidoMaterno, $tipoUsuario, $estadoUsuario, $areaUsuario, $usuario, $claveHash) {
+        $conexion = Conexion::conectarBD();
+
+        if (empty($claveHash)) {
+            $sql = 'UPDATE usuario 
+                    SET tipo_doc = ?, 
+                        num_doc = ?, 
+                        nombre = ?, 
+                        ap_paterno = ?, 
+                        ap_materno = ?, 
+                        tipo = ?, 
+                        estado = ?, 
+                        cod_area = ?, 
+                        usuario = ?
+                    WHERE cod_usuario = ?';
+
+            $stmt = $conexion->prepare($sql);
+            if (!$stmt) {
+                Conexion::desconectarBD();
+                return false;
+            }
+
+            $stmt->bind_param("sssssssssi", $tipoDocumento, $numeroDocumento, $nombre, $apellidoPaterno, $apellidoMaterno, $tipoUsuario, $estadoUsuario, $areaUsuario, $usuario, $id);
+
+        } else {
+            $sql = 'UPDATE usuario 
+                    SET tipo_doc = ?, 
+                        num_doc = ?, 
+                        nombre = ?, 
+                        ap_paterno = ?, 
+                        ap_materno = ?, 
+                        tipo = ?, 
+                        estado = ?, 
+                        cod_area = ?, 
+                        usuario = ?, 
+                        clave = ?
+                    WHERE cod_usuario = ?';
+
+            $stmt = $conexion->prepare($sql);
+            if (!$stmt) {
+                Conexion::desconectarBD();
+                return false;
+            }
+
+            $stmt->bind_param("ssssssssssi", $tipoDocumento, $numeroDocumento, $nombre, $apellidoPaterno, $apellidoMaterno, $tipoUsuario, $estadoUsuario, $areaUsuario, $usuario, $claveHash, $id);
+        }
+
+        $resultado = $stmt->execute();
+        $stmt->close();
+        Conexion::desconectarBD();
+        return $resultado;
+    }
+
+    //Cambiar de estado, no eliminar
     public function eliminarRemitente($id){
     $conexion = Conexion::conectarBD();
     $sql = "DELETE FROM remitente WHERE idremite = ?;";
@@ -268,12 +384,52 @@ class Usuario
     return $resultado;
     }
 
+    public function eliminarUsuario($id) {
+        $conexion = Conexion::conectarBD();
 
+        $sql = 'UPDATE usuario 
+                SET estado = 2
+                WHERE cod_usuario = ?';
 
+        $stmt = $conexion->prepare($sql);
 
+        if (!$stmt) {
+            Conexion::desconectarBD();
+            return false;
+        }
 
-    
-    
-    
+        $stmt->bind_param("i", $id);
+        $resultado = $stmt->execute();
+
+        $stmt->close();
+        Conexion::desconectarBD();
+
+        return $resultado;
+    }
+
+    public function obtenerTiposUsuario() {
+        $conexion = Conexion::conectarBD();
+        $sql = 'SELECT cod_tipo_usuario, tipo_usuario FROM tipo_usuario';
+        $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            die("Error en la preparación: " . $conexion->error);
+        }
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $tiposUsuario = [];
+
+        if ($resultado && $resultado->num_rows > 0) {
+            while ($fila = $resultado->fetch_assoc()) {
+                $tiposUsuario[] = [
+                    'cod_tipo_usuario' => $fila['cod_tipo_usuario'],
+                    'tipo_usuario' => $fila['tipo_usuario']
+                ];
+            }
+        }
+
+        $stmt->close();
+        Conexion::desconectarBD();
+        return $tiposUsuario;
+    }    
 }
 

@@ -9,8 +9,25 @@ $asunto = $_POST['asunto'] ?? null;
 $tipoDocumento = $_POST['tipo_documento'] ?? null;
 $numeroTramite = $_POST['numero_tramite'] ?? null;
 $folios = $_POST['folios'] ?? null;
+$comentario = $_POST['comentario'] ?? ' ';
+$area_origen = "REMITENTE EXTERNO";
+$area_destino = "OFICINA TRAMITE DOCUMENTARIO";
 $remitente = $_POST['remitente'] ?? null;
+
 $documento = $_FILES['DOCUMENTO_VIRTUAL'] ?? null;
+$file = rand(1000,100000)."-".$documento['name'];
+$file_loc = $documento['tmp_name'];
+$file_size = $documento['size'];
+$file_type = $documento['type'];
+$folder="../../uploads/tramites";
+// new file size in KB
+$new_size = $file_size/1024;
+// new file size in KB
+// make file name in lower case
+$new_file_name = strtolower($file);
+// make file name in lower case
+$final_file=str_replace(' ','-',$new_file_name);
+
 
 // Configurar y capturar la hora
 date_default_timezone_set('America/Lima');
@@ -35,7 +52,7 @@ if($getTramite->validarAsunto($asunto)){
                     //Nombre base para guardar el archivo
                     $nombre_base = $numeroTramite."-".$documento['name'];
                     //Guardar el archivo en la base de datos
-                    if($getTramite->insertarTramite($tipoTramite, $anio, $numeroTramite,$tipoDocumento, $horaRegistro, $fechaRegistro,$remitente,$asunto)){
+                    if($getTramite->insertarTramite($tipoTramite, $anio, $numeroTramite,$tipoDocumento, $horaRegistro, $fechaRegistro, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $final_file, $file_type, $new_size)){
                         //mover el archivo
                         $rutaDestino = "../../uploads/tramites/" . basename($nombre_base);
                         $getTramite->moverArchivo($documento, $rutaDestino);

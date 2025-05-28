@@ -3,15 +3,11 @@ include_once("GetAjustes.php");
 
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEditar'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEliminar'])) {
     $id = $_POST['id'] ?? '';
-    $correo = $_POST['email'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
-    $clave = $_POST['password'] ?? '';
-    $claveHash = password_hash($clave, PASSWORD_BCRYPT);
 
     $getAjustes = new GetAjustes;
-    $getAjustes->actualizarRegistroRemitente($correo, $telefono, $claveHash, $id);
+    $getAjustes->eliminarUsuario($id);
 
     echo json_encode([
         'flag' => true,

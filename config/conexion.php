@@ -4,10 +4,10 @@ class Conexion
     private static $conexion;
 
     // Define las constantes de configuración fuera de los métodos
-    private const SERVIDOR_MYSQL = 'localhost';
-    private const USUARIO_MYSQL = 'root';
-    private const PASSWORD_MYSQL = '';
-    private const BASE_DATOS = 'mesa_partes';
+    private const SERVIDOR_MYSQL = 'db';
+    private const USUARIO_MYSQL = 'admin';
+    private const PASSWORD_MYSQL = 'claveultrasecreta';
+    private const BASE_DATOS = 'mesa_de_partes';
 
     // Método para conectar a la base de datos
     public static function conectarBD()

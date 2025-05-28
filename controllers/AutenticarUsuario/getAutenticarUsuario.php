@@ -72,8 +72,8 @@ class GetAutenticarUsuario {
     }
 
     // Verificar si el usuario existe en la base de datos
-    public function validarUsuario($documento, $tipoPersona) {
-        if ($this->objUsuario->validarUsuario($documento, $tipoPersona)) {
+    public function validarRemitente($documento, $tipoPersona) {
+        if ($this->objUsuario->validarRemitente($documento, $tipoPersona)) {
             $this->message = "Usuario verificado correctamente.";
             return true;
         } else {

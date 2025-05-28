@@ -1,7 +1,7 @@
 <?php 
 include_once("../../models/usuario.php");
 
-class GetCrearUsuario {
+class GetCrearRemitente {
  
     public $message = "";
     private $objUsuario;
@@ -96,7 +96,7 @@ class GetCrearUsuario {
     }
 
     public function verificarUsuario($documento, $tipoPersona) {
-        if ($this->objUsuario->validarUsuario($documento, $tipoPersona)) {
+        if ($this->objUsuario->validarRemitente($documento, $tipoPersona)) {
             $this->message = "El usuario ya esta registrado.";
             return false;
         } else {
@@ -110,8 +110,8 @@ class GetCrearUsuario {
     }
     
 
-    public function crearUsuario($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave){
-        return $this->objUsuario->crearUsuario($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave);
+    public function crearRemitente($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave){
+        return $this->objUsuario->crearRemitente($tipoUsuario, $tipoDocumento, $numeroDocumento, $nombres, $telefono, $email, $clave);
     }
 
 }

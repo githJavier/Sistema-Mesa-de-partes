@@ -55,7 +55,7 @@ class GetRestablecerUsuario{
 
     public function verificarDocumentoCorreo($correo, $documento) {
         $objUsuario = new Usuario();
-        $correoBD = $objUsuario->consultarCorreo($documento);
+        $correoBD = $objUsuario->consultarCorreoRemitente($documento);
         if (empty($correoBD)) {
             $this->message = "El documento ingresado tiene registrado un correo.";
             return false;

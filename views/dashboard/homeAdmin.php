@@ -1,18 +1,12 @@
 <?php 
-/*
-if (isset($_SESSION['usuario'])) {
-    session_destroy();
-}*/
-
-
 include_once("head.php");
 include_once("menuAdmin.php");
 include_once("headerAdmin.php");
 
 class panelPrincipal {
     public function panelPrincipalShow() {
-        //$usuario = $_SESSION['usuario'];
-        //$datos = $_SESSION['datos'];
+        $usuario = $_SESSION['usuario'];
+        $datos = $_SESSION['datos'];
         $getHead = new GetHead;
         $getMenu = new GetMenuAdmin;
         $getHeader = new GetHeaderAdmin;
@@ -27,8 +21,8 @@ class panelPrincipal {
                 <!-- Contenido principal -->
                 <div class="main-content">
                     <?php 
-                    //$getHeader->headerShow($datos['tipo_remitente'], $datos['nombres'], $datos['retipo_docu'], $usuario);
-                    $getHeader->headerAdminShow("Administrador", "Pedro Javier Pablo Pascual", "DNI", "70905907");
+                    //$getHeader->headerAdminShow($datos['tipo'], $usuario, "DNI", "70905907");
+                    $getHeader->headerAdminShow($datos['usuario'], $datos['tipo'], $datos['nombre_completo'], $datos['tipo_doc'], $datos['num_doc'], $datos['area']);
                     ?>
                     <div class="container mt-4 container-dinamico" id="contenido-dinamico">
                         

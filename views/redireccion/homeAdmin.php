@@ -2,7 +2,7 @@
 include_once("../dashboard/homeAdmin.php");
 $panelPrincipal = new panelPrincipal();
 session_start();
-/*
+
 function validarSesion()
 {
     if (!isset($_SESSION["usuario"])) {
@@ -10,13 +10,13 @@ function validarSesion()
     } else {
         return true;
     }
-}*/
+}
 
-//if (validarSesion()) {
+if (validarSesion()) {
     $panelPrincipal->panelPrincipalShow();
-//} else {
-    //header("Location: ../../index.php");
- //   exit();
-//}
+} else {
+    header("Location: ../../index.php");
+   exit();
+}
 
 ?>
