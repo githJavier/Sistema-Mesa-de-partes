@@ -1,10 +1,10 @@
-<?php 
+<?php
 include_once("../../views/dashboard/formAdministrarUsuarios.php");
 include_once("getAdministracion.php");
 
+$formAdministrarUsuarios = new formAdministrarUsuarios();
+$getAdministracion = new GetAdministracion();
 
-$formAdministrarUsuarios = new formAdministrarUsuarios;
-$getAdministracion = new GetAdministracion;
 $usuarios = $getAdministracion->listarUsuarios();
 
 if (!empty($usuarios)) {
@@ -19,6 +19,3 @@ if (!empty($usuarios)) {
         'message' => $getAdministracion->message
     ]);
 }
- 
-
-?>

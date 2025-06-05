@@ -131,3 +131,24 @@ window.usuariosPagination = crearPaginacion(
     "usuarios-select-page-size"
 );
 
+window.tipoDocumentosPagination = crearPaginacion(
+    "administracionDocumentos",
+    "tipoDocumentos-table",
+    "tipoDocumentos-search",
+    "tipoDocumentos-no-results",
+    "tipoDocumentos-pagination-info",
+    "tipoDocumentos-prev-page",
+    "tipoDocumentos-next-page",
+    "tipoDocumentos-select-page-size"
+);
+
+window.areasPagination = crearPaginacion(
+    "administracionAreas",
+    "areas-table",
+    "areas-search",
+    "areas-no-results",
+    "areas-pagination-info",
+    "areas-prev-page",
+    "areas-next-page",
+    "areas-select-page-size"
+);

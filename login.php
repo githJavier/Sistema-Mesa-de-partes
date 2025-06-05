@@ -19,12 +19,12 @@ if (isset($_SESSION['usuario'])) {
 
   <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="card shadow p-4 card-container" style="width: 450px;">
+
       <!-- Encabezado -->
       <div class="text-center mb-4">
         <h2 class="txt-titulo"><i class="fa-regular fa-file-lines"></i> MESA DE PARTES VIRTUAL</h2>
         <p class="text-muted">Sistema de gestión documental</p>
       </div>
-
 
       <!-- Selector de formulario -->
       <div class="nav nav-pills nav-justified mb-4">
@@ -46,7 +46,6 @@ if (isset($_SESSION['usuario'])) {
               <label class="form-check-label" for="juridica">Persona Jurídica</label>
             </div>
           </div>
-
           <!-- Documento -->
           <div class="mb-4">
             <div class="input-group">
@@ -55,7 +54,6 @@ if (isset($_SESSION['usuario'])) {
             </div>
             <span id="documentoError" class="text-danger ms-5" style="display:none;"></span>
           </div>
-
           <!-- Contraseña -->
           <div class="mb-4">
             <div class="input-group">
@@ -65,12 +63,11 @@ if (isset($_SESSION['usuario'])) {
             </div>
             <span id="passwordError" class="text-danger ms-5" style="display:none;"></span>
           </div>
-
           <!-- Botón -->
           <div class="d-flex justify-content-center mb-3">
             <button type="button" class="btn btn-dark w-75 rounded-pill" onclick="enviarForm()">Ingresar</button>
           </div>
-
+          <!-- Otras opciones -->
           <div class="d-flex justify-content-around mt-3 txt-small">
             <small><a href="registro.php" class="text-decoration-none">Crear cuenta</a></small>
             <small><a href="recuperar.php" class="text-decoration-none">Recuperar contraseña</a></small>
@@ -81,6 +78,7 @@ if (isset($_SESSION['usuario'])) {
       <!-- FORMULARIO USUARIO -->
       <div id="formUsuario" class="d-none">
         <form id="loginUsuario">
+          <!-- Usuario -->
           <div class="mb-4">
             <div class="input-group">
               <span class="input-group-text bg-dark text-light"><i class="fas fa-user-tie"></i></span>
@@ -88,7 +86,7 @@ if (isset($_SESSION['usuario'])) {
             </div>
               <span id="usuarioSistemaError" class="text-danger ms-5" style="display:none;"></span>
           </div>
-
+          <!-- Contraseña -->
           <div class="mb-4">
             <div class="input-group">
               <span class="input-group-text bg-dark text-light"><i class="fas fa-lock"></i></span>
@@ -97,7 +95,7 @@ if (isset($_SESSION['usuario'])) {
             </div>
               <span id="claveSistemaError" class="text-danger ms-5" style="display:none;"></span>
           </div>
-
+          <!-- Botón -->
           <div class="d-flex justify-content-center mb-3">
             <button type="button" class="btn btn-dark w-75 rounded-pill" onclick="enviarFormUsuario()">Acceder al sistema</button>
           </div>
@@ -106,6 +104,18 @@ if (isset($_SESSION['usuario'])) {
 
     </div>
   </div>
+
+  <style>
+    /* Eliminar el ícono automático de mostrar contraseña en Edge */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+    /* También para navegadores WebKit (aunque Chrome no lo usa aún) */
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+      display: none !important;
+    }
+  </style>
 
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

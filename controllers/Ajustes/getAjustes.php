@@ -1,6 +1,9 @@
 <?php
 include_once("../../models/ubicacion.php");
 include_once("../../models/usuario.php");
+include_once("../../models/tipoDocumento.php");
+include_once("../../models/area.php");
+
 
 class GetAjustes {
     public $message = "";
@@ -104,9 +107,51 @@ class GetAjustes {
         }
     }
 
+    public function obtenerTipoDocumentoId($codigoTipoDocumento) {
+        $getTipoDocumento = new TipoDocumento();
+        $datosTipoDocumento = $getTipoDocumento->obtenerTipoDocumentoId($codigoTipoDocumento);
+
+        if ($datosTipoDocumento) {
+            return $datosTipoDocumento;
+        } else {
+            return null;
+        }
+    }
+
+    public function obtenerAreaId($codigoArea) {
+        $getArea = new Area();
+        $datosArea = $getArea->obtenerAreaId($codigoArea);
+
+        if ($datosArea) {
+            return $datosArea;
+        } else {
+            return null;
+        }
+    }
+
     public function actualizarRegistroRemitente($correo, $telefono_celular, $clave, $idremite){
         $getUsuario = new Usuario();
         $respuesta = $getUsuario->actualizarDatosRemitente($correo, $telefono_celular, $clave, $idremite);
+        if($respuesta){
+            $this->message = "Los datos fueron actualizados correctamente";
+        }else{
+            $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
+    public function actualizarRegistroTipoDocumento($id, $tipoDocumento, $abreviatura){
+        $getTipoDocumento = new TipoDocumento();
+        $respuesta = $getTipoDocumento->actualizarDatosTipoDocumento($id, $tipoDocumento, $abreviatura);
+        if($respuesta){
+            $this->message = "Los datos fueron actualizados correctamente";
+        }else{
+            $this->message = "No se pudieron actualizar los datos"; 
+        }
+    }
+
+    public function actualizarRegistroArea($id, $area){
+        $getArea = new Area();
+        $respuesta = $getArea->actualizarArea($id, $area);
         if($respuesta){
             $this->message = "Los datos fueron actualizados correctamente";
         }else{
@@ -139,6 +184,26 @@ class GetAjustes {
         $respuesta = $getUsuario->eliminarUsuario($id);
         if($respuesta){
             $this->message = "Usuario eliminado correctamente";
+        }else{
+            $this->message = "No se pudo eliminar el registro"; 
+        }
+    }
+
+    public function eliminarTipoDocumento($id){
+        $getTipoDocumento = new TipoDocumento();
+        $respuesta = $getTipoDocumento->eliminarTipoDocumento($id);
+        if($respuesta){
+            $this->message = "Tipo de documento eliminado correctamente";
+        }else{
+            $this->message = "No se pudo eliminar el registro"; 
+        }
+    }
+
+    public function eliminarArea($id){
+        $getArea = new Area();
+        $respuesta = $getArea->eliminarArea($id);
+        if($respuesta){
+            $this->message = "Área eliminada correctamente";
         }else{
             $this->message = "No se pudo eliminar el registro"; 
         }

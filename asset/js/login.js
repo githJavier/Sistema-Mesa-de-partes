@@ -97,7 +97,6 @@ function validarFormulario() {
     return isValid;
 }
 
-
 function validarFormularioUsuario() {
     let isValid = true;
 
@@ -136,7 +135,6 @@ function validarFormularioUsuario() {
 
     return isValid;
 }
-
 
 function enviarForm() {
     if (validarFormulario()) {
@@ -229,7 +227,6 @@ function enviarFormUsuario() {
         });
     }
 }
-
 
 // Inicializar eventos
 document.addEventListener('DOMContentLoaded', () => {

@@ -21,7 +21,6 @@ class panelPrincipal {
                 <!-- Contenido principal -->
                 <div class="main-content">
                     <?php 
-                    //$getHeader->headerAdminShow($datos['tipo'], $usuario, "DNI", "70905907");
                     $getHeader->headerAdminShow($datos['usuario'], $datos['tipo'], $datos['nombre_completo'], $datos['tipo_doc'], $datos['num_doc'], $datos['area']);
                     ?>
                     <div class="container mt-4 container-dinamico" id="contenido-dinamico">
@@ -31,6 +30,7 @@ class panelPrincipal {
 
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script src="../../asset/js/ResolverTramitesForms.js"></script>
                 <script src="../../asset/js/homeAdmin.js"></script>
                 <script src="../../asset/js/menu.js"></script>
             </body>

@@ -25,6 +25,29 @@ window.TramitesPagination = (function () {
 
         document.getElementById("prev-page").disabled = currentPage === 1;
         document.getElementById("next-page").disabled = currentPage === totalPages || totalPages === 0;
+        // ➕ Actualiza la cantidad de expedientes visibles
+        updateExpedientesCount();
+    }
+
+    function updateExpedientesCount() {
+        const table = document.getElementById("tramites-table");
+        if (!table) return;
+
+        const rows = table.querySelectorAll("tbody tr");
+        const totalExpedientes = rows.length;
+        const countSpan = document.getElementById("cantidad-expedientes");
+        const alertBox = document.getElementById("alert-expedientes");
+
+        if (countSpan && alertBox) {
+
+            if (totalExpedientes === 0) {
+                countSpan.innerText = "0";
+                alertBox.querySelector("strong").innerText = "No hay expedientes por recibir";
+            } else {
+                countSpan.innerText = totalExpedientes;
+                alertBox.querySelector("strong").innerText = `Usted tiene ${totalExpedientes} expediente(s) por recibir`;
+            }
+        }
     }
 
     function init() {
@@ -88,8 +111,7 @@ window.TramitesPagination = (function () {
     // Botón "Limpiar"
     document.getElementById('reset-btn').addEventListener('click', function () {
         document.getElementById('search').value = '';
-        document.getElementById('filtroTipo').value = '';
-        document.getElementById('filtroEstado').value = '';
+        document.getElementById('filtroPrioridad').value = '';
         document.getElementById('date-from').value = '';
         document.getElementById('date-to').value = '';
 
@@ -109,29 +131,26 @@ window.TramitesPagination = (function () {
 
 window.TramitesPagination.init();
 
-function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, detallestramiteJSON) {
-    const detallestramite = JSON.parse(detallestramiteJSON); // ← ✅ convertirlo a array real
-
+function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, flujos) {
     document.getElementById('modal-codigo').textContent = codigo;
     document.getElementById('modal-tipodocumento').textContent = tipoDocumento;
     document.getElementById('modal-asunto').textContent = asunto;
     document.getElementById('modal-fecharegistro').textContent = fechaRegistro;
     document.getElementById('modal-remitente').textContent = remitente;
-
     const cuerpoTabla = document.getElementById('tabla-detalles-tramite');
     cuerpoTabla.innerHTML = '';
 
-    if (Array.isArray(detallestramite)) {
-        detallestramite.forEach(detalle => {
+    if (Array.isArray(flujos)) {
+        flujos.forEach(flujo => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
-                <td>${detalle.f_area_origen || ''}</td>
-                <td>${detalle.f_estado || ''}</td>
-                <td>${detalle.f_area_destino || ''}</td>
-                <td>${detalle.f_fec_recep || ''}</td>
-                <td>${detalle.f_hora_recep || ''}</td>
-                <td>${detalle.f_folio || ''}</td>
-                <td>${detalle.f_comentario || ''}</td>
+                <td>${flujo.f_area_origen || ''}</td>
+                <td>${flujo.f_estado || ''}</td>
+                <td>${flujo.f_area_destino || ''}</td>
+                <td>${flujo.f_fec_recep || ''}</td>
+                <td>${flujo.f_hora_recep || ''}</td>
+                <td>${flujo.f_folio || ''}</td>
+                <td>${flujo.f_comentario || ''}</td>
             `;
             cuerpoTabla.appendChild(fila);
         });
@@ -150,7 +169,6 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, de
     modalVentana.classList.add('animar-entrada');
 }
 
-
 function cerrarModal() {
     const modalFondo = document.getElementById('modalFondo');
     const modalVentana = document.getElementById('modalVentana');
@@ -163,16 +181,54 @@ function cerrarModal() {
     }, 300);
 }
 
-function validarFiltroTramitesArchivados() {
+function recibirTramiteExterno(codigo_tramite, area_origen, area_destino, num_documento){
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/RecibirTramiteExterno/controlRecibirTramiteExterno.php",
+        data: {
+            codigo_tramite: codigo_tramite,
+            area_origen: area_origen,
+            area_destino: area_destino,
+            num_documento: num_documento,
+            btnRecibir00: "Recibir00"
+        },
+        dataType: "json",
+        success: function(response) {
+            if (response.flag == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => window.location.href = response.redirect);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Ocurrió un error desconocido.'
+                });
+            }
+        },
+         error: function(xhr, status, error) {
+            console.error("Estado:", status);
+            console.error("Error:", error);
+            console.error("Respuesta del servidor:", xhr.responseText);
+            Swal.fire({
+                icon: 'error',
+                 title: 'Error',
+                text: 'Error en la solicitud: ' + error
+            });
+        }
+    });
+}
+
+function validarFiltroTramitesRegistrados() {
     let dateFrom = document.getElementById("date-from").value;
     let dateTo = document.getElementById("date-to").value;
+    let prioridad = document.getElementById("filtroPrioridad").value;
 
-    if (
-        dateFrom === "" &&
-        dateTo === "" &&
-        document.getElementById("filtroTipo").value === "" &&
-        document.getElementById("filtroEstado").value === ""
-    ) {
+    if (dateFrom === "" && dateTo === "" && prioridad === "") {
         Swal.fire({
             icon: 'info',
             title: 'Campos vacíos',
@@ -206,10 +262,9 @@ function validarFiltroTramitesArchivados() {
 
 // Botón "Filtrar"
 document.getElementById('filter-btn').addEventListener('click', function () {
-    if (!validarFiltroTramitesArchivados()) return;
+    if (!validarFiltroTramitesRegistrados()) return;
 
-    const tipo = document.getElementById('filtroTipo').value.toLowerCase();
-    const estado = document.getElementById('filtroEstado').value.toLowerCase();
+    const prioridad = document.getElementById('filtroPrioridad').value.toLowerCase();
     const fechaDesde = document.getElementById('date-from').value;
     const fechaHasta = document.getElementById('date-to').value;
 
@@ -217,14 +272,12 @@ document.getElementById('filter-btn').addEventListener('click', function () {
     let found = false;
 
     filas.forEach(fila => {
-        const tipoDoc = fila.querySelector('.td-tipo').textContent.toLowerCase();
-        const estadoActual = fila.querySelector('.td-estado').textContent.toLowerCase();
+        const prioridadDoc = fila.querySelector('.td-prioridad').textContent.toLowerCase();
         const fechaRegistro = fila.querySelector('.td-fecha').textContent;
 
         let mostrar = true;
 
-        if (tipo && tipo !== tipoDoc) mostrar = false;
-        if (estado && estado !== estadoActual) mostrar = false;
+        if (prioridad && prioridad !== prioridadDoc) mostrar = false;
         if (fechaDesde && fechaRegistro < fechaDesde) mostrar = false;
         if (fechaHasta && fechaRegistro > fechaHasta) mostrar = false;
 

@@ -12,16 +12,16 @@ class GetMenuAdmin{
                     <button type="button" class="menu-item" onclick="cargarHome()">
                         <i class="fas fa-house"></i><span class="menu-text">HOME</span>
                     </button>
-                    <button type="button" class="menu-item d-none" id="linkTramite" data-bs-toggle="collapse" data-bs-target="#collapseBandeja" aria-expanded="false">
+                    <button type="button" class="menu-item d" id="linkTramite" data-bs-toggle="collapse" data-bs-target="#collapseBandeja" aria-expanded="false">
                         <i class="fas fa-inbox"></i><span class="menu-text">BANDEJA</span>
                     </button>
 
                     <!-- Contenido colapsable -->
                     <div class="collapse collapse-tramite ms-4" id="collapseBandeja">
-                        <button type="button" class="menu-item sub-item menu-text" id="botonTramite">
-                            <i class="fas fa-file-import"></i>TRAMITES POR RECIBIR
+                        <button type="button" class="menu-item sub-item menu-text" id="RecibirTramitesExternos">
+                            <i class="fas fa-file-import"></i>TRAMITES POR RECIBIR (EXT.)
                         </button>
-                        <button type="button" class="menu-item sub-item menu-text" id="botonSeguimiento">
+                        <button type="button" class="menu-item sub-item menu-text" id="ResolverTramites">
                             <i class="fas fa-tasks"></i>TRAMITES POR RESOLVER
                         </button>
                     </div>

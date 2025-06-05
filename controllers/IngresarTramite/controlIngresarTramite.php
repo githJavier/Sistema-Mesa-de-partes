@@ -2,87 +2,116 @@
 include_once("getIngresarTramite.php");
 
 $getTramite = new GetIngresarTramite;
-// captura de tipo de tramite (como viene de afuera se le coloca externo)
+
+// Captura de tipo de trámite (externo por defecto)
 $tipoTramite = "EXTERNO";
+
 // Captura de campos enviados por FormData
-$asunto = $_POST['asunto'] ?? null;
-$tipoDocumento = $_POST['tipo_documento'] ?? null;
-$numeroTramite = $_POST['numero_tramite'] ?? null;
-$folios = $_POST['folios'] ?? null;
-$comentario = $_POST['comentario'] ?? ' ';
-$area_origen = "REMITENTE EXTERNO";
-$area_destino = "OFICINA TRAMITE DOCUMENTARIO";
-$remitente = $_POST['remitente'] ?? null;
+$btnEnviarTramite= 'btnEnviarTramite';
+$asunto          = $_POST['asunto'] ?? null;
+$tipoDocumento   = $_POST['tipo_documento'] ?? null;
+$numeroTramite   = $_POST['numero_tramite'] ?? null;
+$folios          = $_POST['folios'] ?? null;
+$comentario      = $_POST['comentario'] ?? ' ';
+$remitente       = $_POST['remitente'] ?? null;
 
-$documento = $_FILES['DOCUMENTO_VIRTUAL'] ?? null;
-$file = rand(1000,100000)."-".$documento['name'];
-$file_loc = $documento['tmp_name'];
-$file_size = $documento['size'];
-$file_type = $documento['type'];
-$folder="../../uploads/tramites";
-// new file size in KB
-$new_size = $file_size/1024;
-// new file size in KB
-// make file name in lower case
-$new_file_name = strtolower($file);
-// make file name in lower case
-$final_file=str_replace(' ','-',$new_file_name);
+$area_origen     = "REMITENTE EXTERNO";
+$area_destino    = "OFICINA TRAMITE DOCUMENTARIO";
 
+// Captura del archivo subido
+$documento       = $_FILES['DOCUMENTO_VIRTUAL'] ?? null;
+$file            = rand(1000,100000) . "-" . $documento['name'];
+$file_loc        = $documento['tmp_name'];
+$file_size       = $documento['size'];
+$file_type       = $documento['type'];
 
-// Configurar y capturar la hora
+$folder          = "../../uploads/tramites";
+
+// Preparación de nombre final del archivo
+$new_size        = (float)$file_size / 1024;
+$new_file_name   = strtolower($file);
+$final_file      = str_replace(' ', '-', $new_file_name);
+
+// Zona horaria y fecha/hora actual
 date_default_timezone_set('America/Lima');
-$fechaRegistro = date('Y-m-d'); // Formato: 2025-05-06
-$anio = date('Y'); //Capturar el año
-$horaRegistro = date('H:i');    // Formato: 14:35
+$anio            = date('Y');
+$fechaRegistro   = date('Y-m-d');
 
-// Convertir hora a formato AM/PM
-$horaNumerica = date('H'); // Obtiene solo la hora (00 a 23)
-if ($horaNumerica >= 12) {
-    $horaRegistro .= '-pm';
+// Selección de formato de hora
+$formato = 2; // 1: 24h / 2: 12h con am-pm
+
+if ($formato == 1) {
+    $horaRegistro = date('H:i');
+} elseif ($formato == 2) {
+    $horaRegistro = date('h:i') . '-' . date('a');
 } else {
-    $horaRegistro .= '-am';
+    $horaRegistro = 'Formato no válido';
 }
 
+// Validaciones encadenadas del formulario
+if ($getTramite->validarBoton($btnEnviarTramite)) {
+    if ($getTramite->validarAsunto($asunto)) {
+        if ($getTramite->validarTipoDocumento($tipoDocumento)) {
+            if ($getTramite->validarNumeroTramite($numeroTramite)) {
+                if ($getTramite->validarArchivo($documento)) {
+                    if ($getTramite->validarFolios($folios)) {
 
-if($getTramite->validarAsunto($asunto)){
-    if($getTramite->validarTipoDocumento($tipoDocumento)){
-        if($getTramite->validarNumeroTramite($numeroTramite)){
-            if($getTramite->validarArchivo($documento)){
-                if($getTramite->validarFolios($folios)){
-                    //Nombre base para guardar el archivo
-                    $nombre_base = $numeroTramite."-".$documento['name'];
-                    //Guardar el archivo en la base de datos
-                    if($getTramite->insertarTramite($tipoTramite, $anio, $numeroTramite,$tipoDocumento, $horaRegistro, $fechaRegistro, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $final_file, $file_type, $new_size)){
-                        //mover el archivo
-                        $rutaDestino = "../../uploads/tramites/" . basename($nombre_base);
-                        $getTramite->moverArchivo($documento, $rutaDestino);
-                        echo json_encode([
-                            'flag' => 1,
-                            'message' => "Envio de formulario exitoso",
-                            'redirect' => "../../views/redireccion/home.php"
-                        ]);
+                        // Nombre base del archivo en el servidor
+                        $nombre_base = $numeroTramite . "-" . $documento['name'];
+
+                        // Intentar insertar el trámite en base de datos
+                        if ($getTramite->insertarTramite(
+                            $tipoTramite,
+                            $anio,
+                            $numeroTramite,
+                            $tipoDocumento,
+                            $horaRegistro,
+                            $fechaRegistro,
+                            $remitente,
+                            $asunto,
+                            $folios,
+                            $comentario,
+                            $area_origen,
+                            $area_destino,
+                            $final_file,
+                            $file_type,
+                            $new_size
+                        )) {
+                            // Mover archivo a carpeta de destino
+                            $rutaDestino = "../../uploads/tramites/" . basename($nombre_base);
+                            $getTramite->moverArchivo($documento, $rutaDestino);
+
+                            echo json_encode([
+                                'flag'     => 1,
+                                'message'  => "Envio de formulario exitoso",
+                                'redirect' => "../../views/redireccion/home.php"
+                            ]);
+                        } else {
+                        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                        exit;
+                        }
+                    } else {
+                        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                        exit;
                     }
-                    
-                    
-                }else{
+                } else {
                     echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                     exit;
                 }
-            }else{
+            } else {
                 echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                 exit;
             }
-        }else{
+        } else {
             echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
             exit;
         }
-    }else{
+    } else {
         echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
         exit;
     }
-}else{
-    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
-    exit;
+} else {
+        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+        exit;
 }
-
 ?>

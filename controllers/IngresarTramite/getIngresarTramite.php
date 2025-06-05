@@ -13,7 +13,7 @@ class GetIngresarTramite{
     }
 
     public function validarBoton($nombreBoton) {
-        return isset($_POST[$nombreBoton]) && $_POST[$nombreBoton] == "IngresarTramite";
+        return isset($_POST[$nombreBoton]) && $_POST[$nombreBoton] == "EnviarTramite";
     }
 
     public function obtenerUltimoTramite(){
@@ -48,7 +48,6 @@ class GetIngresarTramite{
         return $codigo_Generado;
     }
     
-
     public function obtenerTipoDocumento(){
         $getTipoDocumento = new TipoDocumento();
         $tipoDocumento = $getTipoDocumento->obtenerTipoDocumento();
@@ -60,11 +59,20 @@ class GetIngresarTramite{
         $datosRemitente = $getDatosRemitente->obtenerDatosRemitenteForm($usuario);
         return $datosRemitente;
     }
+
     public function validarAsunto($asunto){
         if (!isset($asunto) || trim($asunto) === "") {
             $this->message = "El asunto es obligatorio.";
             return false;
         }
+
+        // Validar longitud máxima 100 caracteres
+        if (strlen($asunto) > 100) {
+            $this->message = "El asunto no debe exceder los 100 caracteres. Actualmente tiene " . strlen($asunto) . " caracteres.";
+            return false;
+        }
+
+        // Si pasa todas las validaciones
         return true;
     }
     
@@ -105,7 +113,6 @@ class GetIngresarTramite{
         return true;
     }
     
-    
     public function validarArchivo($archivo) {
         if (!isset($archivo) || $archivo['error'] !== UPLOAD_ERR_OK) {
             $this->message = "Debe subir un archivo. ";
@@ -136,7 +143,6 @@ class GetIngresarTramite{
     
         return true;
     }
-
 
     public function moverArchivo($archivo, $rutaDestino) {
         return move_uploaded_file($archivo['tmp_name'], $rutaDestino);

@@ -1,0 +1,156 @@
+<?php
+include_once("getDerivarTramite.php");
+
+// Validar método y botón
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite'])) {
+
+    $getTramite = new GetDerivarTramite;
+
+    // Captura de campos enviados por FormData
+    $btnDerivarTramite = 'btnDerivarTramite';
+    $fechaArchivo      = $_POST['fecha_archivo'] ?? null;
+    $horaArchivo       = $_POST['hora_archivo'] ?? null;
+    $numeroExpediente  = $_POST['expediente'] ?? null;
+    $areaDestino       = $_POST['area_destino'] ?? null;
+    $folios            = $_POST['folios'] ?? '';
+    $motivoArchivo     = $_POST['motivo_archivo'] ?? null;
+    $numeroDocumento   = $_POST['numero_documento'] ?? null;
+
+    // Verificar si se cargó un archivo
+    $documento = $_FILES['documento_virtual'] ?? null;
+
+    if ($documento) {
+        // Generar un nombre único para el archivo
+        $nombreOriginal   = $documento['name'];
+        $nombreAleatorio  = rand(1000, 100000) . "-" . $nombreOriginal;
+
+        // Ruta temporal del archivo subido
+        $rutaTemporal     = $documento['tmp_name'];
+
+        // Propiedades del archivo
+        $tamanoBytes      = $documento['size'];
+        $tipoArchivo      = $documento['type'];
+
+        // Carpeta de destino
+        $carpetaDestino   = "../../../uploads/tramites";
+
+        // Convertir tamaño a kilobytes (KB)
+        $tamanoKB         = $tamanoBytes / 1024;
+
+        // Normalizar el nombre del archivo: minúsculas y sin espacios
+        $nombreNormalizado = strtolower($nombreAleatorio);
+        $nombreFinal       = str_replace(' ', '-', $nombreNormalizado);
+    } else {
+        // En caso no se haya subido un archivo
+        $nombreFinal = null;
+    }
+
+    // Establecer la zona horaria local (Lima, Perú)
+    date_default_timezone_set('America/Lima');
+
+    // Obtener el año actual (útil para carpetas, archivos o metadatos)
+    $anioActual = date('Y');
+
+    // Obtener la fecha actual en formato 'YYYY-MM-DD'
+    $fechaRegistro = date('Y-m-d');
+
+    // Definir el formato de hora: 1 = 24 horas, 2 = 12 horas con am/pm
+    $formatoHora = 2;
+
+    // Obtener la hora actual según el formato elegido
+    switch ($formatoHora) {
+        case 1:
+            // Ejemplo: 13:45
+            $horaRegistro = date('H:i');
+            break;
+
+        case 2:
+            // Ejemplo: 01:45 - pm
+            $horaRegistro = date('h:i') . '-' . date('a');
+            break;
+
+        default:
+            // En caso de formato inválido
+            $horaRegistro = 'Formato no válido';
+            break;
+    }
+
+    if ($getTramite->validarBoton($btnDerivarTramite)) {
+        if ($getTramite->validarMotivo($motivoArchivo)) {
+            if ($getTramite->validarAreaDestino($areaDestino)) {
+                if ($getTramite->validarNumeroExpediente($numeroExpediente)) {
+                    if ($getTramite->validarArchivo($documento)) {
+                        if ($getTramite->validarFolios($folios)) {
+                            // Nombre base para guardar el archivo
+                            $nombre_base = $numeroExpediente . "-" . $documento['name'];
+                            // Intentar derivar el trámite
+                            if ($getTramite->DerivarTramite(
+                                $numeroExpediente,
+                                $fechaRegistro,
+                                $horaRegistro,
+                                $areaDestino,
+                                $motivoArchivo,
+                                $numeroDocumento,
+                                $folios,
+                                $nombreFinal,
+                                $tipoArchivo,
+                                $tamanoKB
+                            )) {
+                                // Mover el archivo
+                                $rutaDestino = "../../../uploads/tramites/" . basename($nombre_base);
+                                if ($getTramite->moverArchivo($documento, $rutaDestino)) {
+                                    // Archivo movido correctamente
+                                    echo json_encode([
+                                        'flag'     => 1,
+                                        'message'  => "Trámite derivado y archivo subido correctamente.",
+                                        'redirect' => "../../views/redireccion/homeAdmin.php"
+                                    ]);
+                                    exit;
+                                } else {
+                                    // Error al mover archivo, pero trámite derivado exitosamente
+                                    echo json_encode([
+                                        'flag'    => 1,
+                                        'message' => "Trámite derivado, pero hubo un error subiendo el archivo",
+                                        'redirect' => "../../views/redireccion/homeAdmin.php"
+                                    ]);
+                                    exit;
+                                }
+                                exit; // Importante para cortar la ejecución aquí
+                            } else {
+                                echo json_encode([
+                                    'flag'    => 0,
+                                    'message' => $getTramite->message
+                                ]);
+                                exit;
+                            }
+                        } else {
+                            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                            exit;
+                        }
+                    } else {
+                        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                        exit;
+                    }
+                } else {
+                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                    exit;
+                }
+            } else {
+                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                exit;
+            }
+        } else {
+            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+            exit;
+        }
+    } else {
+        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+        exit;
+    }
+}
+
+// Si no es POST válido o botón no existe
+echo json_encode([
+    'flag'    => 0,
+    'message' => 'Solicitud no válida'
+]);

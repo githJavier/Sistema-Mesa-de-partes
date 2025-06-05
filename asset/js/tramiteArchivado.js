@@ -60,7 +60,7 @@ function validarFiltroTramitesArchivados() {
                 if (validarFiltroTramitesArchivados()) {
                     // Aquí se llamaría la función que hace la búsqueda, por ejemplo:
                     // buscarTramitesArchivados();
-                    console.log("Validación exitosa. Procediendo con búsqueda...");
+                    //console.log("Validación exitosa. Procediendo con búsqueda...");
                 }
             });
 
@@ -69,5 +69,5 @@ function validarFiltroTramitesArchivados() {
                 document.getElementById("search").value = "";
                 document.getElementById("date-from").value = "";
                 document.getElementById("date-to").value = "";
-                console.log("Formulario limpiado");
+                //console.log("Formulario limpiado");
             });

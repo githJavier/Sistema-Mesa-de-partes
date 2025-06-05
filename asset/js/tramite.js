@@ -1,157 +1,291 @@
+// Función genérica para mostrar u ocultar errores
+function validarCampoRequerido(inputId, errorId, mensaje = 'Este campo es obligatorio.') {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    const valor = input.value.trim();
 
-function validarTramite(){
-    let isValid = true;
-
-    //validar asunto
-    let asunto = document.getElementById("ASUNTO");
-    let asuntoValue = asunto.value.trim();  
-    let asuntoError = document.getElementById("asuntoError");
-    if(asuntoValue === ''){
-        asuntoError.textContent = 'Este campo es obligatorio.';
-        asuntoError.style.display = 'block';
-        isValid = false;
-    }else{
-        asuntoError.style.display = 'none';
-    }
-
-    //validar tipo documento
-    let tipoDocumento = document.getElementById("TIPO_DOCUMENTO");
-    let tipoDocumentoError = document.getElementById('tipoDocumentoError');
-    if(tipoDocumento.value === ''){
-        tipoDocumentoError.textContent = 'Este campo es obligatorio.'
-        tipoDocumentoError.style.display = 'block';
-        isValid = false;
-    }else{
-        tipoDocumentoError.style.display = 'none';
-    }
-
-    //validar numero tramite
-    let numeroTramite = document.getElementById("NUMERO_TRAMITE");
-    let numeroTramiteValue = numeroTramite.value.trim();
-    let numeroTramiteError = document.getElementById("numeroDocumentoError");
-
-    if (numeroTramiteValue === '') {
-        numeroTramiteError.textContent = 'Este campo es obligatorio.';
-        numeroTramiteError.style.display = 'block';
-        isValid = false;
-    } else if (!/^\d{4}-EX\d{10}$/.test(numeroTramiteValue)) {
-        numeroTramiteError.textContent = 'Formato inválido. Ejemplo válido: 2025-DOC0000000001';
-        numeroTramiteError.style.display = 'block';
-        isValid = false;
+    if (valor === '') {
+        error.textContent = mensaje;
+        error.style.display = 'block';
+        return false;
     } else {
-        numeroTramiteError.style.display = 'none';
+        error.style.display = 'none';
+        return true;
     }
-
-
-    // Validar DOCUMENTO_VIRTUAL (obligatorio y máximo 1000 KB)
-    let documentoVirtual = document.getElementById("DOCUMENTO_VIRTUAL");
-    let documentoVirtualError = document.getElementById("documentoVirtualError");
-
-    if (documentoVirtual.files.length === 0) {
-        documentoVirtualError.textContent = "Debe adjuntar un documento.";
-        documentoVirtualError.style.display = "block";
-        isValid = false;
-    } else {
-        let archivo = documentoVirtual.files[0];
-        let tamañoKB = archivo.size / 1024; // convertir a KB
-
-        if (tamañoKB > 1000) {
-            documentoVirtualError.textContent = "El archivo no debe superar los 1000 KB.";
-            documentoVirtualError.style.display = "block";
-            isValid = false;
-        } else {
-            documentoVirtualError.style.display = "none";
-        }
-    }
-
-
-
-    let folios = document.getElementById("FOLIOS");
-    let foliosValue = folios.value.trim();
-    let foliosError = document.getElementById("foliosError");
-
-    if(foliosValue === ''){
-        foliosError.textContent = "Este campo es obligatorio.";
-        foliosError.style.display = "block";
-        isValid = false;
-    }else if (!/^\d+$/.test(foliosValue) || parseInt(foliosValue) <= 0) {
-        foliosError.textContent = "Ingrese un número válido de folios.";
-        foliosError.style.display = "block";
-        isValid = false;
-    } else {
-        foliosError.style.display = "none";
-    }
-
-    return isValid; 
-    
 }
 
+// Validar número de expediente con formato personalizado
+function validarFormatoExpediente(inputId, errorId, regex, ejemploFormato) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    const valor = input.value.trim();
 
-document.getElementById("FOLIOS").addEventListener("input", function(e) {
-    // Eliminar cualquier caracter que no sea número
-    let soloNumeros = this.value.replace(/\D/g, '');
+    if (valor === '') {
+        error.textContent = 'Este campo es obligatorio.';
+        error.style.display = 'block';
+        return false;
+    } else if (!regex.test(valor)) {
+        error.textContent = `Formato inválido. Ejemplo válido: ${ejemploFormato}`;
+        error.style.display = 'block';
+        return false;
+    } else {
+        error.style.display = 'none';
+        return true;
+    }
+}
 
-    // Eliminar ceros iniciales
-    soloNumeros = soloNumeros.replace(/^0+/, '');
-});
+// Validar archivo (obligatorio y límite de tamaño en KB)
+function validarArchivo(inputId, errorId, maxKB = 1000) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
 
+    if (input.files.length === 0) {
+        error.textContent = "Debe adjuntar un documento.";
+        error.style.display = "block";
+        return false;
+    }
 
-// Enviar formulario
+    const archivo = input.files[0];
+    const tamañoKB = archivo.size / 1024;
+
+    if (tamañoKB > maxKB) {
+        error.textContent = `El archivo no debe superar los ${maxKB} KB.`;
+        error.style.display = "block";
+        return false;
+    }
+
+    error.style.display = "none";
+    return true;
+}
+
+// Validar número de folios
+function validarFolios(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const valor = input.value.trim();
+    const error = document.getElementById(errorId);
+
+    if (valor === '') {
+        error.textContent = "Este campo es obligatorio.";
+        error.style.display = "block";
+        return false;
+    } else if (!/^\d+$/.test(valor) || parseInt(valor) <= 0) {
+        error.textContent = "Ingrese un número válido de folios.";
+        error.style.display = "block";
+        return false;
+    }
+
+    error.style.display = "none";
+    return true;
+}
+
+// -----------------------------
+// VALIDACIONES POR FORMULARIO
+// -----------------------------
+
+function validarTramite() {
+    let isValid = true;
+
+    isValid &= validarCampoRequerido("ASUNTO", "asuntoError");
+    isValid &= validarCampoRequerido("TIPO_DOCUMENTO", "tipoDocumentoError");
+    isValid &= validarFormatoExpediente("NUMERO_TRAMITE", "numeroDocumentoError", /^\d{4}-EX\d{10}$/, '2025-EX0000000001');
+    isValid &= validarArchivo("DOCUMENTO_VIRTUAL", "documentoVirtualError", 1000);
+    isValid &= validarFolios("FOLIOS", "foliosError");
+
+    return !!isValid;
+}
+
+function validarFormularioDerivarTramite() {
+    let isValid = true;
+
+    isValid &= validarCampoRequerido("AREA_DESTINO", "areaDestinoError");
+    isValid &= validarArchivo("DOCUMENTO_VIRTUAL", "documentoVirtualError", 1000);
+    isValid &= validarFolios("FOLIOS", "foliosError");
+    isValid &= validarCampoRequerido("MOTIVO_ARCHIVO", "motivoArchivoError");
+
+    return !!isValid;
+}
+
+// -----------------------------
+// ENVÍO DE FORMULARIOS
+// -----------------------------
+
 function enviarFormTramite() {
-    if (validarTramite()) {
-        const asunto = document.getElementById("ASUNTO").value.trim();
-        const tipoDocumento = document.getElementById("TIPO_DOCUMENTO").value;
-        const numeroTramite = document.getElementById("NUMERO_TRAMITE").value.trim();
-        const remitente = document.getElementById("NOMBRE").value.trim();
-        const folios = document.getElementById("FOLIOS").value.trim();
-        const documentoVirtual = document.getElementById("DOCUMENTO_VIRTUAL").files[0];
+    if (!validarTramite()) return;
 
-        // Crear objeto FormData y añadir todos los datos
-        let formData = new FormData();
-        formData.append('asunto', asunto);
-        formData.append('tipo_documento', tipoDocumento);
-        formData.append('numero_tramite', numeroTramite);
-        formData.append('remitente', remitente);
-        formData.append('folios', folios);
-        formData.append('DOCUMENTO_VIRTUAL', documentoVirtual);
-        formData.append('btnEnviarTramite', "EnviarTramite");
+    const formData = new FormData();
+    formData.append('asunto', document.getElementById("ASUNTO").value.trim());
+    formData.append('tipo_documento', document.getElementById("TIPO_DOCUMENTO").value);
+    formData.append('numero_tramite', document.getElementById("NUMERO_TRAMITE").value.trim());
+    formData.append('remitente', document.getElementById("NOMBRE").value.trim());
+    formData.append('folios', document.getElementById("FOLIOS").value.trim());
+    formData.append('DOCUMENTO_VIRTUAL', document.getElementById("DOCUMENTO_VIRTUAL").files[0]);
+    formData.append('btnEnviarTramite', "EnviarTramite");
 
-        
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/IngresarTramite/controlIngresarTramite.php",
-            data: formData,
-            processData: false, // No procesar los datos (necesario para FormData)
-            contentType: false, // No establecer Content-Type (lo hace FormData automáticamente)
-            dataType: "json",
-            success: function(response) {
-                if (response.flag == 1) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => window.location.href = response.redirect);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'Ocurrió un error al enviar el trámite.'
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                //console.error("Estado:", status);
-                //console.error("Error:", error);
-                //console.error("Respuesta del servidor:", xhr.responseText);
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/IngresarTramite/controlIngresarTramite.php",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function(response) {
+            if (response.flag == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => window.location.href = response.redirect);
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error en la solicitud: ' + error
+                    text: response.message || 'Ocurrió un error al enviar el trámite.'
                 });
             }
-        });
-    }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error en la solicitud: ' + error
+            });
+        }
+    });
 }
 
+function derivarTramite() {
+    if (!validarFormularioDerivarTramite()) return;
+
+    const formData = new FormData();
+    formData.append("fecha_archivo", document.getElementById("FECHA_ARCHIVO").value.trim());
+    formData.append("hora_archivo", document.getElementById("HORA_ARCHIVO").value.trim());
+    formData.append("expediente", document.getElementById("EXPEDIENTE").value.trim());
+    formData.append("area_destino", document.getElementById("AREA_DESTINO").value.trim());
+    formData.append("folios", document.getElementById("FOLIOS").value.trim());
+    formData.append("motivo_archivo", document.getElementById("MOTIVO_ARCHIVO").value.trim());
+    formData.append("documento_virtual", document.getElementById("DOCUMENTO_VIRTUAL").files[0]);
+    formData.append("numero_documento", document.getElementById("NUM_DOCUMENTO").value.trim());
+    formData.append("btnDerivarTramite", "DerivarTramite");
+
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/ResolverTramite/DerivarTramite/controlDerivarTramite.php",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function(response) {
+            if (response.flag == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => cargarformularioResolverTramites());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Ocurrió un error al enviar el trámite.'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: 'Error: ' + error
+            });
+        }
+    });
+}
+
+function archivarTramite() {
+    const motivoArchivo = document.getElementById("MOTIVO_ARCHIVO").value.trim();
+    const error = document.getElementById("motivoArchivoError");
+
+    if (motivoArchivo === "") {
+        error.textContent = 'Este campo es obligatorio.';
+        error.style.display = 'block';
+        return;
+    } else {
+        error.style.display = 'none';
+    }
+
+    const formData = new FormData();
+    formData.append("fecha_archivo", document.getElementById("FECHA_ARCHIVO").value.trim());
+    formData.append("hora_archivo", document.getElementById("HORA_ARCHIVO").value.trim());
+    formData.append("expediente", document.getElementById("EXPEDIENTE").value.trim());
+    formData.append("asunto_archivo", document.getElementById("ASUNTO_ARCHIVO").value.trim());
+    formData.append("motivo_archivo", motivoArchivo);
+    formData.append("numero_documento", document.getElementById("NUM_DOCUMENTO").value.trim());
+    formData.append("btnArchivarTramite", "ArchivarTramite");
+
+    $.ajax({
+        type: "POST",
+        url: "../../controllers/ResolverTramite/ArchivarTramite/controlArchivarTramite.php",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function(response) {
+            if (response.flag == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Trámite archivado',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => cargarformularioResolverTramites());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Ocurrió un error al archivar el trámite.'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: 'Error: ' + error
+            });
+        }
+    });
+}
+
+// Cargar áreas dinámicamente (sin cambios)
+function cargarAreasParaDerivar() {
+    fetch('../../controllers/Ajustes/controlAjustesUsuario.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const areas = data.data.areas;
+                const selectAreaDestino = document.getElementById('AREA_DESTINO');
+                selectAreaDestino.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'SELECCIONA UNIDAD DESTINO';
+                defaultOption.selected = true;
+                selectAreaDestino.appendChild(defaultOption);
+
+                areas.forEach(areaObj => {
+                    const option = document.createElement('option');
+                    option.value = areaObj.area;
+                    option.textContent = areaObj.area;
+                    selectAreaDestino.appendChild(option);
+                });
+            } else {
+                alert('Error: ' + (data.message || 'No se encontraron áreas disponibles.'));
+            }
+        })
+        .catch(() => alert('Error al cargar las áreas destino.'));
+}
+
+function cerrarFormulario() {
+    window.location.href = 'homeAdmin.php';
+}

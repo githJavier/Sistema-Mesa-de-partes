@@ -44,6 +44,20 @@ function guardarContenidoEnLocalStorage(html, vista) {
         localStorage.setItem("vistaActual", vista);
     }
 }
+
+function guardarParametrosArchivarTramite(codigo, asunto, documento) {
+    localStorage.setItem("archivar_codigo", codigo);
+    localStorage.setItem("archivar_asunto", asunto);
+    localStorage.setItem("archivar_documento", documento);
+}
+
+function guardarParametrosDerivarTramite(codigo, asunto, documento) {
+    localStorage.setItem("derivar_codigo", codigo);
+    localStorage.setItem("derivar_asunto", asunto);
+    localStorage.setItem("derivar_documento", documento);
+}
+
+
 // ✅ Cargar contenido desde localStorage si existe
 function cargarDesdeLocalStorage() {
     const vista = localStorage.getItem("vistaActual");
@@ -70,6 +84,34 @@ function cargarDesdeLocalStorage() {
             case "consultarTramitesDerivados":
                 cargarformularioConsultarTramitesDerivados();
                 break;
+            case "recibirTramitesExternos":
+                cargarformularioRecibirTramitesExternos();
+                break;
+            case "resolverTramites":
+                cargarformularioResolverTramites();
+                break;
+            case "archivarTramite":
+                const codigoA = localStorage.getItem("archivar_codigo");
+                const asuntoA = localStorage.getItem("archivar_asunto");
+                const documentoA = localStorage.getItem("archivar_documento");
+                if (codigoA && asuntoA && documentoA) {
+                    cargarFormularioArchivarTramite(codigoA, asuntoA, documentoA);
+                } else {
+                    //console.warn("⚠️ Faltan parámetros para cargar archivarTramite.");
+                }
+                break;
+
+            case "derivarTramite":
+                const codigoD = localStorage.getItem("derivar_codigo");
+                const asuntoD = localStorage.getItem("derivar_asunto");
+                const documentoD = localStorage.getItem("derivar_documento");
+                if (codigoD && asuntoD && documentoD) {
+                    cargarFormularioDerivarTramite(codigoD, asuntoD, documentoD);
+                } else {
+                    //console.warn("⚠️ Faltan parámetros para cargar derivarTramite.");
+                }
+                break;
+
             default:
                 cargarHome();
         }
@@ -77,6 +119,8 @@ function cargarDesdeLocalStorage() {
         cargarHome(); // por defecto
     }
 }
+
+// Llamar al cargar la página
 cargarDesdeLocalStorage();
 
 function cargarHome() {
@@ -87,7 +131,6 @@ function cargarHome() {
         });
     });
 }
-
 
 function cargarformularioAdministracionRemitentes() {
 
@@ -139,8 +182,6 @@ function cargarformularioAdministracionUsuarios() {
     });
 }
 
-
-
 function cargarformularioAdministracionAreas() {
 
     verificarSesion(() => {
@@ -152,6 +193,11 @@ function cargarformularioAdministracionAreas() {
                 if (response.flag == 1) {
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "administracionAreas");
+                    setTimeout(() => {
+                        if (typeof window.areasPagination !== "undefined") {
+                            window.areasPagination.init();
+                        }
+                    }, 100);
                 }
             },
             error: function(xhr, status, error) {
@@ -160,7 +206,6 @@ function cargarformularioAdministracionAreas() {
         });
     });
 }
-
 
 function cargarformularioAdministracionDocumentos() {
 
@@ -173,6 +218,11 @@ function cargarformularioAdministracionDocumentos() {
                 if (response.flag == 1) {
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "administracionDocumentos");
+                    setTimeout(() => {
+                        if (typeof window.tipoDocumentosPagination !== "undefined") {
+                            window.tipoDocumentosPagination.init();
+                        }
+                    }, 100);
                 }
             },
             error: function(xhr, status, error) {
@@ -182,33 +232,72 @@ function cargarformularioAdministracionDocumentos() {
     });
 }
 
-
 function cargarformularioConsultarTramitesArchivados(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Consultar/controlFormConsultarTramitesArchivados.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesArchivados");
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Consultar/controlFormConsultarTramitesArchivados.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesArchivados");
+                }
             }
-        }
-    })
+        })
+    });
 }
 
 function cargarformularioConsultarTramitesDerivados(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Consultar/controlFormConsultarTramitesDerivados.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesDerivados");
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Consultar/controlFormConsultarTramitesDerivados.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesDerivados");
+                }
             }
-        }
-    })
+        })
+    });
+}
+
+function cargarformularioRecibirTramitesExternos(){
+      
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/RecibirTramiteExterno/controlFormRecibirTramiteExterno.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "recibirTramitesExternos");
+                }
+            }
+        })
+    });
+}
+
+function cargarformularioResolverTramites(){
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/ResolverTramite/controlFormResolverTramite.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "resolverTramites");
+                }
+            }
+        })
+    });
 }
 
 $(document).on('click', '#AdministrarRemitentes', function() {
@@ -229,7 +318,12 @@ $(document).on('click', '#ConsultarTramitesArchivados', function() {
 $(document).on('click', '#ConsultarTramitesDerivados', function() {
     cargarformularioConsultarTramitesDerivados();
 });
-
+$(document).on('click', '#RecibirTramitesExternos', function() {
+    cargarformularioRecibirTramitesExternos();
+});
+$(document).on('click', '#ResolverTramites', function() {
+    cargarformularioResolverTramites();
+});
 
 // ✅ Cierre de sesión: eliminar el contenido almacenado
 document.getElementById("cerrarSesion")?.addEventListener("click", function () {
@@ -263,4 +357,3 @@ function verificarSesion(callback) {
             window.location.href = "../../index.php";
         });
 }
-
