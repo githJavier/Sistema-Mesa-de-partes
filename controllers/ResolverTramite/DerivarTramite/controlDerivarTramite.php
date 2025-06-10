@@ -7,14 +7,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
     $getTramite = new GetDerivarTramite;
 
     // Captura de campos enviados por FormData
-    $btnDerivarTramite = 'btnDerivarTramite';
-    $fechaArchivo      = $_POST['fecha_archivo'] ?? null;
-    $horaArchivo       = $_POST['hora_archivo'] ?? null;
-    $numeroExpediente  = $_POST['expediente'] ?? null;
-    $areaDestino       = $_POST['area_destino'] ?? null;
-    $folios            = $_POST['folios'] ?? '';
-    $motivoArchivo     = $_POST['motivo_archivo'] ?? null;
-    $numeroDocumento   = $_POST['numero_documento'] ?? null;
+    $btnDerivarTramite    = 'btnDerivarTramite';
+    $fechaArchivo         = $_POST['fecha_archivo'] ?? null;
+    $horaArchivo          = $_POST['hora_archivo'] ?? null;
+    $numeroExpediente     = $_POST['expediente'] ?? null;
+    $areaDestino          = $_POST['area_destino'] ?? null;
+    $folios               = $_POST['folios'] ?? '';
+    $motivoArchivo        = $_POST['motivo_archivo'] ?? null;
+    $numeroDocumento      = $_POST['numero_documento'] ?? null;
+    $codigoDetalleTramite = $_POST['codigo_detalle_tramite'] ?? null;
 
     // Verificar si se cargó un archivo
     $documento = $_FILES['documento_virtual'] ?? null;
@@ -22,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
     if ($documento) {
         // Generar un nombre único para el archivo
         $nombreOriginal   = $documento['name'];
-        $nombreAleatorio  = rand(1000, 100000) . "-" . $nombreOriginal;
 
         // Ruta temporal del archivo subido
         $rutaTemporal     = $documento['tmp_name'];
@@ -38,8 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
         $tamanoKB         = $tamanoBytes / 1024;
 
         // Normalizar el nombre del archivo: minúsculas y sin espacios
-        $nombreNormalizado = strtolower($nombreAleatorio);
+        $nombreNormalizado = strtolower($nombreOriginal);
         $nombreFinal       = str_replace(' ', '-', $nombreNormalizado);
+
+        // Nombre base del archivo en el servidor
+        $tipo = "00U00"; // Es un código que hace referencia a archivo subido por usuario del sistema
+        $nombre_base = $numeroExpediente . "_" . $tipo . "_" . $nombreFinal;
     } else {
         // En caso no se haya subido un archivo
         $nombreFinal = null;
@@ -81,8 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
                 if ($getTramite->validarNumeroExpediente($numeroExpediente)) {
                     if ($getTramite->validarArchivo($documento)) {
                         if ($getTramite->validarFolios($folios)) {
-                            // Nombre base para guardar el archivo
-                            $nombre_base = $numeroExpediente . "-" . $documento['name'];
                             // Intentar derivar el trámite
                             if ($getTramite->DerivarTramite(
                                 $numeroExpediente,
@@ -91,8 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
                                 $areaDestino,
                                 $motivoArchivo,
                                 $numeroDocumento,
+                                $codigoDetalleTramite,
                                 $folios,
-                                $nombreFinal,
+                                $nombre_base,
                                 $tipoArchivo,
                                 $tamanoKB
                             )) {

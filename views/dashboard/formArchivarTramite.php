@@ -66,7 +66,7 @@ class GetFormArchivarTramite {
 
         <!-- BOTONES -->
         <div class="d-grid gap-2 col-12 col-md-6 col-lg-4 mx-auto mt-4 mb-4">
-          <button type="button" class="btn btn-enviarTramite w-100 px-3 py-2" onclick="archivarTramite()">ARCHIVAR</button>
+          <button id="btnArchivarTramite" type="button" class="btn btn-enviarTramite w-100 px-3 py-2" onclick="archivarTramite()">ARCHIVAR</button>
           <button type="button" class="btn btn-secondary w-100 px-3 py-2 mt-2" onclick="cargarformularioResolverTramites()">CANCELAR</button>
         </div>
       </div>

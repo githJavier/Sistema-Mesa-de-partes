@@ -20,7 +20,7 @@ function cargarFormularioArchivarTramite(codigo_tramite, asunto, num_documento){
     })
 }
 
-function cargarFormularioDerivarTramite(codigo_tramite, asunto, num_documento){
+function cargarFormularioDerivarTramite(codigo_tramite, asunto, num_documento, cod_detalle_tramite){
     $.ajax({
         type: "POST",
         url: "../../controllers/ResolverTramite/DerivarTramite/controlFormDerivarTramite.php",
@@ -28,6 +28,7 @@ function cargarFormularioDerivarTramite(codigo_tramite, asunto, num_documento){
             codigo_tramite: codigo_tramite,
             asunto: asunto,
             num_documento: num_documento,
+            cod_detalle_tramite: cod_detalle_tramite,
             btnDerivarTramite: "DerivarTramite"
         },
         dataType: "json",

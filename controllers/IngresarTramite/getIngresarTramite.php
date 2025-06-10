@@ -145,7 +145,13 @@ class GetIngresarTramite{
     }
 
     public function moverArchivo($archivo, $rutaDestino) {
-        return move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+        if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
+            $this->message = "Archivo subido correctamente.";
+            return true;
+        } else {
+            $this->message = "Error al mover el archivo.";
+            return false;
+        }
     }
 
     public function insertarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $final_file, $file_type, $new_size){

@@ -86,124 +86,147 @@ function guardarContenidoEnLocalStorage(html, vista) {
 }
 
 function cargarHome() {
-    $("#contenido-dinamico").load("../../views/dashboard/principal.php", function() {
-        guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
+
+    verificarSesionRemitente(() => {
+        $("#contenido-dinamico").load("../../views/dashboard/principal.php", function() {
+            guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
+        });
     });
 }
 
 function cargarFormularioTramite() {
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/IngresarTramite/controlFormIngresarTramite.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                if(response.message){
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Aviso',
-                        text: response.message
-                    }).then(()=>{
+
+    verificarSesionRemitente(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/IngresarTramite/controlFormIngresarTramite.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    if(response.message){
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Aviso',
+                            text: response.message
+                        }).then(()=>{
+                            $("#contenido-dinamico").html(response.formularioHTML);
+                            guardarContenidoEnLocalStorage(response.formularioHTML, "tramite");
+                            cargarDepartamentos();
+                        })
+                    }else{
                         $("#contenido-dinamico").html(response.formularioHTML);
                         guardarContenidoEnLocalStorage(response.formularioHTML, "tramite");
                         cargarDepartamentos();
-                    })
-                }else{
+                    }
+                }else if(response.flag == 2){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "tramite");
-                    cargarDepartamentos();
                 }
-            }else if(response.flag == 2){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "tramite");
             }
-        }
-    })
-}
-function cargarformularioAyuda(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Ayuda/controlFormAyuda.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                if(response.message){
-                     Swal.fire({
-                        icon: 'info',
-                        title: 'Aviso',
-                        text: response.message
-                     }).then(()=>{
-                        $("#contenido-dinamico").html(response.formularioHTML);
-                        guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
-                        cargarDepartamentos();
-                     })
-                }else{
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
-                    cargarDepartamentos();
-                }
-                
-            }else if(response.flag ==2){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
-            }
-        }
-    })
-}
-
-function cargarFormularioSeguimiento(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/SeguimientoTramite/controlFormSeguimientoTramite.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "seguimiento");
-            } else {
-                alert("Ocurrió un problema al cargar el formulario.");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error en AJAX: ", error);
-            alert("Error en la comunicación con el servidor.");
-        }
-    });    
-}
-
-function cargarAjustesDatos() {
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Ajustes/controlFormAjustarDatos.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "ajustes");
-
-                const datoDepartamento = response.departamento;
-                const datoProvincia = response.provincia;
-                const datoDistrito = response.distrito;
-                cargarDepartamentos(datoDepartamento, datoProvincia, datoDistrito);
-            }
-        }
+        })
     });
 }
 
+function cargarformularioAyuda(){
+
+    verificarSesionRemitente(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Ayuda/controlFormAyuda.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    if(response.message){
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Aviso',
+                            text: response.message
+                        }).then(()=>{
+                            $("#contenido-dinamico").html(response.formularioHTML);
+                            guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+                            cargarDepartamentos();
+                        })
+                    }else{
+                        $("#contenido-dinamico").html(response.formularioHTML);
+                        guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+                        cargarDepartamentos();
+                    }
+                    
+                }else if(response.flag ==2){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "ayuda");
+                }
+            }
+        })
+    });
+}
+
+function cargarFormularioSeguimiento(){
+
+    verificarSesionRemitente(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/SeguimientoTramite/controlFormSeguimientoTramite.php",
+            dataType: "json",
+            success: function(response) {
+            if (response.flag == 1) {
+                $("#contenido-dinamico").html(response.formularioHTML);
+                guardarContenidoEnLocalStorage(response.formularioHTML, "seguimiento");
+                // Esperar brevemente a que el DOM procese el nuevo HTML
+                setTimeout(() => {
+                inicializarModalEstadosTramite();
+                }, 100);
+            } else {
+                alert("Ocurrió un problema al cargar el formulario.");
+            }
+            },
+            error: function(xhr, status, error) {
+            console.error("Error en AJAX: ", error);
+            alert("Error en la comunicación con el servidor.");
+            }
+        });
+    });
+}
+
+function cargarAjustesDatos() {
+
+    verificarSesionRemitente(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Ajustes/controlFormAjustarDatos.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "ajustes");
+
+                    const datoDepartamento = response.departamento;
+                    const datoProvincia = response.provincia;
+                    const datoDistrito = response.distrito;
+                    cargarDepartamentos(datoDepartamento, datoProvincia, datoDistrito);
+                }
+            }
+        });
+    });
+}
 
 function cargarformularioMensaje(){
-    $.ajax({
-        type: "POST",
-        url: "../../controllers/Mensaje/controlFormMensaje.php",
-        dataType: "json",
-        success: function(response){
-            if(response.flag == 1){
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "mensajes");
+
+    verificarSesionRemitente(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Mensaje/controlFormMensaje.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "mensajes");
+                }
             }
-        }
-    })
+        })
+    });
 }
+
 $(document).on('click', '#botonTramite', function() {
     cargarFormularioTramite();
 });
@@ -223,8 +246,6 @@ $(document).on('click', '#botonAyuda', function() {
 $(document).on('click', '#botonMensaje', function() {
     cargarformularioMensaje();
 });
-
-
 
 function cargarDepartamentos(datoDepartamento = null, datoProvincia = null, datoDistrito = null) {
     $.ajax({
@@ -348,3 +369,19 @@ document.getElementById("cerrarSesion")?.addEventListener("click", function () {
     localStorage.removeItem("contenidoDinamico");
     localStorage.removeItem("vistaActual");
 });
+
+function verificarSesionRemitente(callback) {
+    fetch("../../utils/verificarSesionRemitente.php")
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "found") {
+                if (typeof callback === "function") callback();
+            } else {
+                window.location.href = "../../index.php";
+            }
+        })
+        .catch(() => {
+            // Fallback ante error de red o del servidor
+            window.location.href = "../../index.php";
+        });
+}

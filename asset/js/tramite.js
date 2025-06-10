@@ -109,8 +109,14 @@ function validarFormularioDerivarTramite() {
 // ENVÍO DE FORMULARIOS
 // -----------------------------
 
+var yaEnviando = false;
+
 function enviarFormTramite() {
+    if (yaEnviando) return; // Evita múltiples clics
     if (!validarTramite()) return;
+
+    yaEnviando = true; // Activa bandera
+    document.getElementById("btnEnviarTramite").disabled = true; // Desactiva botón
 
     const formData = new FormData();
     formData.append('asunto', document.getElementById("ASUNTO").value.trim());
@@ -143,6 +149,9 @@ function enviarFormTramite() {
                     title: 'Error',
                     text: response.message || 'Ocurrió un error al enviar el trámite.'
                 });
+                // Permitir reintento si falló
+                yaEnviando = false;
+                document.getElementById("btnEnviarTramite").disabled = false;
             }
         },
         error: function(xhr, status, error) {
@@ -151,12 +160,18 @@ function enviarFormTramite() {
                 title: 'Error',
                 text: 'Error en la solicitud: ' + error
             });
+            yaEnviando = false;
+            document.getElementById("btnEnviarTramite").disabled = false;
         }
     });
 }
 
 function derivarTramite() {
+    if (yaEnviando) return; // Evita múltiples clics
     if (!validarFormularioDerivarTramite()) return;
+
+    yaEnviando = true; // Activa bandera
+    document.getElementById("btnDerivarTramite").disabled = true; // Desactiva botón
 
     const formData = new FormData();
     formData.append("fecha_archivo", document.getElementById("FECHA_ARCHIVO").value.trim());
@@ -167,6 +182,7 @@ function derivarTramite() {
     formData.append("motivo_archivo", document.getElementById("MOTIVO_ARCHIVO").value.trim());
     formData.append("documento_virtual", document.getElementById("DOCUMENTO_VIRTUAL").files[0]);
     formData.append("numero_documento", document.getElementById("NUM_DOCUMENTO").value.trim());
+    formData.append("codigo_detalle_tramite", document.getElementById("COD_DETALLE_TRAMITE").value.trim());
     formData.append("btnDerivarTramite", "DerivarTramite");
 
     $.ajax({
@@ -191,6 +207,9 @@ function derivarTramite() {
                     title: 'Error',
                     text: response.message || 'Ocurrió un error al enviar el trámite.'
                 });
+                // Permitir reintento si falló
+                yaEnviando = false;
+                document.getElementById("btnDerivarTramite").disabled = false;
             }
         },
         error: function(xhr, status, error) {
@@ -199,11 +218,15 @@ function derivarTramite() {
                 title: 'Error en la solicitud',
                 text: 'Error: ' + error
             });
+            yaEnviando = false;
+            document.getElementById("btnDerivarTramite").disabled = false;
         }
     });
 }
 
 function archivarTramite() {
+    if (yaEnviando) return; // Evita múltiples clics
+
     const motivoArchivo = document.getElementById("MOTIVO_ARCHIVO").value.trim();
     const error = document.getElementById("motivoArchivoError");
 
@@ -214,6 +237,9 @@ function archivarTramite() {
     } else {
         error.style.display = 'none';
     }
+
+    yaEnviando = true; // Activa bandera
+    document.getElementById("btnArchivarTramite").disabled = true; // Desactiva botón
 
     const formData = new FormData();
     formData.append("fecha_archivo", document.getElementById("FECHA_ARCHIVO").value.trim());
@@ -246,6 +272,9 @@ function archivarTramite() {
                     title: 'Error',
                     text: response.message || 'Ocurrió un error al archivar el trámite.'
                 });
+                // Permitir reintento si falló
+                yaEnviando = false;
+                document.getElementById("btnArchivarTramite").disabled = false;
             }
         },
         error: function(xhr, status, error) {
@@ -254,6 +283,8 @@ function archivarTramite() {
                 title: 'Error en la solicitud',
                 text: 'Error: ' + error
             });
+            yaEnviando = false;
+            document.getElementById("btnArchivarTramite").disabled = false;
         }
     });
 }

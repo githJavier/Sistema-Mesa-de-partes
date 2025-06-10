@@ -108,7 +108,10 @@ window.TramitesPagination = (function () {
 
 window.TramitesPagination.init();
 
-function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, flujos) {
+function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, flujosJSON, archivoAdjuntoJSON) {
+    const flujos = JSON.parse(flujosJSON);
+    const archivoAdjunto = JSON.parse(archivoAdjuntoJSON);
+
     document.getElementById('modal-codigo').textContent = codigo;
     document.getElementById('modal-tipodocumento').textContent = tipoDocumento;
     document.getElementById('modal-asunto').textContent = asunto;
@@ -135,6 +138,26 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
         const fila = document.createElement('tr');
         fila.innerHTML = `<td colspan="7" class="text-center">No hay detalles disponibles</td>`;
         cuerpoTabla.appendChild(fila);
+    }
+
+    const rutaBase = '../../uploads/tramites/';
+    const btnRemitente = document.getElementById('btn-remitente');
+
+    // Buscar archivos específicos
+    const archivoR00 = archivoAdjunto.find(nombre => nombre.includes('_00R00_'));
+
+    // Botón Remitente
+    if (archivoR00) {
+        btnRemitente.href = rutaBase + archivoR00;
+        btnRemitente.classList.remove('btn-secondary', 'disabled-link');
+        btnRemitente.classList.add('btn-danger');
+        btnRemitente.setAttribute('target', '_blank');
+        btnRemitente.disabled = false;
+    } else {
+        btnRemitente.removeAttribute('href');
+        btnRemitente.classList.remove('btn-danger');
+        btnRemitente.classList.add('btn-secondary', 'disabled-link');
+        btnRemitente.setAttribute('aria-disabled', 'true');
     }
 
     const modalFondo = document.getElementById('modalFondo');
@@ -231,14 +254,21 @@ document.getElementById('filter-btn').addEventListener('click', function () {
 });
 
 async function generarPDF() {
-    const botonPDF = event.target;
-    botonPDF.style.display = 'none';
+    const btnRemitente = document.getElementById('btn-remitente');
+    const btnPDF = event.target;
+
+    const visibleRemitente = btnRemitente && btnRemitente.style.display !== 'none';
+
+    btnPDF.style.display = 'none';
+    if (btnRemitente) btnRemitente.style.display = 'none';
+
     await new Promise(resolve => setTimeout(resolve, 300));
 
     const modal = document.getElementById("modalVentana");
 
     html2canvas(modal, { scale: 2 }).then(canvas => {
-        botonPDF.style.display = 'inline-block';
+        btnPDF.style.display = 'inline-block';
+        if (btnRemitente) btnRemitente.style.display = visibleRemitente ? 'inline-block' : 'none';
 
         const imgData = canvas.toDataURL("image/png");
         const { jsPDF } = window.jspdf;
@@ -280,7 +310,7 @@ async function generarPDF() {
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
 
             const codigoTramite = document.getElementById("modal-codigo").textContent.trim() || "detalle_tramite";
-            const nombreArchivo = `detalle_${codigoTramite}.pdf`;
+            const nombreArchivo = `${codigoTramite}_seguimiento_tramite.pdf`;
             pdf.save(nombreArchivo);
         };
     });

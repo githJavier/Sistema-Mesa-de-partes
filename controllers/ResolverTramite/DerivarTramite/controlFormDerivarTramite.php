@@ -7,9 +7,10 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite'])) {
     
     // Captura de datos del formulario    
-    $codigo_tramite  = $_POST['codigo_tramite'] ?? '';
-    $asunto          = $_POST['asunto']         ?? '';
-    $num_documento   = $_POST['num_documento']  ?? '';
+    $codigo_tramite        = $_POST['codigo_tramite']       ?? '';
+    $asunto                = $_POST['asunto']               ?? '';
+    $num_documento         = $_POST['num_documento']        ?? '';
+    $cod_detalle_tramite   = $_POST['cod_detalle_tramite']  ?? '';
 
     // Configurar la zona horaria
     date_default_timezone_set('America/Lima');
@@ -35,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
         $asunto,
         $fechaRegistro,
         $horaRegistro,
-        $num_documento
+        $num_documento,
+        $cod_detalle_tramite
     );
 
     echo json_encode([

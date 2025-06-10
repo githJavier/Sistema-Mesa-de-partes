@@ -1,6 +1,6 @@
 <?php
 class GetFormDerivarTramite {
-  public function formDerivarTramiteShow($codigo_tramite, $asunto, $fechaRegistro, $horaRegistro, $num_documento) {
+  public function formDerivarTramiteShow($codigo_tramite, $asunto, $fechaRegistro, $horaRegistro, $num_documento, $cod_detalle_tramite) {
     ob_start();
     ?>
     <div class="d-flex justify-content-center">
@@ -30,8 +30,9 @@ class GetFormDerivarTramite {
           </div>
         </div>
 
-        <!-- Campo oculto -->
+        <!-- Campos ocultos -->
         <input type="hidden" id="NUM_DOCUMENTO" name="NUM_DOCUMENTO" value="<?= htmlspecialchars($num_documento) ?>">
+        <input type="hidden" id="COD_DETALLE_TRAMITE" name="COD_DETALLE_TRAMITE" value="<?= htmlspecialchars($cod_detalle_tramite) ?>">
 
         <!-- ASUNTO -->
         <div class="row mb-3">
@@ -103,7 +104,7 @@ class GetFormDerivarTramite {
 
         <!-- BOTONES -->
         <div class="d-grid gap-2 col-12 col-md-6 col-lg-4 mx-auto mt-4 mb-4">
-          <button type="button" class="btn btn-enviarTramite w-100 px-3 py-2" onclick="derivarTramite()">DERIVAR</button>
+          <button id="btnDerivarTramite" type="button" class="btn btn-enviarTramite w-100 px-3 py-2" onclick="derivarTramite()">DERIVAR</button>
           <button type="button" class="btn btn-secondary w-100 px-3 py-2 mt-2" onclick="cargarformularioResolverTramites()">CANCELAR</button>
         </div>
       </div>

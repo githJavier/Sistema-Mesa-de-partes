@@ -186,8 +186,9 @@ class Tramite{
     try {
         $area_usuario = null;
 
-        // 2. Obtener trámites archivados por área
+        // 1. Obtener trámites archivados por área
         $sql = "SELECT 
+                    dt.cod_detalletramite as dt_cod_detalletramite,
                     e.estado as dt_estado,
                     dt.urgente as dt_urgente,
                     dt.area_origen as dt_area_origen,
@@ -229,12 +230,13 @@ class Tramite{
             return [];
         }
 
-        // 3. Recorrer trámites encontrados
+        // 2. Recorrer trámites encontrados
         while ($row = $data_detalle_tramite->fetch_assoc()) {
             $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
             $detalle = $row;
 
-            // 3.1 Obtener datos del trámite principal
+            // 2.1 Obtener datos del trámite principal
             $sql_tramite = "SELECT 
                                 td.tipodocumento as t_tipodocumento,
                                 t.fec_reg as t_fec_reg,
@@ -254,7 +256,7 @@ class Tramite{
             } else {
             }
 
-            // 3.2 Obtener historial de flujo
+            // 2.2 Obtener historial de flujo
             $sql_flujo = "SELECT 
                             e.estado as f_estado,
                             f.area_origen as f_area_origen,
@@ -278,9 +280,25 @@ class Tramite{
             while ($detalle_flujo = $data_flujo->fetch_assoc()) {
                 $flujo[] = $detalle_flujo;
             }
+            
+            // 2.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
 
-            // 3.3 Construcción final
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 2.4 Construcción final
             $tramites[] = [
+                'dt_cod_detalletramite'=> $detalle['dt_cod_detalletramite'],
                 'dt_estado'           => $detalle['dt_estado'],
                 'dt_urgente'          => $detalle['dt_urgente'],
                 'dt_area_origen'      => $detalle['dt_area_origen'],
@@ -293,7 +311,8 @@ class Tramite{
                 't_asunto'            => $detalle['t_asunto'] ?? null,
                 't_remitente'         => $detalle['t_remitente'] ?? null,
                 't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
-                'flujo'               => $flujo
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
             ];
         }
     } catch (Exception $e) {
@@ -303,6 +322,7 @@ class Tramite{
         if (isset($stmt1)) $stmt1->close();
         if (isset($stmt2)) $stmt2->close();
         if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
         Conexion::desconectarBD();
     }
 
@@ -424,6 +444,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
 
         // 2. Obtener trámites archivados por área
         $sql = "SELECT 
+                    dt.cod_detalletramite as dt_cod_detalletramite,
                     e.estado as dt_estado,
                     dt.urgente as dt_urgente,
                     dt.area_origen as dt_area_origen,
@@ -467,6 +488,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
         // 3. Recorrer trámites encontrados
         while ($row = $data_detalle_tramite->fetch_assoc()) {
             $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
             $detalle = $row;
 
             // 3.1 Obtener datos del trámite principal
@@ -513,9 +535,25 @@ public function obtenerTramitesArchivados($nombre_usuario) {
             while ($detalle_flujo = $data_flujo->fetch_assoc()) {
                 $flujo[] = $detalle_flujo;
             }
+            
+            // 3.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
 
-            // 3.3 Construcción final
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 3.4 Construcción final
             $tramites[] = [
+                'dt_cod_detalletramite'=> $detalle['dt_cod_detalletramite'],
                 'dt_estado'           => $detalle['dt_estado'],
                 'dt_urgente'          => $detalle['dt_urgente'],
                 'dt_area_origen'      => $detalle['dt_area_origen'],
@@ -528,7 +566,8 @@ public function obtenerTramitesArchivados($nombre_usuario) {
                 't_asunto'            => $detalle['t_asunto'] ?? null,
                 't_remitente'         => $detalle['t_remitente'] ?? null,
                 't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
-                'flujo'               => $flujo
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
             ];
         }
     } catch (Exception $e) {
@@ -538,6 +577,7 @@ public function obtenerTramitesArchivados($nombre_usuario) {
         if (isset($stmt1)) $stmt1->close();
         if (isset($stmt2)) $stmt2->close();
         if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
         Conexion::desconectarBD();
     }
 
@@ -568,7 +608,8 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         }
 
         // 2. Obtener trámites derivados por área
-        $sql = "SELECT 
+        $sql = "SELECT
+                    dt.cod_detalletramite as dt_cod_detalletramite,
                     e.estado as dt_estado,
                     dt.urgente as dt_urgente,
                     dt.area_origen as dt_area_origen,
@@ -612,6 +653,7 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         // 3. Procesar trámites
         while ($row = $data_detalle_tramite->fetch_assoc()) {
             $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
             $detalle = $row;
 
             // 3.1 Obtener datos del trámite principal
@@ -658,8 +700,23 @@ public function obtenerTramitesDerivados($nombre_usuario) {
             while ($detalle_flujo = $data_flujo->fetch_assoc()) {
                 $flujo[] = $detalle_flujo;
             }
+            
+            // 3.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
 
-            // 3.3 Construcción final del trámite
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 3.4 Construcción final del trámite
             $tramites[] = [
                 'dt_estado'           => $detalle['dt_estado'],
                 'dt_urgente'          => $detalle['dt_urgente'],
@@ -673,7 +730,8 @@ public function obtenerTramitesDerivados($nombre_usuario) {
                 't_asunto'            => $detalle['t_asunto'] ?? null,
                 't_remitente'         => $detalle['t_remitente'] ?? null,
                 't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
-                'flujo'               => $flujo
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
             ];
         }
 
@@ -685,6 +743,7 @@ public function obtenerTramitesDerivados($nombre_usuario) {
         if (isset($stmt1)) $stmt1->close();
         if (isset($stmt2)) $stmt2->close();
         if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
         Conexion::desconectarBD();
     }
 
@@ -742,6 +801,7 @@ public function obtenerTramitesRegistradosRemitenteExterno() {
         // 2. Procesar trámites
         while ($row = $data_detalle_tramite->fetch_assoc()) {
             $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
             $detalle = $row;
 
             // 2.1 Obtener datos del trámite principal
@@ -790,7 +850,22 @@ public function obtenerTramitesRegistradosRemitenteExterno() {
                 $flujo[] = $detalle_flujo;
             }
 
-            // 2.3 Construcción final del trámite
+            // 2.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
+
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 2.4 Construcción final del trámite
             $tramites[] = [
                 'dt_cod_detalletramite'  => $detalle['dt_cod_detalletramite'],
                 'dt_estado'           => $detalle['dt_estado'],
@@ -806,7 +881,8 @@ public function obtenerTramitesRegistradosRemitenteExterno() {
                 't_remitente'         => $detalle['t_remitente'] ?? null,
                 't_num_documento'     => $detalle['t_num_documento'] ?? null,
                 't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
-                'flujo'               => $flujo
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
             ];
         }
 
@@ -818,6 +894,7 @@ public function obtenerTramitesRegistradosRemitenteExterno() {
         if (isset($stmt1)) $stmt1->close();
         if (isset($stmt2)) $stmt2->close();
         if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
         Conexion::desconectarBD();
     }
 
@@ -959,6 +1036,7 @@ public function obtenerTramitesPorResolver($area_usuario) {
         // 2. Procesar trámites
         while ($row = $data_detalle_tramite->fetch_assoc()) {
             $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
             $detalle = $row;
 
             // 2.1 Obtener datos del trámite principal
@@ -1007,7 +1085,22 @@ public function obtenerTramitesPorResolver($area_usuario) {
                 $flujo[] = $detalle_flujo;
             }
 
-            // 2.3 Construcción final del trámite
+            // 2.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
+
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 2.4 Construcción final del trámite
             $tramites[] = [
                 'dt_cod_detalletramite'  => $detalle['dt_cod_detalletramite'],
                 'dt_estado'           => $detalle['dt_estado'],
@@ -1023,7 +1116,8 @@ public function obtenerTramitesPorResolver($area_usuario) {
                 't_remitente'         => $detalle['t_remitente'] ?? null,
                 't_num_documento'     => $detalle['t_num_documento'] ?? null,
                 't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
-                'flujo'               => $flujo
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
             ];
         }
 
@@ -1035,6 +1129,7 @@ public function obtenerTramitesPorResolver($area_usuario) {
         if (isset($stmt1)) $stmt1->close();
         if (isset($stmt2)) $stmt2->close();
         if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
         Conexion::desconectarBD();
     }
 
@@ -1106,6 +1201,7 @@ public function DerivarTramite(
     $areaDestino,
     $comentario,
     $numDocumento,
+    $codigoDetalleTramite,
     $orden,
     $folios,
     $id_detalle_tramite,
@@ -1177,7 +1273,7 @@ public function DerivarTramite(
 
             $stmt3->bind_param(
                 "issd",
-                $id_detalle_tramite,
+                $codigoDetalleTramite,
                 $final_file,
                 $file_type,
                 $new_size

@@ -109,8 +109,9 @@ window.TramitesPagination = (function () {
 
 window.TramitesPagination.init();
 
-function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, detallestramiteJSON) {
-    const detallestramite = JSON.parse(detallestramiteJSON); // ← ✅ convertirlo a array real
+function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, detallestramiteJSON, archivoAdjuntoJSON) {
+    const detallestramite = JSON.parse(detallestramiteJSON);
+    const archivoAdjunto = JSON.parse(archivoAdjuntoJSON);
 
     document.getElementById('modal-codigo').textContent = codigo;
     document.getElementById('modal-tipodocumento').textContent = tipoDocumento;
@@ -141,6 +142,40 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, de
         cuerpoTabla.appendChild(fila);
     }
 
+    // Manejo de botones de adjuntos
+    const rutaBase = '../../uploads/tramites/';
+    const btnRemitente = document.getElementById('btn-remitente');
+    const btnDerivado = document.getElementById('btn-derivado');
+
+    // Buscar archivos específicos
+    const archivoR00 = archivoAdjunto.find(nombre => nombre.includes('_00R00_'));
+    const archivoU00 = archivoAdjunto.find(nombre => nombre.includes('_00U00_'));
+
+    // Botón Remitente
+    if (archivoR00) {
+        btnRemitente.href = rutaBase + archivoR00;
+        btnRemitente.classList.remove('btn-secondary', 'disabled-link');
+        btnRemitente.classList.add('btn-danger');
+        btnRemitente.setAttribute('target', '_blank');
+        btnRemitente.disabled = false;
+    } else {
+        btnRemitente.removeAttribute('href');
+        btnRemitente.classList.remove('btn-danger');
+        btnRemitente.classList.add('btn-secondary', 'disabled-link');
+        btnRemitente.setAttribute('aria-disabled', 'true');
+    }
+
+    // Botón Derivado
+    if (archivoU00) {
+        btnDerivado.href = rutaBase + archivoU00;
+        btnDerivado.style.display = 'inline-block';
+        btnDerivado.setAttribute('target', '_blank');
+    } else {
+        btnDerivado.style.display = 'none';
+        btnDerivado.removeAttribute('href');
+    }
+
+    // Mostrar modal
     const modalFondo = document.getElementById('modalFondo');
     const modalVentana = document.getElementById('modalVentana');
 
@@ -240,14 +275,25 @@ document.getElementById('filter-btn').addEventListener('click', function () {
 });
 
 async function generarPDF() {
-    const botonPDF = event.target;
-    botonPDF.style.display = 'none';
+    const btnRemitente = document.getElementById('btn-remitente');
+    const btnDerivado = document.getElementById('btn-derivado');
+    const btnPDF = event.target;
+
+    const visibleRemitente = btnRemitente && btnRemitente.style.display !== 'none';
+    const visibleDerivado = btnDerivado && btnDerivado.style.display !== 'none';
+
+    btnPDF.style.display = 'none';
+    if (btnRemitente) btnRemitente.style.display = 'none';
+    if (btnDerivado) btnDerivado.style.display = 'none';
+
     await new Promise(resolve => setTimeout(resolve, 300));
 
     const modal = document.getElementById("modalVentana");
 
     html2canvas(modal, { scale: 2 }).then(canvas => {
-        botonPDF.style.display = 'inline-block';
+        btnPDF.style.display = 'inline-block';
+        if (btnRemitente) btnRemitente.style.display = visibleRemitente ? 'inline-block' : 'none';
+        if (btnDerivado) btnDerivado.style.display = visibleDerivado ? 'inline-block' : 'none';
 
         const imgData = canvas.toDataURL("image/png");
         const { jsPDF } = window.jspdf;
@@ -289,8 +335,125 @@ async function generarPDF() {
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
 
             const codigoTramite = document.getElementById("modal-codigo").textContent.trim() || "detalle_tramite";
-            const nombreArchivo = `detalle_${codigoTramite}.pdf`;
+            const nombreArchivo = `${codigoTramite}_seguimiento_tramite.pdf`;
             pdf.save(nombreArchivo);
         };
     });
+}
+
+function inicializarModalEstadosTramite() {
+  const modalEl = document.getElementById('et-estadoTramiteModal');
+  if (!modalEl) return; // Si el modal no existe, salir
+
+  const noMostrarBtn = document.getElementById('et-noMostrarBtn');
+  const cerrarModalBtn = document.getElementById('et-cerrarModalBtn');
+  const prevSlideBtn = document.getElementById('et-prevSlide');
+  const nextSlideBtn = document.getElementById('et-nextSlide');
+  const steps = document.querySelectorAll('.et-step');
+  const carouselItems = document.querySelectorAll('.et-carousel-item');
+
+  // Mostrar/ocultar modal
+  function showModal() {
+    modalEl.style.display = 'flex'; // flex para centrarlo
+  }
+  function hideModal() {
+    modalEl.style.display = 'none';
+  }
+
+  function checkUserPreference() {
+    const ocultar = localStorage.getItem("et-ocultarModalEstados");
+    if (ocultar === "true") {
+      hideModal();
+    } else {
+      showModal();
+    }
+  }
+
+  // Inicia después de breve espera
+  setTimeout(checkUserPreference, 500);
+
+  // Botón "No volver a mostrar"
+  noMostrarBtn?.addEventListener("click", function () {
+    localStorage.setItem("et-ocultarModalEstados", "true");
+    modalEl.classList.add("hide-animation");
+    setTimeout(() => {
+      hideModal();
+      modalEl.classList.remove("hide-animation");
+    }, 500);
+  });
+
+  // Botón "Cerrar"
+  cerrarModalBtn?.addEventListener("click", function () {
+    modalEl.classList.add("hide-animation");
+    setTimeout(() => {
+      hideModal();
+      modalEl.classList.remove("hide-animation");
+    }, 500);
+  });
+
+  // Navegación por pasos
+  steps.forEach((step) => {
+    step.addEventListener("click", function () {
+      const index = this.getAttribute("data-index");
+      steps.forEach((s) => s.classList.remove("active"));
+      this.classList.add("active");
+      carouselItems.forEach((item) => item.classList.remove("active"));
+      carouselItems[index].classList.add("active");
+    });
+  });
+
+  // Botones prev/next
+  prevSlideBtn?.addEventListener("click", function () {
+    const currentActive = document.querySelector(".et-carousel-item.active");
+    const prevItem = currentActive.previousElementSibling || carouselItems[carouselItems.length - 1];
+
+    currentActive.classList.remove("active");
+    prevItem.classList.add("active");
+
+    const index = Array.from(carouselItems).indexOf(prevItem);
+    steps.forEach((s) => s.classList.remove("active"));
+    steps[index].classList.add("active");
+  });
+
+  nextSlideBtn?.addEventListener("click", function () {
+    const currentActive = document.querySelector(".et-carousel-item.active");
+    const nextItem = currentActive.nextElementSibling || carouselItems[0];
+
+    currentActive.classList.remove("active");
+    nextItem.classList.add("active");
+
+    const index = Array.from(carouselItems).indexOf(nextItem);
+    steps.forEach((s) => s.classList.remove("active"));
+    steps[index].classList.add("active");
+  });
+}
+
+// Cargar tipos de documento dinámicamente en el filtro
+function cargarTiposDocumentosParaFiltrado() {
+    fetch('../../controllers/Ajustes/controlAjustesUsuario.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const tipos_documento = data.data.tipos_documento;
+                const selectTipoDocumento = document.getElementById('filtroTipo');
+
+                // Limpiamos las opciones previas y dejamos solo "Todos"
+                selectTipoDocumento.innerHTML = '';
+                const opcionTodos = document.createElement('option');
+                opcionTodos.value = '';
+                opcionTodos.textContent = 'Todos';
+                selectTipoDocumento.appendChild(opcionTodos);
+
+                // Insertamos dinámicamente los tipos de documento
+                tipos_documento.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.value = doc.tipodocumento; // valor para filtrar
+                    option.textContent = doc.tipodocumento; // lo que ve el usuario
+                    selectTipoDocumento.appendChild(option);
+                });
+            } else {
+                alert('Error: ' + (data.message || 'No se encontraron tipos de documento'));
+            }
+        })
+        .catch(() => alert('Error al cargar los tipos de documento'));
 }

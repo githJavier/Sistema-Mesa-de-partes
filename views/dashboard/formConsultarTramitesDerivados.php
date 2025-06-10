@@ -101,7 +101,8 @@ class formConsultarTramitesDerivados{
                                     '<?= addslashes($tramite['t_asunto']) ?>',
                                     '<?= addslashes($tramite['t_fec_reg']) ?>',
                                     '<?= addslashes($tramite['t_remitente']) ?>',
-                                    <?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>
+                                    '<?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>',
+                                    '<?= htmlspecialchars(json_encode($tramite['archivos']), ENT_QUOTES, 'UTF-8') ?>'
                                 )">
                                 <i class="fas fa-eye me-1"></i> Ver
                             </button>
@@ -214,9 +215,18 @@ class formConsultarTramitesDerivados{
                         </table>
                         <!-- Botón centrado debajo de la tabla -->
                         <div class="text-center my-3">
+                            <!-- Botón para generar PDF -->
                             <button class="btn btn-danger btn-sm" onclick="generarPDF()">
                                 <i class="bi bi-file-earmark-pdf"></i> Generar PDF
                             </button>
+                            <!-- Botón para ver archivo subido por remitente -->
+                            <a id="btn-remitente" class="btn btn-danger btn-sm" target="_blank">
+                                <i class="bi bi-paperclip"></i> Documento del remitente
+                            </a>
+                            <!-- Botón para ver archivo adjunto en la derivación -->
+                            <a id="btn-derivado" class="btn btn-danger btn-sm" target="_blank" style="display: none;">
+                                <i class="bi bi-paperclip"></i> Documento de derivación
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -226,6 +236,18 @@ class formConsultarTramitesDerivados{
             </div>
         </div>
         </div>
+    
+        <style>
+            .disabled-link {
+            pointer-events: none;        /* impide clics */
+            opacity: 0.5;                /* aspecto apagado */
+            color: #aaa !important;      /* letra más gris */
+            background-color: #e0e0e0 !important;  /* fondo gris claro */
+            border-color: #ccc !important;
+            cursor: not-allowed;         /* cursor de bloqueo */
+            text-decoration: none;
+            }
+        </style>
 
         <!-- html2canvas para capturar el contenido como imagen -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
