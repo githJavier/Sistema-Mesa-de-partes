@@ -1,6 +1,6 @@
 <?php 
 class formConsultarTramitesArchivados{
-    public function formConsultarTramitesArchivadosShow($tramites){
+    public function formConsultarTramitesArchivadosShow($tramites, $tiposDocumento){
         ob_start();
         //Formularios para los Tramites Archivados
         ?>
@@ -22,8 +22,11 @@ class formConsultarTramitesArchivados{
                     <label class="input-group-text span-input-tramite text-light" for="filtroTipo"><i class="fas fa-file-alt"></i></label>
                     <select class="form-select" id="filtroTipo" name="tipo_documento">
                         <option value="">Todos</option>
-                        <option value="SOLICITUD">Solicitud</option>
-                        <option value="APERSONAMIENTO">Apersonamiento</option>
+                        <?php
+                            foreach ($tiposDocumento as $documento) {
+                                echo "<option value='" . $documento['tipodocumento'] . "'>" . strtoupper($documento['tipodocumento']) . "</option>";
+                            }
+                        ?>
                     </select>
                     </div>
                 </div>
