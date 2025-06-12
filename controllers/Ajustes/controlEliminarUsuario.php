@@ -1,5 +1,5 @@
 <?php
-include_once("GetAjustes.php");
+include_once("getAjustes.php");
 
 header('Content-Type: application/json');
 

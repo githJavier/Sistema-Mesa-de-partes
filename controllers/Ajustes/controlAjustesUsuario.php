@@ -1,5 +1,5 @@
 <?php
-include_once("GetAjustes.php");
+include_once("getAjustes.php");
 include_once("../../models/area.php");
 include_once("../../models/usuario.php");
 include_once("../../models/tipoDocumento.php");
