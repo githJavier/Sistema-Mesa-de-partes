@@ -427,33 +427,3 @@ function inicializarModalEstadosTramite() {
     steps[index].classList.add("active");
   });
 }
-
-// Cargar tipos de documento dinámicamente en el filtro
-function cargarTiposDocumentosParaFiltrado() {
-    fetch('../../controllers/Ajustes/controlAjustesUsuario.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const tipos_documento = data.data.tipos_documento;
-                const selectTipoDocumento = document.getElementById('filtroTipo');
-
-                // Limpiamos las opciones previas y dejamos solo "Todos"
-                selectTipoDocumento.innerHTML = '';
-                const opcionTodos = document.createElement('option');
-                opcionTodos.value = '';
-                opcionTodos.textContent = 'Todos';
-                selectTipoDocumento.appendChild(opcionTodos);
-
-                // Insertamos dinámicamente los tipos de documento
-                tipos_documento.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc.tipodocumento; // valor para filtrar
-                    option.textContent = doc.tipodocumento; // lo que ve el usuario
-                    selectTipoDocumento.appendChild(option);
-                });
-            } else {
-                alert('Error: ' + (data.message || 'No se encontraron tipos de documento'));
-            }
-        })
-        .catch(() => alert('Error al cargar los tipos de documento'));
-}

@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__ . '/../../utils/log_config.php';
 class formSeguimientoTramite{
-    public function formSeguimientoTramiteShow($tramites){
+    public function formSeguimientoTramiteShow($tramites, $tiposDocumento){
         ob_start();
         //Formularios para ver el seguimiento de los Tramites
         ?>
@@ -23,6 +23,11 @@ class formSeguimientoTramite{
                     <label class="input-group-text span-input-tramite text-light" for="filtroTipo"><i class="fas fa-file-alt"></i></label>
                     <select class="form-select" id="filtroTipo" name="tipo_documento">
                         <option value="">Todos</option>
+                        <?php
+                            foreach ($tiposDocumento as $documento) {
+                                echo "<option value='" . $documento['tipodocumento'] . "'>" . strtoupper($documento['tipodocumento']) . "</option>";
+                            }
+                        ?>
                     </select>
                     </div>
                 </div>
@@ -771,9 +776,6 @@ class formSeguimientoTramite{
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/seguimientoTramite.js"></script>
 
-        <script>
-            cargarTiposDocumentosParaFiltrado();
-        </script>
         <?php
         return ob_get_clean();
     }
