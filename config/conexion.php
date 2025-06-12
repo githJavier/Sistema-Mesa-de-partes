@@ -3,25 +3,18 @@ class Conexion
 {
     private static $conexion;
 
-    // Define las constantes de configuración fuera de los métodos
-    private const SERVIDOR_MYSQL = 'db';
-    private const USUARIO_MYSQL = 'admin';
-    private const PASSWORD_MYSQL = 'claveultrasecreta';
-    private const BASE_DATOS = 'mesa_de_partes';
-
-    // Método para conectar a la base de datos
     public static function conectarBD()
     {
         if (!self::$conexion) {
-            // Crear una nueva conexión mysqli
-            self::$conexion = new mysqli(
-                self::SERVIDOR_MYSQL,
-                self::USUARIO_MYSQL,
-                self::PASSWORD_MYSQL,
-                self::BASE_DATOS
-            );
+            // Obtener los datos desde variables de entorno
+            $host = getenv('DB_HOST');
+            $user = getenv('DB_USER');
+            $pass = getenv('DB_PASSWORD');
+            $db   = getenv('DB_NAME');
+            $port = getenv('DB_PORT') ?: 3306; // valor por defecto si no se define
 
-            // Verificar si hay errores al conectar
+            self::$conexion = new mysqli($host, $user, $pass, $db, $port);
+
             if (self::$conexion->connect_error) {
                 die("Error al conectar a la base de datos: " . self::$conexion->connect_error);
             }
@@ -30,7 +23,6 @@ class Conexion
         return self::$conexion;
     }
 
-    // Método para desconectar la base de datos
     public static function desconectarBD()
     {
         if (self::$conexion) {
