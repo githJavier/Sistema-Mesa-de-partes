@@ -163,7 +163,13 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
         cuerpoTabla.appendChild(fila);
     }
 
-    const rutaBase = '../../uploads/tramites/';
+    // Ruta base de acceso público a los archivos almacenados en Supabase.
+    // ⚠️ Si se cambia de proveedor de almacenamiento en el futuro (por ejemplo, a S3 o Cloudinary),
+    // esta base debe actualizarse para reflejar la nueva estructura de URLs.
+    const supabaseBaseUrl = 'https://xozmffgvhrucxbpltgch.supabase.co'; // URL del proyecto Supabase
+    const bucket = 'documentos';
+    const rutaBase = `${supabaseBaseUrl}/storage/v1/object/public/${bucket}/`;
+
     const btnRemitente = document.getElementById('btn-remitente');
 
     // Buscar archivos específicos

@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
         // Nombre base del archivo en el servidor
         $tipo = "00U00"; // Es un código que hace referencia a archivo subido por usuario del sistema
         $nombre_base = $numeroExpediente . "_" . $tipo . "_" . $nombreFinal;
+        $nombre_final = $getTramite->limpiarNombreArchivo($nombre_base);
     } else {
         // En caso no se haya subido un archivo
         $nombreFinal = null;
@@ -85,45 +86,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
                 if ($getTramite->validarNumeroExpediente($numeroExpediente)) {
                     if ($getTramite->validarArchivo($documento)) {
                         if ($getTramite->validarFolios($folios)) {
-                            // Intentar derivar el trámite
-                            if ($getTramite->DerivarTramite(
-                                $numeroExpediente,
-                                $fechaRegistro,
-                                $horaRegistro,
-                                $areaDestino,
-                                $motivoArchivo,
-                                $numeroDocumento,
-                                $codigoDetalleTramite,
-                                $folios,
-                                $nombre_base,
-                                $tipoArchivo,
-                                $tamanoKB
-                            )) {
-                                // Mover el archivo
-                                $rutaDestino = "../../../uploads/tramites/" . basename($nombre_base);
-                                if ($getTramite->moverArchivo($documento, $rutaDestino)) {
-                                    // Archivo movido correctamente
+                            if ($getTramite->moverArchivo($documento, $nombre_final)) {
+                                // Intentar derivar el trámite
+                                if ($getTramite->DerivarTramite(
+                                    $numeroExpediente,
+                                    $fechaRegistro,
+                                    $horaRegistro,
+                                    $areaDestino,
+                                    $motivoArchivo,
+                                    $numeroDocumento,
+                                    $codigoDetalleTramite,
+                                    $folios,
+                                    $nombre_final,
+                                    $tipoArchivo,
+                                    $tamanoKB
+                                )) {
                                     echo json_encode([
                                         'flag'     => 1,
                                         'message'  => "Trámite derivado y archivo subido correctamente.",
-                                        'redirect' => "../../views/redireccion/homeAdmin.php"
+                                        'redirect' => "../../views/redireccion/home.php"
                                     ]);
                                     exit;
                                 } else {
-                                    // Error al mover archivo, pero trámite derivado exitosamente
-                                    echo json_encode([
-                                        'flag'    => 1,
-                                        'message' => "Trámite derivado, pero hubo un error subiendo el archivo",
-                                        'redirect' => "../../views/redireccion/homeAdmin.php"
-                                    ]);
+                                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                     exit;
                                 }
-                                exit; // Importante para cortar la ejecución aquí
                             } else {
-                                echo json_encode([
-                                    'flag'    => 0,
-                                    'message' => $getTramite->message
-                                ]);
+                                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                 exit;
                             }
                         } else {

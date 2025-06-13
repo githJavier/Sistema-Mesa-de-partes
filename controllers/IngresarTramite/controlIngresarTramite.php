@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
     // Nombre base del archivo en el servidor
     $tipo = "00R00"; // Es un código que hace referencia a archivo subido por remitente
     $nombre_base = $numeroTramite . "_" . $tipo . "_" . $final_file;
+    $nombre_final = $getTramite->limpiarNombreArchivo($nombre_base);
 
     // Zona horaria y fecha/hora actual
     date_default_timezone_set('America/Lima');
@@ -62,28 +63,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                 if ($getTramite->validarNumeroTramite($numeroTramite)) {
                     if ($getTramite->validarArchivo($documento)) {
                         if ($getTramite->validarFolios($folios)) {
-                            // Intentar insertar el trámite
-                            if ($getTramite->insertarTramite(
-                                $tipoTramite,
-                                $anio,
-                                $numeroTramite,
-                                $tipoDocumento,
-                                $horaRegistro,
-                                $fechaRegistro,
-                                $remitente,
-                                $asunto,
-                                $folios,
-                                $comentario,
-                                $area_origen,
-                                $area_destino,
-                                $nombre_base,
-                                $file_type,
-                                $new_size
-                            )) {
-                                // Mover archivo a carpeta de destino
-                                $rutaDestino = "../../uploads/tramites/" . basename($nombre_base);
-                                if ($getTramite->moverArchivo($documento, $rutaDestino)) {
-                                    // Archivo movido correctamente
+                            if ($getTramite->moverArchivo($documento, $nombre_final)) {
+                                //Intentar insertar el trámite
+                                if ($getTramite->insertarTramite(
+                                    $tipoTramite,
+                                    $anio,
+                                    $numeroTramite,
+                                    $tipoDocumento,
+                                    $horaRegistro,
+                                    $fechaRegistro,
+                                    $remitente,
+                                    $asunto,
+                                    $folios,
+                                    $comentario,
+                                    $area_origen,
+                                    $area_destino,
+                                    $nombre_final,
+                                    $file_type,
+                                    $new_size
+                                )) {
                                     echo json_encode([
                                         'flag'     => 1,
                                         'message'  => "Trámite registrado y archivo subido correctamente.",
@@ -91,19 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                                     ]);
                                     exit;
                                 } else {
-                                    echo json_encode([
-                                        'flag'     => 1,
-                                        'message'  => "Trámite registrado, pero hubo un error subiendo el archivo.",
-                                        'redirect' => "../../views/redireccion/home.php"
-                                    ]);
+                                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                     exit;
                                 }
-                                exit;
                             } else {
-                                echo json_encode([
-                                    'flag'    => 0,
-                                    'message' => $getTramite->message
-                                ]);
+                                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                 exit;
                             }
                         } else {

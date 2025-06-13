@@ -1,14 +1,17 @@
 <?php
 include_once("../../../models/tramite.php");
+include_once("../../../utils/supabaseUploader.php");
 
 session_start();
 class GetDerivarTramite{
     public $message = "";
 
     private $objTramite;
+    private $uploader;
 
     public function __construct() {
-        $this->objTramite = new Tramite();
+        $this->objTramite = new Tramite();                  // Para lógica de trámites
+        $this->uploader = new SupabaseUploader();           // Para subir documentos
     }
 
     public function validarBoton($nombreBoton) {
@@ -99,12 +102,23 @@ class GetDerivarTramite{
         return true;
     }
 
-    public function moverArchivo($archivo, $rutaDestino) {
-        if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
-            $this->message = "Archivo subido correctamente.";
-            return true;
+    function limpiarNombreArchivo($nombre) {
+        // Transforma caracteres con tilde y ñ
+        $nombre = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nombre);
+        // Reemplaza cualquier carácter que no sea seguro para URLs
+        $nombre = preg_replace('/[^A-Za-z0-9_\-\.]/', '-', $nombre);
+        // Opcional: reemplaza múltiples guiones seguidos por uno solo
+        $nombre = preg_replace('/-+/', '-', $nombre);
+        return $nombre;
+    }
+
+    public function moverArchivo($datosArchivo, $nombreArchivo) {
+        $url = $this->uploader->subirDocumento($datosArchivo, $nombreArchivo);
+        if ($url) {
+            $this->message = $this->uploader->message;
+            return $url;
         } else {
-            $this->message = "Error al mover el archivo.";
+            $this->message = $this->uploader->message;
             return false;
         }
     }
