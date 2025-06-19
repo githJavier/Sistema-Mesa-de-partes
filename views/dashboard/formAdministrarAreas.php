@@ -123,7 +123,7 @@ class formAdministrarAreas{
                                 </div>
 
                                 <div class="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary" onclick="cerrarModalCrearArea()">Cancelar</button>
                                     <button type="button" class="btn btn-dark" id="btnCrearArea" onclick="enviarFormCrear()">Guardar</button>
                                 </div>
                             </form>

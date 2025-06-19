@@ -58,7 +58,7 @@ class GetArchivarTramite{
 
             // Obtener orden del trámite
             $getTramite = new Tramite();
-            $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento);
+            $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigo_generado);
             if ($orden === null) {
                 $this->message = "Error al obtener el orden del trámite.";
                 $this->success = false;

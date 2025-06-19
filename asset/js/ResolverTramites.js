@@ -171,13 +171,15 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
     const rutaBase = `${supabaseBaseUrl}/storage/v1/object/public/${bucket}/`;
 
     const btnRemitente = document.getElementById('btn-remitente');
+    const btnDerivado = document.getElementById('btn-derivado');
 
     // Buscar archivos específicos
-    const archivoR00 = archivoAdjunto.find(nombre => nombre.includes('_00R00_'));
+    const archivoINI = archivoAdjunto.find(nombre => nombre.includes('_00INI00_'));
+    const archivosDRV = archivoAdjunto.filter(nombre => nombre.includes('_00DRV00_'));
 
     // Botón Remitente
-    if (archivoR00) {
-        btnRemitente.href = rutaBase + archivoR00;
+    if (archivoINI) {
+        btnRemitente.href = rutaBase + archivoINI;
         btnRemitente.classList.remove('btn-secondary', 'disabled-link');
         btnRemitente.classList.add('btn-danger');
         btnRemitente.setAttribute('target', '_blank');
@@ -189,6 +191,39 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
         btnRemitente.setAttribute('aria-disabled', 'true');
     }
 
+    // Botón Derivado
+    if (archivosDRV.length > 0) {
+        btnDerivado.style.display = 'inline-block';
+
+        const cantidad = archivosDRV.length;
+
+        btnDerivado.innerHTML = `
+            <i class="bi bi-paperclip"></i> ${cantidad === 1 ? 'Documento de derivación' : `Documentos de derivación (${cantidad})`}
+        `;
+
+        if (cantidad === 1) {
+            // Enlace directo al único archivo
+            btnDerivado.href = rutaBase + archivosDRV[0];
+            btnDerivado.setAttribute('target', '_blank');
+            // Aseguramos que no tenga el atributo que dispara el modal
+            btnDerivado.removeAttribute('data-bs-toggle');
+            btnDerivado.removeAttribute('onclick');
+            delete btnDerivado.dataset.archivosDerivacion;
+        } else {
+            // Guardamos la lista para el modal
+            btnDerivado.removeAttribute('href'); // No debe redirigir
+            btnDerivado.removeAttribute('target');
+            btnDerivado.dataset.archivosDerivacion = JSON.stringify(archivosDRV);
+            btnDerivado.onclick = abrirModalDerivacion; // Asignar función que abre el modal
+        }
+    } else {
+        btnDerivado.style.display = 'none';
+        delete btnDerivado.dataset.archivosDerivacion;
+        btnDerivado.removeAttribute('href');
+        btnDerivado.removeAttribute('target');
+    }
+
+    // Mostrar modal
     const modalFondo = document.getElementById('modalFondo');
     const modalVentana = document.getElementById('modalVentana');
 
@@ -196,6 +231,66 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
     void modalVentana.offsetWidth;
     modalVentana.classList.remove('animar-salida');
     modalVentana.classList.add('animar-entrada');
+}
+
+function abrirModalDerivacion() {
+    const btn = document.getElementById('btn-derivado');
+    const lista = document.getElementById('lista-derivaciones');
+    const archivos = JSON.parse(btn.dataset.archivosDerivacion || '[]');
+
+    if (archivos.length <= 1) {
+        return; // Protección adicional
+    }
+
+    const supabaseBaseUrl = 'https://xozmffgvhrucxbpltgch.supabase.co';
+    const rutaBase = `${supabaseBaseUrl}/storage/v1/object/public/documentos/`;
+
+    lista.innerHTML = ''; // Limpiar lista
+
+    // Valor aproximado de altura por ítem (ajusta si tienes paddings/margins grandes)
+    const alturaPorItem = 50; // px
+    const maxItemsVisibles = 7;
+
+    archivos.forEach(nombre => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+                            <span class="nombre-archivo fw-semibold">${nombre}</span>
+                            <a href="${rutaBase + nombre}" class="btn btn-sm btn-danger" target="_blank">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                        `;
+        lista.appendChild(li);
+        // Después de agregar todos los <li>...
+        setTimeout(() => {
+            const modalBody = document.querySelector('#modal-derivaciones .modal-body');
+            if (archivos.length > maxItemsVisibles) {
+                modalBody.style.maxHeight = (alturaPorItem * maxItemsVisibles) + 'px';
+                modalBody.style.overflowY = 'auto';
+            } else {
+                modalBody.style.maxHeight = 'none';
+                modalBody.style.overflowY = 'visible';
+            }
+        }, 0);
+    });
+
+    // Ajustar altura dinámica del modal-body
+    const modalBody = document.querySelector('#modal-derivaciones .modal-body');
+    const maxVisible = 7;
+    const itemHeight = 60; // Puedes ajustar según el estilo real de tus ítems
+    const paddingExtra = 20;
+
+    if (archivos.length <= maxVisible) {
+        modalBody.style.maxHeight = (archivos.length * itemHeight + paddingExtra) + 'px';
+    } else {
+        modalBody.style.maxHeight = (maxVisible * itemHeight + paddingExtra) + 'px';
+    }
+
+    document.getElementById('modal-derivaciones').style.display = 'flex';
+}
+
+function cerrarModalDerivacion() {
+    document.getElementById('modal-derivaciones').style.display = 'none';
 }
 
 function cerrarModal() {
@@ -281,12 +376,15 @@ document.getElementById('filter-btn').addEventListener('click', function () {
 
 async function generarPDF() {
     const btnRemitente = document.getElementById('btn-remitente');
+    const btnDerivado = document.getElementById('btn-derivado');
     const btnPDF = event.target;
 
     const visibleRemitente = btnRemitente && btnRemitente.style.display !== 'none';
+    const visibleDerivado = btnDerivado && btnDerivado.style.display !== 'none';
 
     btnPDF.style.display = 'none';
     if (btnRemitente) btnRemitente.style.display = 'none';
+    if (btnDerivado) btnDerivado.style.display = 'none';
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -295,6 +393,7 @@ async function generarPDF() {
     html2canvas(modal, { scale: 2 }).then(canvas => {
         btnPDF.style.display = 'inline-block';
         if (btnRemitente) btnRemitente.style.display = visibleRemitente ? 'inline-block' : 'none';
+        if (btnDerivado) btnDerivado.style.display = visibleDerivado ? 'inline-block' : 'none';
 
         const imgData = canvas.toDataURL("image/png");
         const { jsPDF } = window.jspdf;

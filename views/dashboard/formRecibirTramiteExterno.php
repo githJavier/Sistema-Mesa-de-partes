@@ -240,7 +240,7 @@ class formRecibirTramitesExternos{
                             </button>
                             <!-- Botón para ver archivo subido por remitente -->
                             <a id="btn-remitente" class="btn btn-danger btn-sm" target="_blank">
-                                <i class="bi bi-paperclip"></i> Documento del remitente
+                                <i class="bi bi-paperclip"></i> Documento inicial
                             </a>
                         </div>
                     </div>
@@ -261,6 +261,17 @@ class formRecibirTramitesExternos{
             border-color: #ccc !important;
             cursor: not-allowed;         /* cursor de bloqueo */
             text-decoration: none;
+            }
+
+            .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            min-width: auto;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
             }
         </style>
 

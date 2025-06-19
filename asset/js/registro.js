@@ -187,12 +187,13 @@ function consultarDocumento() {
         dataType: 'json',
         
         success: function(response) {
-            if (response.success) {  
+            if (response.success && response.data) {
                 if (response.tipo === "DNI") {
-                    let nombreCompleto = `${response.nombres} ${response.apellidoPaterno} ${response.apellidoMaterno}`;
+                    let nombreCompleto = response.data.nombre_completo.trim();
                     document.getElementById('nombre').value = nombreCompleto;
                 } else if (response.tipo === "RUC") {
-                    document.getElementById('nombre').value = response.razonSocial;
+                    let razonSocial = response.data.razon_social.trim();
+                    document.getElementById('nombre').value = razonSocial;
                 }
             } else {
                 Swal.fire({
@@ -212,7 +213,6 @@ function consultarDocumento() {
         }
     });
 }
-
 
 function enviarForm() {
     if (validarFormulario()) {
@@ -278,8 +278,6 @@ function enviarForm() {
         });
     }
 }
-
-
 
 document.getElementById('documento')?.addEventListener('input', function () {
     this.value = this.value.replace(/[^0-9]/g, ''); // Elimina caracteres no numéricos

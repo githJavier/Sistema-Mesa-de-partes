@@ -152,12 +152,12 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
     const btnDerivado = document.getElementById('btn-derivado');
 
     // Buscar archivos específicos
-    const archivoR00 = archivoAdjunto.find(nombre => nombre.includes('_00R00_'));
-    const archivoU00 = archivoAdjunto.find(nombre => nombre.includes('_00U00_'));
+    const archivoINI = archivoAdjunto.find(nombre => nombre.includes('_00INI00_'));
+    const archivosDRV = archivoAdjunto.filter(nombre => nombre.includes('_00DRV00_'));
 
     // Botón Remitente
-    if (archivoR00) {
-        btnRemitente.href = rutaBase + archivoR00;
+    if (archivoINI) {
+        btnRemitente.href = rutaBase + archivoINI;
         btnRemitente.classList.remove('btn-secondary', 'disabled-link');
         btnRemitente.classList.add('btn-danger');
         btnRemitente.setAttribute('target', '_blank');
@@ -169,14 +169,38 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
         btnRemitente.setAttribute('aria-disabled', 'true');
     }
 
+    btnDerivado.style.display = 'inline-block'; // Siempre visible
+
     // Botón Derivado
-    if (archivoU00) {
-        btnDerivado.href = rutaBase + archivoU00;
-        btnDerivado.style.display = 'inline-block';
-        btnDerivado.setAttribute('target', '_blank');
+    if (archivosDRV.length > 0) {
+        const cantidad = archivosDRV.length;
+        btnDerivado.innerHTML = `
+            <i class="bi bi-paperclip"></i> ${cantidad === 1 ? 'Documento de derivación' : `Documentos de derivación (${cantidad})`}
+        `;
+        btnDerivado.classList.remove('btn-secondary', 'disabled-link');
+        btnDerivado.classList.add('btn-danger');
+        btnDerivado.removeAttribute('aria-disabled');
+
+        if (cantidad === 1) {
+            btnDerivado.href = rutaBase + archivosDRV[0];
+            btnDerivado.setAttribute('target', '_blank');
+            btnDerivado.removeAttribute('onclick');
+            delete btnDerivado.dataset.archivosDerivacion;
+        } else {
+            btnDerivado.removeAttribute('href');
+            btnDerivado.removeAttribute('target');
+            btnDerivado.dataset.archivosDerivacion = JSON.stringify(archivosDRV);
+            btnDerivado.onclick = abrirModalDerivacion;
+        }
     } else {
-        btnDerivado.style.display = 'none';
+        btnDerivado.innerHTML = `<i class="bi bi-paperclip"></i> Documentos de derivación`;
         btnDerivado.removeAttribute('href');
+        btnDerivado.removeAttribute('target');
+        btnDerivado.removeAttribute('onclick');
+        delete btnDerivado.dataset.archivosDerivacion;
+        btnDerivado.classList.remove('btn-danger');
+        btnDerivado.classList.add('btn-secondary', 'disabled-link');
+        btnDerivado.setAttribute('aria-disabled', 'true');
     }
 
     // Mostrar modal
@@ -187,6 +211,66 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
     void modalVentana.offsetWidth;
     modalVentana.classList.remove('animar-salida');
     modalVentana.classList.add('animar-entrada');
+}
+
+function abrirModalDerivacion() {
+    const btn = document.getElementById('btn-derivado');
+    const lista = document.getElementById('lista-derivaciones');
+    const archivos = JSON.parse(btn.dataset.archivosDerivacion || '[]');
+
+    if (archivos.length <= 1) {
+        return; // Protección adicional
+    }
+
+    const supabaseBaseUrl = 'https://xozmffgvhrucxbpltgch.supabase.co';
+    const rutaBase = `${supabaseBaseUrl}/storage/v1/object/public/documentos/`;
+
+    lista.innerHTML = ''; // Limpiar lista
+
+    // Valor aproximado de altura por ítem (ajusta si tienes paddings/margins grandes)
+    const alturaPorItem = 50; // px
+    const maxItemsVisibles = 7;
+
+    archivos.forEach(nombre => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+                            <span class="nombre-archivo fw-semibold">${nombre}</span>
+                            <a href="${rutaBase + nombre}" class="btn btn-sm btn-danger" target="_blank">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                        `;
+        lista.appendChild(li);
+        // Después de agregar todos los <li>...
+        setTimeout(() => {
+            const modalBody = document.querySelector('#modal-derivaciones .modal-body');
+            if (archivos.length > maxItemsVisibles) {
+                modalBody.style.maxHeight = (alturaPorItem * maxItemsVisibles) + 'px';
+                modalBody.style.overflowY = 'auto';
+            } else {
+                modalBody.style.maxHeight = 'none';
+                modalBody.style.overflowY = 'visible';
+            }
+        }, 0);
+    });
+
+    // Ajustar altura dinámica del modal-body
+    const modalBody = document.querySelector('#modal-derivaciones .modal-body');
+    const maxVisible = 7;
+    const itemHeight = 60; // Puedes ajustar según el estilo real de tus ítems
+    const paddingExtra = 20;
+
+    if (archivos.length <= maxVisible) {
+        modalBody.style.maxHeight = (archivos.length * itemHeight + paddingExtra) + 'px';
+    } else {
+        modalBody.style.maxHeight = (maxVisible * itemHeight + paddingExtra) + 'px';
+    }
+
+    document.getElementById('modal-derivaciones').style.display = 'flex';
+}
+
+function cerrarModalDerivacion() {
+    document.getElementById('modal-derivaciones').style.display = 'none';
 }
 
 function cerrarModal() {

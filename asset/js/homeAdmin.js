@@ -90,6 +90,9 @@ function cargarDesdeLocalStorage() {
             case "resolverTramites":
                 cargarformularioResolverTramites();
                 break;
+            case "ingresarTramite":
+                cargarformularioIngresarTramite();
+                break;
             case "archivarTramite":
                 const codigoA = localStorage.getItem("archivar_codigo");
                 const asuntoA = localStorage.getItem("archivar_asunto");
@@ -300,6 +303,23 @@ function cargarformularioResolverTramites(){
     });
 }
 
+function cargarformularioIngresarTramite(){
+    
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/IngresarTramiteUsuario/controlFormIngresarTramiteUsuario.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "ingresarTramite");
+                }
+            }
+        })
+    });
+}
+
 $(document).on('click', '#AdministrarRemitentes', function() {
     cargarformularioAdministracionRemitentes();
 });
@@ -323,6 +343,9 @@ $(document).on('click', '#RecibirTramitesExternos', function() {
 });
 $(document).on('click', '#ResolverTramites', function() {
     cargarformularioResolverTramites();
+});
+$(document).on('click', '#IngresarTramite', function() {
+    cargarformularioIngresarTramite();
 });
 
 // ✅ Cierre de sesión: eliminar el contenido almacenado

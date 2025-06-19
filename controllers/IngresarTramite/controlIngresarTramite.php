@@ -6,48 +6,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
 
     $getTramite = new GetIngresarTramite;
 
-    // Captura de tipo de trámite (externo por defecto)
+    // Tipo de trámite fijo
     $tipoTramite = "EXTERNO";
 
-    // Captura de campos enviados por FormData
-    $btnEnviarTramite= 'btnEnviarTramite';
-    $asunto          = $_POST['asunto'] ?? null;
-    $tipoDocumento   = $_POST['tipo_documento'] ?? null;
-    $numeroTramite   = $_POST['numero_tramite'] ?? null;
-    $folios          = $_POST['folios'] ?? null;
-    $comentario      = $_POST['comentario'] ?? ' ';
-    $remitente       = $_POST['remitente'] ?? null;
+    // Captura de datos del formulario
+    $btnEnviarTramite = 'btnEnviarTramite';
+    $asunto           = $_POST['asunto']           ?? null;
+    $tipoDocumento    = $_POST['tipo_documento']   ?? null;
+    $numeroTramite    = $_POST['numero_tramite']   ?? null;
+    $folios           = $_POST['folios']           ?? null;
+    $remitente        = $_POST['remitente']        ?? null;
 
-    $area_origen     = "REMITENTE EXTERNO";
-    $area_destino    = "OFICINA TRAMITE DOCUMENTARIO";
+    // Datos fijos de área
+    $area_origen      = "REMITENTE EXTERNO";
+    $area_destino     = "OFICINA TRAMITE DOCUMENTARIO";
 
-    // Captura del archivo subido
-    $documento       = $_FILES['DOCUMENTO_VIRTUAL'] ?? null;
-    $file            = $documento['name'];
-    $file_loc        = $documento['tmp_name'];
-    $file_size       = $documento['size'];
-    $file_type       = $documento['type'];
+    // Captura del archivo adjunto
+    $documento    = $_FILES['DOCUMENTO_VIRTUAL'] ?? null;
+    $file         = $documento['name'];
+    $file_loc     = $documento['tmp_name'];
+    $file_size    = $documento['size'];
+    $file_type    = $documento['type'];
 
-    $folder          = "../../uploads/tramites";
+    $new_size     = (float)$file_size / 1024;
+    $new_file     = strtolower($file);
+    $final_file   = str_replace(' ', '-', $new_file);
 
-    // Preparación de nombre final del archivo
-    $new_size        = (float)$file_size / 1024;
-    $new_file_name   = strtolower($file);
-    $final_file      = str_replace(' ', '-', $new_file_name);
+    // Construcción del nombre final del archivo
+    $tipo          = "00INI00"; // Código para remitente
+    $nombre_base   = $numeroTramite . "_" . $tipo . "_" . $final_file;
+    $nombre_final  = $getTramite->limpiarNombreArchivo($nombre_base);
 
-    // Nombre base del archivo en el servidor
-    $tipo = "00R00"; // Es un código que hace referencia a archivo subido por remitente
-    $nombre_base = $numeroTramite . "_" . $tipo . "_" . $final_file;
-    $nombre_final = $getTramite->limpiarNombreArchivo($nombre_base);
-
-    // Zona horaria y fecha/hora actual
+    // Configurar zona horaria y obtener fecha/hora
     date_default_timezone_set('America/Lima');
-    $anio            = date('Y');
-    $fechaRegistro   = date('Y-m-d');
+    $anio           = date('Y');
+    $fechaRegistro  = date('Y-m-d');
 
-    // Selección de formato de hora
-    $formato = 2; // 1: 24h / 2: 12h con am-pm
-
+    // Formato de hora: 1 = 24h, 2 = 12h
+    $formato = 2;
     if ($formato == 1) {
         $horaRegistro = date('H:i');
     } elseif ($formato == 2) {
@@ -56,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
         $horaRegistro = 'Formato no válido';
     }
 
-    // Validaciones encadenadas del formulario
+    // Validaciones encadenadas (cascada)
     if ($getTramite->validarBoton($btnEnviarTramite)) {
         if ($getTramite->validarAsunto($asunto)) {
             if ($getTramite->validarTipoDocumento($tipoDocumento)) {
@@ -64,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                     if ($getTramite->validarArchivo($documento)) {
                         if ($getTramite->validarFolios($folios)) {
                             if ($getTramite->moverArchivo($documento, $nombre_final)) {
-                                //Intentar insertar el trámite
+                                // Insertar trámite en base de datos
                                 if ($getTramite->insertarTramite(
                                     $tipoTramite,
                                     $anio,
@@ -75,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                                     $remitente,
                                     $asunto,
                                     $folios,
-                                    $comentario,
                                     $area_origen,
                                     $area_destino,
                                     $nombre_final,
@@ -89,40 +84,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                                     ]);
                                     exit;
                                 } else {
-                                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                                    echo json_encode(['flag' => 0, 'message' => '8'.$getTramite->message]);
                                     exit;
                                 }
                             } else {
-                                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                                echo json_encode(['flag' => 0, 'message' => '7'.$getTramite->message]);
                                 exit;
                             }
                         } else {
-                            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                            echo json_encode(['flag' => 0, 'message' => '6'.$getTramite->message]);
                             exit;
                         }
                     } else {
-                        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                        echo json_encode(['flag' => 0, 'message' => '5'.$getTramite->message]);
                         exit;
                     }
                 } else {
-                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                    echo json_encode(['flag' => 0, 'message' => '4'.$getTramite->message]);
                     exit;
                 }
             } else {
-                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+                echo json_encode(['flag' => 0, 'message' => '3'.$getTramite->message]);
                 exit;
             }
         } else {
-            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+            echo json_encode(['flag' => 0, 'message' => '2'.$getTramite->message]);
             exit;
         }
     } else {
-        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
+        echo json_encode(['flag' => 0, 'message' => '1'.$getTramite->message]);
         exit;
     }
 }
 
-// Si no es POST válido o botón no existe
+// Si no es una solicitud POST válida o falta el botón
 echo json_encode([
     'flag'    => 0,
     'message' => 'Solicitud no válida'

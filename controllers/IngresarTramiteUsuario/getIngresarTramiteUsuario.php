@@ -2,23 +2,29 @@
 include_once("../../models/tramite.php");
 include_once("../../models/tipoDocumento.php");
 include_once("../../models/usuario.php");
+include_once("../../models/area.php");
 include_once("../../utils/supabaseUploader.php");
+include_once("../../utils/log_config.php");
 
-class GetIngresarTramite {
+class GetIngresarTramiteUsuario {
     public $message = "";
 
     private $objTramite;
-    private $uploader;
+    private $objArea;
     private $objTipoDocumento;
+    private $objRemitente;
+    private $uploader;
 
     public function __construct() {
-        $this->objTramite         = new Tramite();            // Para lógica de trámites
-        $this->uploader           = new SupabaseUploader();   // Para subir documentos
-        $this->objTipoDocumento   = new TipoDocumento();      // Tipos de documentos
+        $this->objTramite = new Tramite();
+        $this->objArea = new Area();
+        $this->objTipoDocumento = new TipoDocumento();
+        $this->objRemitente = new Usuario();
+        $this->uploader = new SupabaseUploader();
     }
 
     public function validarBoton($nombreBoton) {
-        return isset($_POST[$nombreBoton]) && $_POST[$nombreBoton] === "EnviarTramite";
+        return isset($_POST[$nombreBoton]) && $_POST[$nombreBoton] == "EnviarTramiteUsuario";
     }
 
     public function obtenerUltimoTramiteExterno() {
@@ -44,13 +50,12 @@ class GetIngresarTramite {
     }
 
     public function asignarNumeroTramite() {
-        $anio   = date('Y');
+        $anio = date('Y');
         $codigo = [
             'codigo_externo' => '',
             'codigo_interno' => ''
         ];
 
-        // Código externo
         $ultimoExterno = $this->obtenerUltimoTramiteExterno();
         if ($ultimoExterno === false || !preg_match('/(\d{4}-EX)(\d{10})/', $ultimoExterno, $matchesEx)) {
             $codigo['codigo_externo'] = $anio . "-EX" . str_pad(1, 10, "0", STR_PAD_LEFT);
@@ -59,7 +64,6 @@ class GetIngresarTramite {
             $codigo['codigo_externo'] = $anio . "-EX" . str_pad($numeroEx, 10, "0", STR_PAD_LEFT);
         }
 
-        // Código interno
         $ultimoInterno = $this->obtenerUltimoTramiteInterno();
         if ($ultimoInterno === false || !preg_match('/(\d{4}-IN)(\d{10})/', $ultimoInterno, $matchesIn)) {
             $codigo['codigo_interno'] = $anio . "-IN" . str_pad(1, 10, "0", STR_PAD_LEFT);
@@ -107,6 +111,52 @@ class GetIngresarTramite {
         return true;
     }
 
+    public function validarObservacion($observacion) {
+        if (!isset($observacion) || trim($observacion) === "") {
+            $this->message = "La observación es obligatoria.";
+            return false;
+        }
+
+        if (strlen($observacion) > 100) {
+            $this->message = "La observación no debe exceder los 100 caracteres. Actualmente tiene " . strlen($observacion) . " caracteres.";
+            return false;
+        }
+
+        return true;
+    }
+
+    public function validarTipoTramite($tipoTramite) {
+        $tiposPermitidos = ['INTERNO', 'EXTERNO'];
+
+        if (!isset($tipoTramite) || trim($tipoTramite) === "") {
+            $this->message = "El tipo de trámite es obligatorio.";
+            return false;
+        }
+
+        if (!in_array($tipoTramite, $tiposPermitidos)) {
+            $this->message = "El tipo de trámite debe ser INTERNO o EXTERNO. Valor recibido: '{$tipoTramite}'.";
+            return false;
+        }
+
+        return true;
+    }
+
+    public function validarUrgencia($urgente) {
+        $valoresPermitidos = ['SI', 'NO'];
+
+        if (!isset($urgente) || trim($urgente) === "") {
+            $this->message = "Debe indicar si el trámite es urgente o no.";
+            return false;
+        }
+
+        if (!in_array(strtoupper($urgente), $valoresPermitidos)) {
+            $this->message = "El campo 'urgente' solo puede ser 'SI' o 'NO'. Valor recibido: '{$urgente}'.";
+            return false;
+        }
+
+        return true;
+    }
+
     public function validarTipoDocumento($tipoDocumento) {
         if (!isset($tipoDocumento) || trim($tipoDocumento) === "") {
             $this->message = "Debe seleccionar un tipo de documento.";
@@ -140,13 +190,63 @@ class GetIngresarTramite {
         return true;
     }
 
+    public function validarAreaDestino($areaDestino) {
+        if (!isset($areaDestino) || trim($areaDestino) === "") {
+            $this->message = "Debe seleccionar un área de destino.";
+            return false;
+        }
+
+        $areas = $this->objArea->obtenerAreas();
+
+        if (!is_array($areas) || empty($areas)) {
+            $this->message = "No se pudo obtener la lista de áreas disponibles.";
+            return false;
+        }
+
+        $nombresDeAreas = array_column($areas, 'area');
+
+        if (!in_array($areaDestino, $nombresDeAreas)) {
+            $this->message = "El área de destino seleccionada no es válida.";
+            return false;
+        }
+
+        return true;
+    }
+
+    public function validarRemitente($remitente) {
+        if (!isset($remitente) || trim($remitente) === "") {
+            $this->message = "Debe seleccionar un remitente.";
+            return false;
+        }
+
+        $remitentes = $this->objRemitente->listarRemitentes();
+
+        if (!is_array($remitentes) || empty($remitentes)) {
+            $this->message = "No se pudo obtener la lista de remitentes disponibles.";
+            return false;
+        }
+
+        $nombresDeRemitentes = array_map(function($nombre) {
+            return trim(mb_strtoupper($nombre)); // homogeniza
+        }, array_column($remitentes, 'nombres'));
+
+        $remitenteNormalizado = trim(mb_strtoupper($remitente)); // homogeniza
+
+        if (!in_array($remitenteNormalizado, $nombresDeRemitentes)) {
+            $this->message = "El remitente seleccionado no es válido.";
+            return false;
+        }
+
+        return true;
+    }
+
     public function validarFolios($folios) {
         if (!isset($folios) || trim($folios) === "") {
             $this->message = "El número de folios es obligatorio.";
             return false;
         }
 
-        if (!ctype_digit($folios) || (int) $folios <= 0) {
+        if (!ctype_digit($folios) || (int)$folios <= 0) {
             $this->message = "El número de folios debe ser un número entero positivo.";
             return false;
         }
@@ -160,9 +260,9 @@ class GetIngresarTramite {
             return false;
         }
 
-        $extension  = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-        $tipoMime   = mime_content_type($archivo['tmp_name']);
-        $tamanio    = $archivo['size'];
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        $tipoMime = mime_content_type($archivo['tmp_name']);
+        $tamanio = $archivo['size'];
 
         $extensionesValidas = ['pdf', 'doc', 'docx'];
         $tiposMimeValidos = [
@@ -184,7 +284,7 @@ class GetIngresarTramite {
         return true;
     }
 
-    public function limpiarNombreArchivo($nombre) {
+    function limpiarNombreArchivo($nombre) {
         $nombre = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nombre);
         $nombre = preg_replace('/[^A-Za-z0-9_\-\.]/', '-', $nombre);
         $nombre = preg_replace('/-+/', '-', $nombre);
@@ -203,27 +303,25 @@ class GetIngresarTramite {
         return $url;
     }
 
-    public function insertarTramite(
-        $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
-        $remitente, $asunto, $folios, $area_origen, $area_destino,
-        $final_file, $file_type, $new_size
-    ) {
-        $getTramite         = new Tramite();
-        $num_documento      = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
-        $orden              = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
+    public function insertarTramiteUsuario($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $cod_usuario, $urgente, $final_file, $file_type, $new_size) {
+        $getTramite = new Tramite();
+        $num_documento = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
+        $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
         $id_detalle_tramite = $getTramite->obtenerNuevoIdDetalleTramite();
 
-        $respuesta = $this->objTramite->ingresarTramite(
-            $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento,
-            $horaReg, $fecReg, $remitente, $asunto, $folios,
-            $area_origen, $area_destino, $num_documento, $orden,
-            $id_detalle_tramite, $final_file, $file_type, $new_size
+        $respuesta = $this->objTramite->ingresarTramiteUsuario(
+            $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
+            $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino,
+            $cod_usuario, $urgente, $num_documento, $orden, $id_detalle_tramite,
+            $final_file, $file_type, $new_size
         );
 
-        $this->message = $respuesta
-            ? "Trámite ingresado correctamente"
-            : "Ocurrió un problema al ingresar el trámite";
+        if (!$respuesta) {
+            $this->message = "Ocurrió un problema al ingresar el trámite.";
+            return false;
+        }
 
+        $this->message = "Trámite ingresado correctamente";
         return $respuesta;
     }
 }

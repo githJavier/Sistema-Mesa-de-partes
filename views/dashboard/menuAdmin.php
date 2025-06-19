@@ -26,6 +26,10 @@ class GetMenuAdmin{
                         </button>
                     </div>
 
+                    <button type="button" class="menu-item" id="IngresarTramite">
+                        <i class="fas fa-file-signature"></i><span class="menu-text">INGRESAR TRÁMITE</span>
+                    </button>
+
                     <button type="button" class="menu-item d-none" id="botonMensaje">
                         <i class="fas fa-paper-plane"></i><span class="menu-text">TRAMITE</span>
                     </button>

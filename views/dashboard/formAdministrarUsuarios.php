@@ -223,7 +223,7 @@ class formAdministrarUsuarios {
                   </div>
 
                   <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalCrearUsuario()">Cancelar</button>
                     <button type="button" class="btn btn-dark" onclick="enviarForm()" id="registrarUsuario">Guardar</button>
                   </div>
                 </form>

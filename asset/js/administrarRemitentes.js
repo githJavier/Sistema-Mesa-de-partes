@@ -140,6 +140,40 @@ function validarFormulario(){
 
     return isValid;
 }
+
+function cerrarModalCrearRemitente() {
+  // Ocultar modal con Bootstrap 5
+  const modalElement = document.getElementById('crearRemitenteModal');
+  const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+  modalInstance.hide();
+
+  // Limpiar formulario
+  const form = document.getElementById('create-form');
+  form.reset();
+
+  // Limpiar inputs manualmente
+  const inputs = form.querySelectorAll('input');
+  inputs.forEach(input => {
+    input.value = '';
+    input.removeAttribute('disabled'); // Reactivar si estaba deshabilitado
+  });
+
+  // Restaurar select al primer valor
+  const selects = form.querySelectorAll('select');
+  selects.forEach(select => {
+    select.selectedIndex = 0;
+  });
+
+  // Ocultar mensajes de error
+  const errores = form.querySelectorAll('span.text-danger');
+  errores.forEach(span => {
+    span.style.display = 'none';
+  });
+
+  // Si hay algún mensaje en campos desactivados, asegúrate de reactivarlos si hace falta
+  document.getElementById('nombre')?.removeAttribute('disabled');
+}
+
 // Validar y enviar formulario
 function enviarForm() {
     if(validarFormulario()){
@@ -156,7 +190,6 @@ function enviarForm() {
         } else if (tipoDocumento === 'RUC') {
             tipoPersona = 'PERSONA JURIDICA';
         }
-
 
         $.ajax({
             type: "POST",
@@ -224,12 +257,13 @@ function consultarDocumento() {
         dataType: 'json',
         
         success: function(response) {
-            if (response.success) {  
+            if (response.success && response.data) {
                 if (response.tipo === "DNI") {
-                    let nombreCompleto = `${response.nombres} ${response.apellidoPaterno} ${response.apellidoMaterno}`;
+                    let nombreCompleto = response.data.nombre_completo.trim();
                     document.getElementById('nombre').value = nombreCompleto;
                 } else if (response.tipo === "RUC") {
-                    document.getElementById('nombre').value = response.razonSocial;
+                    let razonSocial = response.data.razon_social.trim();
+                    document.getElementById('nombre').value = razonSocial;
                 }
             } else {
                 Swal.fire({
@@ -249,7 +283,6 @@ function consultarDocumento() {
         }
     });
 }
-
 
 function cargarDatosRemitente(id) {
     fetch('../../controllers/Ajustes/controlAjustesRemitente.php?id=' + encodeURIComponent(id))
@@ -288,12 +321,8 @@ function cargarDatosRemitente(id) {
         });
 }
 
-
-
-
 function validarFormularioEdicion() {
     let isValid = true;
-
 
     // Validar correo electrónico
     const email = document.getElementById('editEmail');
@@ -452,15 +481,3 @@ function enviarFormEliminar() {
         }
     });
 }
-
-
-
-
-
-
-
-   
-
-
-
-

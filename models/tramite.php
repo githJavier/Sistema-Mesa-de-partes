@@ -4,8 +4,8 @@ include_once(__DIR__ . '/../config/conexion.php');
 
 class Tramite{
     
-// Método: obtenerUltimoTramite
-    public function obtenerUltimoTramite() {
+// Método: obtenerUltimoTramiteExterno
+    public function obtenerUltimoTramiteExterno() {
         $conexion = Conexion::conectarBD();
         $sql = "SELECT codigo_generado 
                 FROM tramite 
@@ -22,13 +22,31 @@ class Tramite{
         return $resultado;
     }
 
+// Método: obtenerUltimoTramiteInterno
+    public function obtenerUltimoTramiteInterno() {
+        $conexion = Conexion::conectarBD();
+        $sql = "SELECT codigo_generado 
+                FROM tramite 
+                WHERE tipo_tramite = 'INTERNO' 
+                ORDER BY num_documento DESC 
+                LIMIT 1;";
+        $stmt = $conexion->prepare($sql);
+        $stmt->execute();
+        $resultado = null;
+        $stmt->bind_result($resultado);
+        $stmt->fetch();
+        $stmt->close();
+        Conexion::desconectarBD();
+        return $resultado;
+    }
+
 // Método: obtenerNuevoNumeroDocumento
-    public function obtenerNuevoNumeroDocumento(): int {
+    public function obtenerNuevoNumeroDocumento($tipoTramite): int {
         $conexion = Conexion::conectarBD();
 
         $sql = "SELECT MAX(num_documento) 
                 FROM tramite 
-                WHERE tipo_tramite = 'EXTERNO';";
+                WHERE tipo_tramite = ?;";
 
         $stmt = $conexion->prepare($sql);
 
@@ -36,6 +54,7 @@ class Tramite{
             throw new Exception("Error en la preparación: " . $conexion->error);
         }
 
+        $stmt->bind_param("s", $tipoTramite); // Aquí se enlaza el valor del parámetro
         $stmt->execute();
 
         $resultado = null;
@@ -49,12 +68,12 @@ class Tramite{
     }
 
 // Método: obtenerSiguienteOrdenPorDocumento
-    public function obtenerSiguienteOrdenPorDocumento(int $numDocu): int {
+    public function obtenerSiguienteOrdenPorDocumento(int $numDocu, string $codigoDocumento): int {
         $conexion = Conexion::conectarBD();
 
         $sql = "SELECT MAX(orden) 
                 FROM flujo 
-                WHERE num_documento = ?";
+                WHERE num_documento = ? AND codigo_generado = ?";
 
         $stmt = $conexion->prepare($sql);
 
@@ -62,7 +81,7 @@ class Tramite{
             throw new Exception("Error al preparar la consulta: " . $conexion->error);
         }
 
-        $stmt->bind_param("i", $numDocu);
+        $stmt->bind_param("is", $numDocu, $codigoDocumento);
         $stmt->execute();
 
         $resultado = null;
@@ -100,7 +119,7 @@ class Tramite{
     }
 
 // Método: ingresarTramite
-    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $num_documento, $orden, $id_detalle_tramite, $final_file, $file_type, $new_size) {
+    public function ingresarTramite($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $area_origen, $area_destino, $num_documento, $orden, $id_detalle_tramite, $final_file, $file_type, $new_size) {
         $conexion = Conexion::conectarBD();
         $resultado = false;
 
@@ -125,13 +144,91 @@ class Tramite{
                                 fec_recep, hora_recep, folio, comentario,
                                 codigo_generado, area_origen, area_destino,
                                 idusuario, idestadode, urgente
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 11, 'NO')";
+                        ) VALUES (?, ?, ?, '', ?, ?, ?, 1, 11, 'NO')";
             $stmt1 = $conexion->prepare($sqlDetalle);
             if (!$stmt1) {
                 throw new Exception("Error al preparar stmt1: " . $conexion->error);
             }
 
-            $stmt1->bind_param("ssissss", $fecReg, $horaReg, $folios, $comentario, $codigoGenerado, $area_origen, $area_destino);
+            $stmt1->bind_param("ssisss", $fecReg, $horaReg, $folios, $codigoGenerado, $area_origen, $area_destino);
+            $stmt1->execute();
+
+            // 2. Insertar en la tabla 'flujo'
+            $sqlFlujo = "INSERT INTO flujo (
+                                codigo_generado, fec_recep, hora_recep, 
+                                folio, idestadoflujo, comentario, area_origen, 
+                                area_destino, num_documento, orden
+                        ) VALUES (?, ?, ?, ?, 11, '', ?, ?, ?, ?)";
+            $stmt2 = $conexion->prepare($sqlFlujo);
+            if (!$stmt2) {
+                throw new Exception("Error al preparar stmt2: " . $conexion->error);
+            }
+
+            $stmt2->bind_param("sssissii", $codigoGenerado, $fecReg, $horaReg, $folios, $area_origen, $area_destino, $num_documento, $orden);
+            $stmt2->execute();
+
+            // 3. Insertar en la tabla 'adjunto'
+            $sqlAdjunto = "INSERT INTO adjunto (
+                                iddetalletramite, file, type, size
+                        ) VALUES (?, ?, ?, ?)";
+            $stmt3 = $conexion->prepare($sqlAdjunto);
+            if (!$stmt3) {
+                throw new Exception("Error al preparar stmt3: " . $conexion->error);
+            }
+
+            $stmt3->bind_param("isss", $id_detalle_tramite, $final_file, $file_type, $new_size);
+            $stmt3->execute();
+
+            // Confirmar transacción
+            $conexion->commit();
+            $resultado = true;
+
+        } catch (Exception $e) {
+            $conexion->rollback();
+        } finally {
+            if (isset($stmt0)) $stmt0->close();
+            if (isset($stmt1)) $stmt1->close();
+            if (isset($stmt2)) $stmt2->close();
+            if (isset($stmt3)) $stmt3->close();
+            Conexion::desconectarBD();
+        }
+
+        return $resultado;
+    }
+
+// Método: ingresarTramite
+    public function ingresarTramiteUsuario($tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $folios, $comentario, $area_origen, $area_destino, $cod_usuario, $urgente, $num_documento, $orden, $id_detalle_tramite, $final_file, $file_type, $new_size) {
+        $conexion = Conexion::conectarBD();
+        $resultado = false;
+
+        try {
+            $conexion->begin_transaction();
+
+            // 1. Insertar en la tabla 'tramite'
+            $sqlTramite = "INSERT INTO tramite (
+                                tipo_tramite, anio, codigo_generado, cod_tipodocumento,
+                                hora_reg, fec_reg, remitente, asunto, num_documento
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt0 = $conexion->prepare($sqlTramite);
+            if (!$stmt0) {
+                throw new Exception("Error al preparar stmt0: " . $conexion->error);
+            }
+
+            $stmt0->bind_param("ssssssssi", $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg, $remitente, $asunto, $num_documento);
+            $stmt0->execute();
+
+            // 2. Insertar en la tabla 'detalletramite'
+            $sqlDetalle = "INSERT INTO detalletramite (
+                                fec_recep, hora_recep, folio, comentario,
+                                codigo_generado, area_origen, area_destino,
+                                idusuario, idestadode, urgente
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 11, ?)";
+            $stmt1 = $conexion->prepare($sqlDetalle);
+            if (!$stmt1) {
+                throw new Exception("Error al preparar stmt1: " . $conexion->error);
+            }
+
+            $stmt1->bind_param("ssissssis", $fecReg, $horaReg, $folios, $comentario, $codigoGenerado, $area_origen, $area_destino, $cod_usuario, $urgente);
             $stmt1->execute();
 
             // 2. Insertar en la tabla 'flujo'
@@ -175,8 +272,7 @@ class Tramite{
         }
 
         return $resultado;
-    }
-
+    } 
 
 // Método: obtenerMisTramites
     public function obtenerMisTramites($nombre_usuario) {
