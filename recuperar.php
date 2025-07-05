@@ -47,7 +47,7 @@
             </form>
 
             <div class="text-center mt-3 txt-small">
-                <small>¿Ya estás registrado? <a href="login.php" class="text-decoration-none ">Iniciar Sesión</a></small>
+                <small>¿Ya estás registrado? <a href="login.php" class="">Iniciar Sesión</a></small>
             </div>
         </div>
     </div>

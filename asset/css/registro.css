@@ -1,51 +1,86 @@
+body {
+  background-image: url('../img/fondo-tacidh.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  /* Efecto de difuminado simulado */
+  backdrop-filter: blur(6px);         /* NO funciona directamente en <body> en todos los navegadores */
+  -webkit-backdrop-filter: blur(6px); /* Para Safari */
+}
+
 .tema-background {
-    background-color: #FFFFFF;
+  background-color: #FFFFFF;
 }
+
 .card-container {
-    width: 100%;
-    max-width: 600px;
-    border-radius: 12px;
-    padding: 30px;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  padding: 30px;
+  background-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
+
 .txt-titulo {
-    color: #303030;
+  color: #303030;
 }
+
 .btn-custom {
-    background-color: #303030;
-    color: #fff;
+  background-color: #981E25;
+  color: #fff;
 }
+
 .btn-custom:hover {
-    background-color: #ffff;
-    color: #303030;
-    border: 1px solid #303030;
+  background-color: #fff;
+  color: #303030;
+  border: 1px solid #808080BF;
 }
+
 .input-group-text {
-    background-color: #303030;
-    color: #fff;
-    border: none;
+  background-color: #303030;
+  color: #fff;
+  border: none;
 }
+
 .txt-small a {
-    color: #3c8dbc;
+  color: #303030;
 }
+
+.txt-small a:hover {
+  color: #981E25;
+}
+
 .text-justify {
-    text-align: justify;
+  text-align: justify;
 }
-.form-check-input{
-    border-color: #303030;
+
+.form-check-input {
+  border-color: #981E25;
 }
+
 .form-check-input:checked {
-    background-color: #303030;
-    border-color: #000000;
+  background-color: #981E25;
+  border-color: #981E25;
+  box-shadow: 0 0 0 1px #981E25;
 }
-.btn{
-    background-color: #303030;
-    color: #ffff;
-  }
-.btn:hover{
-    background-color: #ffff;
-    color: #303030;
-    border: 1px solid #303030;
-  }
-  .text-decoration-none{
-    color: #3c8dbc;
-  }
+
+/* .btn {
+  background-color: #981E25;
+  color: #fff;
+} */
+
+.btn:hover {
+  background-color: #fff;
+  color: #303030;
+  border: 1px solid #808080BF;
+}
+
+.text-decoration-none {
+  color: #303030;
+}
+
+.text-decoration-none:hover {
+  color: #981E25;
+}

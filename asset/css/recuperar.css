@@ -1,47 +1,62 @@
+body {
+  background-image: url('../img/fondo-tacidh.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  /* Efecto de difuminado simulado */
+  backdrop-filter: blur(6px);         /* NO funciona directamente en <body> en todos los navegadores */
+  -webkit-backdrop-filter: blur(6px); /* Para Safari */
+}
 
 .tema-background {
-    background-color: #FFFFFF;
+  background-color: #FFFFFF;
 }
 
 .card-container {
-    width: 100%;
-    max-width: 450px;
-    border-radius: 12px;
+  width: 100%;
+  max-width: 450px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .txt-titulo {
-    color: #303030;
+  color: #303030;
 }
-.form-control{
-    border:  1px solid #303030;
+
+.form-control {
+  border: 1px solid #303030;
 }
 
 .txt-label {
-    color: #303030;
+  color: #303030;
 }
 
 .btn-recuperar {
-    background-color: #303030;
-    color: #FFFFFF;
+  background-color: #981E25;
+  color: #FFFFFF;
 }
 
 .btn-recuperar:hover {
-    background-color: #FFFFFF;
-    color: #303030;
-    border-color: #303030;
+  background-color: #FFFFFF;
+  color: #303030;
+  border-color: #808080BF;
 }
 
 .input-group-text {
-    background-color: #303030;
-    color: #FFFFFF;
-    border: none;
+  background-color: #303030;
+  color: #FFFFFF;
+  border: none;
 }
 
 .link-custom {
-    color: #3c8dbc;
-    font-weight: bold;
+  color: #303030;
+  font-weight: bold;
 }
 
 .link-custom:hover {
-    text-decoration: underline;
+  color: #981E25;
+  text-decoration: underline;
 }

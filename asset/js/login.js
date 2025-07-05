@@ -60,7 +60,7 @@ function validarFormulario() {
     const isNatural = document.getElementById('natural')?.checked;
     const isJuridica = document.getElementById('juridica')?.checked;
 
-    if (!documento) return false; // Evitar errores
+    if (!documento) return false;
 
     if (documentoValue === '') {
         documentoError.textContent = 'Este campo es obligatorio.';
@@ -76,12 +76,11 @@ function validarFormulario() {
     }
     documentoError.style.display = isValid ? 'none' : 'block';
 
-    // Validar contraseña
     const password = document.getElementById('password');
     const passwordError = document.getElementById('passwordError');
     const passwordValue = password?.value.trim() || "";
 
-    if (!password) return false; // Evitar errores
+    if (!password) return false;
 
     if (passwordValue === '') {
         passwordError.textContent = 'Este campo es obligatorio.';
@@ -93,6 +92,17 @@ function validarFormulario() {
         passwordError.textContent = '';
     }
     passwordError.style.display = isValid ? 'none' : 'block';
+
+    // Validar que el reCAPTCHA esté marcado
+    const recaptchaResponse = grecaptcha.getResponse(widgetRemitente);
+    if (!recaptchaResponse) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Verificación requerida',
+            text: 'Por favor, marca el reCAPTCHA para continuar.'
+        });
+        isValid = false;
+    }
 
     return isValid;
 }
@@ -133,6 +143,17 @@ function validarFormularioUsuario() {
     }
     claveError.style.display = isValid ? 'none' : 'block';
 
+    // Validar que el reCAPTCHA esté marcado
+    const recaptchaResponse = grecaptcha.getResponse(widgetUsuario);
+    if (!recaptchaResponse) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Verificación requerida',
+            text: 'Por favor, marca el reCAPTCHA para continuar.'
+        });
+        isValid = false;
+    }
+
     return isValid;
 }
 
@@ -141,6 +162,7 @@ function enviarForm() {
         const documento = document.getElementById("documento")?.value || "";
         const contrasena = document.getElementById("password")?.value || "";
         const tipoPersona = document.querySelector('input[name="checkboxUsuario"]:checked')?.value || '';
+        const recaptchaResponse = grecaptcha.getResponse(widgetRemitente);
 
         $.ajax({
             type: "POST",
@@ -149,9 +171,10 @@ function enviarForm() {
                 documento: documento,
                 contrasena: contrasena,
                 tipoPersona: tipoPersona,
+                recaptcha: recaptchaResponse,
                 btnLogin: "Ingresar"
             },
-            dataType: "json", // Asegurar que se reciba JSON
+            dataType: "json",
             success: function(response) {
                 if (response.flag == 1) {
                     Swal.fire({
@@ -167,33 +190,34 @@ function enviarForm() {
                         title: 'Error',
                         text: response.message || 'Ocurrió un error desconocido.'
                     });
+                    grecaptcha.reset();
                 }
             },
             error: function(xhr, status, error) {
-                //console.error("Estado:", status);
-                //console.error("Error:", error);
-                //console.error("Respuesta del servidor:", xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Error en la solicitud: ' + error
                 });
+                grecaptcha.reset();
             }
         });
     }
 }
 
+
 function enviarFormUsuario() {
     if (validarFormularioUsuario()) {
         const usuario = document.getElementById("usuarioSistema")?.value || "";
         const clave = document.getElementById("claveSistema")?.value || "";
-
+        const recaptchaResponse = grecaptcha.getResponse(widgetUsuario);
         $.ajax({
             type: "POST",
             url: "./controllers/AutenticarUsuario/controlAutenticarAdmin.php",
             data: {
                 usuario: usuario,
                 contrasena: clave,
+                recaptcha: recaptchaResponse,
                 btnLogin: "Acceder"
             },
             dataType: "json", // Asegurar que se reciba JSON

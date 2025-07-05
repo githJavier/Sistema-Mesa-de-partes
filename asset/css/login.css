@@ -1,36 +1,102 @@
+body {
+  background-image: url('../img/fondo-tacidh.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  /* Efecto de difuminado simulado */
+  backdrop-filter: blur(6px);         /* NO funciona directamente en <body> en todos los navegadores */
+  -webkit-backdrop-filter: blur(6px); /* Para Safari */
+}
+
+.form-check-input {
+  border-color: #981E25;
+}
+
+/* Cuando está seleccionado */
 .form-check-input:checked {
-  background-color: #303030;
-  border-color: #000000;
+  background-color: #981E25;
+  border-color: #981E25;
+  box-shadow: 0 0 0 1px #981E25;
 }
-.form-check-input{
-  border-color: #000000;
+
+/* Estilo para TODOS los botones nav-link */
+.nav-pills .nav-link {
+  background-color: #808080BF;
+  color: #fff;              
+  border: 1px solid #808080BF;
+  transition: background-color 0.3s, color 0.3s;
 }
+
+/* Cuando está activo (seleccionado) */
+.nav-pills .nav-link.active {
+  background-color: #981E25;
+  color: #fff;
+  border-color: #808080BF;
+}
+
+.nav.nav-pills .nav-link {
+  margin-right: 0.25rem; /* separa ligeramente */
+}
+
+.nav.nav-pills .nav-link:last-child {
+  margin-right: 0;
+}
+
+.input-group-text.custom-style {
+  background-color: #303030 !important;
+  color: #fff !important;
+}
+
+.nav.nav-pills .nav-link.active {
+  z-index: 2;
+}
+
 .tema-background{
-  background-color: #FFFFFF;
+  background-color: #fff;
 }
-.card-container{
-  width: 100%; 
-  max-width: 440px; 
+.card-container {
+  background-color: #fff;
   border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* profundidad sobre fondo oscuro */
 }
 .txt-titulo{
   color: #303030;
 }
 .btn{
-  background-color: #303030;
-  color: #ffff;
+  background-color: #981E25;
+  color: #fff;
+  border: 1px solid #808080BF;
 }
 .btn:hover{
-  background-color: #ffff;
+  background-color: #fff;
   color: #303030;
-  border: 1px solid #303030;
+  border: 1px solid #808080BF;
 }
+
+.btn.btn-toggle-password{
+  background-color: #303030;
+  color: #fff;
+  border: 1px solid #808080BF;
+}
+.btn.btn-toggle-password:hover{
+  background-color: #fff;
+  color: #303030;
+  border: 1px solid #808080BF;
+}
+
 .input-group-text{
   background-color: #303030;
 }
+
 .txt-small a{
-  color: #3c8dbc;
+  color: #303030;
 }
+.txt-small a:hover{
+  color: #981E25;
+}
+
 .fixed-bottom{
   background-color: #303030;
   color: #FFFFFF;

@@ -99,7 +99,7 @@
                     <input type="checkbox" class="form-check-input" id="termsCheck">
                     <small class="form-check-label" for="termsCheck">
                         Acepto haber leído y estar de acuerdo con los 
-                        <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalTerminos">Términos y Condiciones</a>.
+                        <a href="#" class="" data-bs-toggle="modal" data-bs-target="#modalTerminos">Términos y Condiciones</a>.
                     </small>
                     <div id="termsCheckError" class="form-text text-danger ms-1" style="display: none;"></div>
                 </div>
@@ -138,7 +138,7 @@
                 </div>
 
                 <div class="text-center mt-3 txt-small">
-                    <small>¿Ya estás registrado? <a href="login.php" class="text-decoration-none ">Iniciar Sesión</a></small>
+                    <small>¿Ya estás registrado? <a href="login.php" class="">Iniciar Sesión</a></small>
                 </div>
             </form>
         </div>
