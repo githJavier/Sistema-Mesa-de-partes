@@ -280,7 +280,12 @@ class formAdministrarRemitentes {
         <!-- Scripts -->
         <script src="../../asset/js/administrarRemitentes.js"></script>
         <script src="../../asset/js/pagination.js"></script>
-        
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat Admin
+        delete window.habilitarPollingChatAdmin;
+        </Script>
         <?php
         return ob_get_clean();
     }

@@ -1,0 +1,230 @@
+/* Estilos para el contenedor principal */
+.ma-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Título del foro */
+.ma-titulo {
+    font-weight: 600;
+    color: #212529;
+    font-size: 1.75rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.ma-titulo::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #495057;
+}
+
+/* Filtros */
+#ma-form-filtros {
+    background-color: white;
+    padding: 1.25rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+#ma-form-filtros .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#ma-form-filtros .form-control,
+#ma-form-filtros .form-select {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#ma-form-filtros .form-control:focus,
+#ma-form-filtros .form-select:focus {
+    border-color: #adb5bd;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+/* Botones */
+#ma-btn-filtrar {
+    background-color: #495057;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+#ma-btn-filtrar:hover {
+    background-color: #343a40;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-1px);
+}
+
+/* Tarjetas de mensajes */
+.ma-lista-mensajes .card {
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 1.25rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.ma-lista-mensajes .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ma-lista-mensajes .card-header {
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ma-lista-mensajes .card-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.ma-lista-mensajes .card-text {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Badges de estado */
+.badge {
+    padding: 0.4em 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.badge.bg-enviado {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.badge.bg-en-proceso {
+    background-color: #1d56aa; /* azul profesional más oscuro */
+    color: #ffffff;
+}
+
+.badge.bg-resuelto {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+/* Información del remitente */
+.blockquote-footer {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.blockquote-footer::before {
+    content: "\2014\00A0"; /* Carácter de guión largo */
+}
+
+/* Botones de acción */
+.btn-outline-dark {
+    border-width: 1px;
+    font-weight: 500;
+}
+
+.btn-outline-dark:hover {
+    background-color: #212529;
+    color: white;
+}
+
+/* Paginación */
+nav[aria-label="Page navigation"] {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#ma-prev-page,
+#ma-next-page {
+    min-width: 100px;
+}
+
+#ma-items-page {
+    margin: 0 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .ma-container {
+        padding: 1.5rem;
+    }
+    
+    .ma-titulo {
+        font-size: 1.5rem;
+    }
+    
+    #ma-form-filtros {
+        padding: 1rem;
+    }
+    
+    #ma-form-filtros .col-md-4 {
+        margin-bottom: 1rem;
+    }
+    
+    .ma-lista-mensajes .card-title {
+        font-size: 1rem;
+    }
+    
+    .ma-lista-mensajes .card-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .ma-container {
+        padding: 1rem;
+    }
+    
+    .ma-titulo {
+        font-size: 1.25rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .card-header .text-muted {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    nav[aria-label="Page navigation"] {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+}

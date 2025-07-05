@@ -346,6 +346,12 @@ class formResolverTramites{
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/ResolverTramitesForms.js"></script>
         <script src="../../asset/js/ResolverTramites.js"></script>
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat Admin
+        delete window.habilitarPollingChatAdmin;
+        </Script>
         <?php
         return ob_get_clean();
     }

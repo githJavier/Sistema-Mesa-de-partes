@@ -4,15 +4,15 @@ include_once("../../models/ayuda.php");
 class GetAyuda{
     public $message = "";
 
-     public function obtenerDatosRemitente($usuario){
+    public function obtenerDatosRemitente($usuario){
         $getDatosRemitente = new Usuario();
         $datosRemitente = $getDatosRemitente->obtenerDatosRemitenteForm($usuario);
         return $datosRemitente;
     }
 
-    public function guardarConsulta($nombres, $email, $telefono_celular, $asunto, $mensaje){
+    public function guardarConsulta($id_remitente, $asunto, $mensaje){
         $getGuardarConsulta = new Ayuda;
-        $respuesta = $getGuardarConsulta->guardarConsulta($nombres, $email,$telefono_celular,$asunto, $mensaje);
+        $respuesta = $getGuardarConsulta->guardarConsulta($id_remitente, $asunto, $mensaje);
         if($respuesta){
             $this->message = "Consulta ingresado correctamente";
         }else{
@@ -31,34 +31,28 @@ class GetAyuda{
     }
 
     public function validarEmail($email) {
-    if (!isset($email) || trim($email) === "") {
-        $this->message = "El correo electrónico es obligatorio.";
-        return false;
+        if (!isset($email) || trim($email) === "") {
+            $this->message = "El correo electrónico es obligatorio.";
+            return false;
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->message = "El formato del correo electrónico no es válido.";
+            return false;
+        }
+        return true;
     }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $this->message = "El formato del correo electrónico no es válido.";
-        return false;
-    }
-
-    return true;
-}
-
 
     public function validarTelefono($telefono) {
         if (!isset($telefono) || trim($telefono) === "") {
             $this->message = "El teléfono de contacto es obligatorio.";
             return false;
         }
-
         if (!preg_match('/^9\d{8}$/', $telefono)) {
             $this->message = "El número de teléfono debe empezar con 9 y tener exactamente 9 dígitos.";
             return false;
         }
-
-    return true;
+        return true;
     }
-
 
     public function validarAsunto($asunto){
         if (!isset($asunto) || trim($asunto) === "") {
@@ -75,4 +69,13 @@ class GetAyuda{
         }
         return true;
     }
+
+    public function validarIdRemitente($id_remitente) {
+        if (empty($id_remitente) || !is_numeric($id_remitente)) {
+            $this->message = "No se pudo validar el ID del remitente.";
+            return false;
+        }
+        return true;
+    }
+
 }

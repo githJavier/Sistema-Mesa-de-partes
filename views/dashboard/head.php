@@ -11,6 +11,7 @@ class GetHead{
                 <link rel="stylesheet" href="../../asset/css/<?=$rutaFormulario?>">
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"> 
                 <script src="../../asset/css/bootstrap-5.3.3/js/bootstrap.bundle.min.js"></script>
+                <link rel="icon" href="data:,">
                 <title>Home</title>
             </head>
             <!-- SweetAlert2 -->

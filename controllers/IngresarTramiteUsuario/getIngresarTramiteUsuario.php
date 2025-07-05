@@ -57,11 +57,11 @@ class GetIngresarTramiteUsuario {
         ];
 
         $ultimoExterno = $this->obtenerUltimoTramiteExterno();
-        if ($ultimoExterno === false || !preg_match('/(\d{4}-EX)(\d{10})/', $ultimoExterno, $matchesEx)) {
-            $codigo['codigo_externo'] = $anio . "-EX" . str_pad(1, 10, "0", STR_PAD_LEFT);
+        if ($ultimoExterno === false || !preg_match('/(\d{4}-DOC)(\d{10})/', $ultimoExterno, $matchesEx)) {
+            $codigo['codigo_externo'] = $anio . "-DOC" . str_pad(1, 10, "0", STR_PAD_LEFT);
         } else {
             $numeroEx = (int) $matchesEx[2] + 1;
-            $codigo['codigo_externo'] = $anio . "-EX" . str_pad($numeroEx, 10, "0", STR_PAD_LEFT);
+            $codigo['codigo_externo'] = $anio . "-DOC" . str_pad($numeroEx, 10, "0", STR_PAD_LEFT);
         }
 
         $ultimoInterno = $this->obtenerUltimoTramiteInterno();
@@ -182,8 +182,8 @@ class GetIngresarTramiteUsuario {
             return false;
         }
 
-        if (!preg_match('/^\d{4}-(EX|IN)\d{10}$/', $numeroTramite)) {
-            $this->message = "El formato del número de trámite no es válido. Debe ser: AAAA-EX########## o AAAA-IN##########.";
+        if (!preg_match('/^\d{4}-(DOC|IN)\d{10}$/', $numeroTramite)) {
+            $this->message = "El formato del número de trámite no es válido. Debe ser: AAAA-DOC########## o AAAA-IN##########.";
             return false;
         }
 

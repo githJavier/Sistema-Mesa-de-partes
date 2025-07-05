@@ -319,6 +319,13 @@ class formConsultarTramitesDerivados{
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/ConsultarTramitesDerivados.js"></script>
 
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat Admin
+        delete window.habilitarPollingChatAdmin;
+        </Script>
+
         <?php
         return ob_get_clean();
     }

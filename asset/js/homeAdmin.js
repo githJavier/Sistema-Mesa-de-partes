@@ -1,3 +1,5 @@
+window.sonidoHabilitado = false;
+
 function toggleMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     let isSmallScreen = window.innerWidth < 992;
@@ -57,6 +59,9 @@ function guardarParametrosDerivarTramite(codigo, asunto, documento) {
     localStorage.setItem("derivar_documento", documento);
 }
 
+function guardarParametrosChatAdmin(id_ayuda) {
+    localStorage.setItem("chat_id_ayuda", id_ayuda);
+}
 
 // ✅ Cargar contenido desde localStorage si existe
 function cargarDesdeLocalStorage() {
@@ -114,13 +119,36 @@ function cargarDesdeLocalStorage() {
                     //console.warn("⚠️ Faltan parámetros para cargar derivarTramite.");
                 }
                 break;
-
+            case "mensajesAdmin":
+                cargarformularioMensaje();
+                esperarPrimeraInteraccionParaHabilitarSonido();
+                break;
+            case "chatAdmin":
+                const chat_id_ayuda = localStorage.getItem("chat_id_ayuda");
+                if (chat_id_ayuda) {
+                    cargarFormularioResponderMensajeAdmin(chat_id_ayuda);
+                } else {
+                    //console.warn("⚠️ Faltan parámetros para cargar Chat.");
+                }
+                break;
             default:
                 cargarHome();
         }
     } else {
         cargarHome(); // por defecto
     }
+}
+
+function esperarPrimeraInteraccionParaHabilitarSonido() {
+    const activarSonido = () => {
+        window.sonidoHabilitado = true;
+        document.removeEventListener("click", activarSonido);
+        document.removeEventListener("keydown", activarSonido);
+    };
+
+    // Espera cualquier interacción simple
+    document.addEventListener("click", activarSonido);
+    document.addEventListener("keydown", activarSonido);
 }
 
 // Llamar al cargar la página
@@ -320,6 +348,25 @@ function cargarformularioIngresarTramite(){
     });
 }
 
+function cargarformularioMensaje(){
+
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/Mensaje/controlFormMensajeAdmin.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    window.MensajesPagination.init();
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "mensajesAdmin");
+
+                }
+            }
+        })
+    });
+}
+
 $(document).on('click', '#AdministrarRemitentes', function() {
     cargarformularioAdministracionRemitentes();
 });
@@ -346,6 +393,20 @@ $(document).on('click', '#ResolverTramites', function() {
 });
 $(document).on('click', '#IngresarTramite', function() {
     cargarformularioIngresarTramite();
+});
+$(document).on('click', '#botonMensaje', function(event) {
+    // Registrar cualquier tipo de interacción (click ya lo es)
+    window.sonidoHabilitado = true;
+
+    // Para navegadores que solo habilitan audio tras interacción
+    const audio = document.getElementById("sonidoNuevoMensaje");
+    if (audio) {
+        audio.play().catch(() => {
+            // No es necesario mostrar error, solo intentamos activar
+        });
+    }
+
+    cargarformularioMensaje();
 });
 
 // ✅ Cierre de sesión: eliminar el contenido almacenado

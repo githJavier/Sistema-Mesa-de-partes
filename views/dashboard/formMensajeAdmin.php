@@ -1,0 +1,169 @@
+<?php
+require_once __DIR__ . '/../../utils/log_config.php';
+
+class FormMensajeAdmin {
+    public function formMensajeAdminShow($consultas) {
+        ob_start();
+        ?>
+
+        <div class="container mb-5 ma-container">
+            <h3 class="mb-4 border-bottom pb-2 text-dark ma-titulo">FORO DE MENSAJES / AYUDA</h3>
+
+            <!-- Filtros -->
+            <form id="ma-form-filtros" class="row g-2 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label" for="ma-filtro-asunto">Buscar por asunto</label>
+                    <input type="text" class="form-control" id="ma-filtro-asunto" placeholder="Ingrese asunto...">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="ma-filtro-estado">Filtrar por estado</label>
+                    <select class="form-select" id="ma-filtro-estado">
+                        <option value="">Todos</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="En proceso">En proceso</option>
+                        <option value="Resuelto">Resuelto</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="d-flex gap-2 w-100">
+                        <button type="button" class="btn btn-primary w-100" id="ma-btn-filtrar">Filtrar</button>
+                        <button type="reset" class="btn btn-secondary w-100" id="ma-btn-limpiar">Limpiar</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Resultados -->
+            <div class="ma-lista-mensajes">
+                <?php if (is_array($consultas) && count($consultas) > 0): ?>
+                    <?php foreach ($consultas as $consulta): 
+                        $ayuda = $consulta['ayuda'];
+                        $remitente = $consulta['remitente'];
+                        $estado = $ayuda['estado']; // temporal, luego vendrá de la BD
+                    ?>
+                        <?php
+                            $fechaRem = !empty($ayuda['fecha_ultimo_mensaje_remitente']) ? $ayuda['fecha_ultimo_mensaje_remitente'] : $ayuda['fecha'];
+                            $horaRem = !empty($ayuda['hora_ultimo_mensaje_remitente']) ? $ayuda['hora_ultimo_mensaje_remitente'] : $ayuda['hora'];
+                        ?>
+                        <div class="card mb-3 shadow-sm"
+                            data-id="<?= htmlspecialchars($ayuda['id_ayuda']) ?>"
+                            data-fecha-remitente="<?= htmlspecialchars($fechaRem) ?>"
+                            data-hora-remitente="<?= htmlspecialchars($horaRem) ?>"
+                            data-fecha="<?= htmlspecialchars($ayuda['fecha']) ?>"
+                            data-hora="<?= htmlspecialchars($ayuda['hora']) ?>"
+                        >
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <?php if ($estado === 'En proceso'): ?>
+                                    <button 
+                                        class="badge bg-<?= strtolower(str_replace(' ', '-', $estado)) ?> border-0" 
+                                        style="cursor: pointer;"
+                                        onclick="mostrarModalResolver('<?= addslashes($ayuda['id_ayuda']) ?>')"
+                                    >
+                                        <?= $estado ?>
+                                    </button>
+                                <?php else: ?>
+                                    <span class="badge bg-<?= strtolower(str_replace(' ', '-', $estado)) ?>">
+                                        <?= $estado ?>
+                                    </span>
+                                <?php endif; ?>
+                                <span class="text-muted"><?= $ayuda['fecha'] ?> <?= substr($ayuda['hora'], 0, 5) ?></span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title"><?= htmlspecialchars($ayuda['asunto']) ?></h5>
+                                <p class="card-text"><?= nl2br(htmlspecialchars($ayuda['mensaje'])) ?></p>
+                                <footer class="blockquote-footer">
+                                    Por: <?= htmlspecialchars($remitente['nombre_completo']) ?> 
+                                    <cite title="Source Title">(<?= htmlspecialchars($remitente['tipo_documento']) ?> <?= htmlspecialchars($remitente['numero_documento']) ?>)</cite>
+                                </footer>
+                                <div class="text-end mt-2 d-flex justify-content-end align-items-center gap-3 flex-wrap">
+                                    <small class="text-muted">
+                                        <?php if (!empty($ayuda['fecha_ultimo_mensaje_remitente']) && !empty($ayuda['hora_ultimo_mensaje_remitente'])): ?>
+                                            Último mensaje del remitente: 
+                                            <?= htmlspecialchars($ayuda['fecha_ultimo_mensaje_remitente']) ?> 
+                                            <?= substr($ayuda['hora_ultimo_mensaje_remitente'], 0, 5) ?>
+                                        <?php else: ?>
+                                            Iniciado el <?= htmlspecialchars($ayuda['fecha']) ?> a las <?= substr($ayuda['hora'], 0, 5) ?>
+                                        <?php endif; ?>
+                                    </small>
+                                    <button class="btn btn-outline-dark btn-sm"
+                                        onclick="cargarFormularioResponderMensajeAdmin('<?= addslashes($ayuda['id_ayuda']) ?>')">
+                                        <i class="fas fa-comments"></i> Responder
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- ⚠️ Este reemplaza al echo PHP que decías -->
+            <div id="no-initial-messages" class="alert alert-secondary text-center mt-3 <?= (empty($consultas)) ? '' : 'd-none' ?>">
+                No hay mensajes para mostrar.
+            </div>
+
+            <!-- Este es el mensaje JS para resultados filtrados -->
+            <div id="no-results-msg" class="text-center text-muted d-none mt-3" aria-live="polite">
+                No se encontraron resultados.
+            </div>
+
+            <!-- Paginación -->
+            <nav aria-label="Page navigation" class="d-flex justify-content-between align-items-center mt-4">
+                <div>
+                    <label for="ma-items-page" class="form-label">Mostrar:</label>
+                    <select id="ma-items-page" class="form-select d-inline-block w-auto">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                    </select>
+                    mensajes
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" id="ma-prev-page">Anterior</button>
+                    <button class="btn btn-outline-primary" id="ma-next-page">Siguiente</button>
+                </div>
+                <div id="pagination-info" class="mt-2"></div>
+            </nav>
+
+        </div>
+
+        <!-- Modal de Confirmación para Resolver Mensaje -->
+        <div class="modal fade" id="modalConfirmarResolver" tabindex="-1" aria-labelledby="modalConfirmarResolverLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-sm rounded-3">
+
+                <div class="modal-header bg-secondary text-white border-0 pb-2">
+                    <h5 class="modal-title fw-bold d-flex align-items-center" id="modalConfirmarResolverLabel">
+                    <i class="fas fa-circle-exclamation me-2 text-light"></i> Confirmar resolución
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body text-dark fw-semibold">
+                    <p class="mb-2">
+                    Antes de marcar como <span class="text-dark fw-bold">resuelto</span>, asegúrate de que el remitente esté conforme con la respuesta.
+                    </p>
+                    <p class="mb-0 text-muted fw-bold">¿Deseas continuar?</p>
+                    <input type="hidden" id="id-ayuda-a-resolver" value="">
+                </div>
+
+                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-dark btn-hover-soft" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btn-confirmar-resolver" class="btn btn-dark btn-hover-accent">Sí, resolver</button>
+                </div>
+
+                </div>
+            </div>
+        </div>
+
+        <link rel="stylesheet" href="../../asset/css/mensajeAdmin.css">
+        <script src="../../asset/js/mensajeAdmin.js"></script>
+        <audio id="sonidoNuevoMensaje" src="../../asset/sounds/notification.mp3" preload="auto"></audio>
+        <script src="../../asset/js/ResponderConsultasAdminForms.js"></script>
+        <script src="../../asset/js/ResolverMensajeAdmin.js"></script>
+        <script>
+        // Detener Polling de Chat Admin
+        delete window.habilitarPollingChatAdmin;
+        </Script>
+        <?php
+        return ob_get_clean();
+    }
+}

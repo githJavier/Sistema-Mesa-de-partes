@@ -1,3 +1,5 @@
+window.sonidoHabilitado = false;
+
 function toggleMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     let isSmallScreen = window.innerWidth < 992;
@@ -45,6 +47,10 @@ function validarFormularioIngresar(){
     let isValid = true;
 }
 
+function guardarParametrosChat(id_ayuda) {
+    localStorage.setItem("chat_id_ayuda", id_ayuda);
+}
+
 // ✅ Cargar contenido desde localStorage si existe
 function cargarDesdeLocalStorage() {
     const vista = localStorage.getItem("vistaActual");
@@ -67,6 +73,15 @@ function cargarDesdeLocalStorage() {
                 break;
             case "mensajes":
                 cargarformularioMensaje();
+                esperarPrimeraInteraccionParaHabilitarSonido();
+                break;
+            case "chat":
+                const chat_id_ayuda = localStorage.getItem("chat_id_ayuda");
+                if (chat_id_ayuda) {
+                    cargarFormularioResponderMensaje(chat_id_ayuda);
+                } else {
+                    //console.warn("⚠️ Faltan parámetros para cargar chat.");
+                }
                 break;
             default:
                 cargarHome();
@@ -75,6 +90,19 @@ function cargarDesdeLocalStorage() {
         cargarHome(); // por defecto
     }
 }
+
+function esperarPrimeraInteraccionParaHabilitarSonido() {
+    const activarSonido = () => {
+        window.sonidoHabilitado = true;
+        document.removeEventListener("click", activarSonido);
+        document.removeEventListener("keydown", activarSonido);
+    };
+
+    // Espera cualquier interacción simple
+    document.addEventListener("click", activarSonido);
+    document.addEventListener("keydown", activarSonido);
+}
+
 cargarDesdeLocalStorage();
 
 // ✅ Guardar contenido y vista en localStorage
@@ -181,7 +209,7 @@ function cargarFormularioSeguimiento(){
             }
             },
             error: function(xhr, status, error) {
-            console.error("Error en AJAX: ", error);
+            //console.error("Error en AJAX: ", error);
             alert("Error en la comunicación con el servidor.");
             }
         });
@@ -220,6 +248,7 @@ function cargarformularioMensaje(){
             success: function(response){
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
+                    window.MensajesPagination.init();
                     guardarContenidoEnLocalStorage(response.formularioHTML, "mensajes");
                 }
             }
@@ -243,7 +272,18 @@ $(document).on('click', '#botonAyuda', function() {
     cargarformularioAyuda();
 });
 
-$(document).on('click', '#botonMensaje', function() {
+$(document).on('click', '#botonMensaje', function(event) {
+    // Registrar cualquier tipo de interacción (click ya lo es)
+    window.sonidoHabilitado = true;
+
+    // Para navegadores que solo habilitan audio tras interacción
+    const audio = document.getElementById("sonidoNuevoMensaje");
+    if (audio) {
+        audio.play().catch(() => {
+            // No es necesario mostrar error, solo intentamos activar
+        });
+    }
+
     cargarformularioMensaje();
 });
 
@@ -270,11 +310,11 @@ function cargarDepartamentos(datoDepartamento = null, datoProvincia = null, dato
                     cargarProvincias(datoDepartamento, datoProvincia, datoDistrito);
                 }
             } else {
-                console.error("Error en los datos recibidos:", response);
+                //console.error("Error en los datos recibidos:", response);
             }
         },
         error: function(xhr, status, error) {
-            console.error("Error AJAX:", status, error);
+            //console.error("Error AJAX:", status, error);
         }
     });
 }
@@ -317,11 +357,11 @@ function cargarProvincias(datoDepartamento, datoProvincia = null, datoDistrito =
                     cargarDistritos(datoProvincia, datoDistrito);
                 }
             } else {
-                console.error("No se recibieron provincias correctamente:", response);
+                //console.error("No se recibieron provincias correctamente:", response);
             }
         },
         error: function(xhr, status, error) {
-            console.error("Error al cargar provincias:", error);
+            //console.error("Error al cargar provincias:", error);
         }
     });
 }
@@ -355,11 +395,11 @@ function cargarDistritos(datoProvincia, datoDistrito = null) {
                     }
                 });
             } else {
-                console.error("No se recibieron distritos correctamente:", response);
+                //console.error("No se recibieron distritos correctamente:", response);
             }
         },
         error: function(xhr, status, error) {
-            console.error("Error al cargar distritos:", error);
+            //console.error("Error al cargar distritos:", error);
         }
     });
 }

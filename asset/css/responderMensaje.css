@@ -1,0 +1,406 @@
+/* ============================ */
+/* RESET GENERAL SOLO EN CHAT  */
+/* ============================ */
+
+.rma-container *:not(i) {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.4;
+}
+
+/* ============================ */
+/* CONTENEDOR PRINCIPAL CHAT   */
+/* ============================ */
+#contenido-dinamico {
+    height: calc(100vh - 60px); /* 40px = altura del header principal */
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.rma-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 0px solid #ddd;
+    border-radius: 0px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================ */
+/* CABECERA DEL CHAT           */
+/* ============================ */
+.rma-header {
+    padding: 16px 24px;
+    background-color: #f9f9f9;
+    flex-shrink: 0;
+}
+
+.rma-user-info {
+    margin-bottom: 0px;
+}
+
+.rma-user-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.rma-user-doc {
+    font-size: 14px;
+    color: #666;
+    margin: 2px 0 0 0;
+}
+
+.rma-case-info {
+    font-size: 14px;
+    color: #444;
+    margin-top: 10px;
+}
+
+.rma-case-info strong {
+    color: #222;
+}
+
+/* ============================ */
+/* CUERPO DEL CHAT             */
+/* ============================ */
+.rma-chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #f1f3f5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+}
+
+/* Mensaje vacío */
+.rma-chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 40px 20px;
+    gap: 10px;
+    min-height: 200px;
+}
+
+.rma-chat-empty-icon {
+    font-size: 38px;
+    color: #ccc;
+}
+
+.rma-chat-placeholder {
+    font-size: 16px;
+}
+
+/* ============================ */
+/* BURBUJAS DE MENSAJE         */
+/* ============================ */
+.rma-message-wrapper {
+    display: flex;
+    max-width: 80%;
+    transition: all 0.3s ease-in-out;
+}
+
+.rma-message-remitente {
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.rma-message-admin {
+    justify-content: flex-start;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.rma-message-bubble {
+    padding: 10px 15px;
+    border-radius: 16px;
+    background-color: #e0e0e0;
+    color: #222;
+    font-size: 15px;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.rma-message-remitente .rma-message-bubble {
+    background-color: #d1e7dd;
+    border-bottom-right-radius: 4px;
+    color: #0f5132;
+}
+
+.rma-message-admin .rma-message-bubble {
+    background-color: #e5e7eb;
+    border-bottom-left-radius: 4px;
+    color: #212529;
+}
+
+.rma-message-time {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* ============================ */
+/* INPUT NUEVO MENSAJE         */
+/* ============================ */
+.rma-input-area {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+    flex-shrink: 0;
+}
+
+.rma-input-message {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.rma-input-message:focus {
+    border-color: #0d6efd;
+}
+
+.rma-btn-send {
+    margin-left: 12px;
+    padding: 10px 14px;
+    background-color: #0d6efd;
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.rma-btn-send:hover {
+    background-color: #0b5ed7;
+}
+
+.rma-btn-send i {
+    margin: 0;
+}
+
+/* ============================ */
+/* SCROLLBAR PERSONALIZADO     */
+/* ============================ */
+@media (hover: hover) {
+    .rma-chat-box::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .rma-chat-box::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .rma-chat-box::-webkit-scrollbar-thumb {
+        background: #bbb;
+        border-radius: 4px;
+    }
+
+    .rma-chat-box::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+}
+
+/* ============================ */
+/* RESPONSIVE                  */
+/* ============================ */
+@media screen and (max-width: 768px) {
+    .rma-container {
+        height: auto;
+        max-height: 90vh;
+        margin: 10px;
+    }
+
+    .rma-chat-box {
+        padding: 15px 10px;
+    }
+
+    .rma-message-wrapper {
+        max-width: 100%;
+    }
+
+    .rma-header {
+        padding: 12px 16px;
+    }
+
+    .rma-input-area {
+        padding: 10px 12px;
+    }
+}
+
+/**/
+/* =============================== */
+/* ENCABEZADO OSCURO PROFESIONAL  */
+/* =============================== */
+.rma-header {
+    background-color: #0d1b2a; /* azul noche casi negro */
+    color: #fff;
+    padding: 16px 24px;
+    position: relative;
+    z-index: 2;
+}
+
+.rma-user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.rma-user-info {
+    flex: 1;
+}
+
+.rma-user-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.rma-user-doc {
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-top: 4px;
+}
+
+/* =============================== */
+/* TARJETA DEL ASUNTO Y MENSAJE   */
+/* =============================== */
+.rma-case-info-card {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    color: #000;
+    padding: 16px;
+    box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.rma-case-asunto-box,
+.rma-case-mensaje-box {
+    border: 1px solid #000;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.rma-case-asunto-box p,
+.rma-case-mensaje-box p {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rma-user-btn button i {
+    margin-right: 4px;
+}
+
+/**/
+.rma-case-info-card {
+    margin-top: 14px;
+    border: 1px solid #2c2c2c;
+    background-color: #f9f9f9;
+    color: #1e1e1e;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Asunto */
+.rma-case-asunto-box {
+    background-color: #2c2f36;
+    padding: 14px 20px;
+    border-bottom: 1px solid #444;
+}
+
+.rma-case-asunto-text {
+    font-weight: 600;
+    font-size: 16px;
+    color: #f1f1f1;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Mensaje */
+.rma-case-mensaje-box {
+    background-color: #ffffff;
+    padding: 16px 20px;
+    color: #333;
+    font-size: 14.5px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.rma-case-mensaje-text {
+    margin: 0;
+    font-weight: 400;
+    color: #212529;
+    word-break: break-word;
+}
+
+/**/
+.rma-case-mensaje-box {
+    max-height: 200px; /* o el alto que consideres adecuado */
+    overflow-y: auto;
+    padding: 12px 16px;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* Scrollbar personalizada solo si deseas mejorarla visualmente */
+.rma-case-mensaje-box::-webkit-scrollbar {
+    width: 6px;
+}
+.rma-case-mensaje-box::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 4px;
+}
+.rma-case-mensaje-box::-webkit-scrollbar-thumb:hover {
+    background-color: #888;
+}
+
+/**/
+.rma-input-message {
+    resize: none;
+    overflow-y: auto;
+    max-height: 150px;
+}

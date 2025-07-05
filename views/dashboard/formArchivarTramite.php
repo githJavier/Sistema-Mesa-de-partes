@@ -73,6 +73,10 @@ class GetFormArchivarTramite {
     </form>
 
     <script src="../../asset/js/tramite.js"></script>
+    <script>
+    // Detener Polling de Mensajes
+    delete window.habilitarPollingMensajes;
+    </Script>
     <?php
     return ob_get_clean();
   }

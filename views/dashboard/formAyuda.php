@@ -1,4 +1,5 @@
 <?php 
+require_once __DIR__ . '/../../utils/log_config.php';
 class formAyuda {
     public function formAyudaShow($datosRemitente) {
         ob_start();
@@ -71,8 +72,14 @@ class formAyuda {
                 </div>
             </form>
 
-            <script src="../../asset/js/ayuda.js"></script>
         </div>
+        <script src="../../asset/js/ayuda.js"></script>
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat
+        delete window.habilitarPollingChat;
+        </Script>
         <?php
         return ob_get_clean();
     }

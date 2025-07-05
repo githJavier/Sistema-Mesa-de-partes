@@ -56,7 +56,7 @@ class Usuario
 
     public function obtenerDatosRemitente($usuario, $clave) {
         $conexion = Conexion::conectarBD();
-        $sql = 'SELECT tipo_remitente, retipo_docu, nombres, clave 
+        $sql = 'SELECT idremite, tipo_remitente, retipo_docu, nombres, clave 
                 FROM remitente 
                 WHERE docu_num = ? LIMIT 1';
         $stmt = $conexion->prepare($sql);
@@ -71,6 +71,7 @@ class Usuario
             $dato = $resultado->fetch_assoc();
             if (password_verify($clave, $dato['clave'])) {
                 $datoRemitente = [
+                    'idremite' => $dato['idremite'],
                     'retipo_docu' => $dato['retipo_docu'],
                     'nombres' => $dato['nombres'],
                     'tipo_remitente' => $dato['tipo_remitente']

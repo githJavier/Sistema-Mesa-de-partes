@@ -823,6 +823,12 @@ class formSeguimientoTramite{
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/seguimientoTramite.js"></script>
 
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat
+        delete window.habilitarPollingChat;
+        </Script>
         <?php
         return ob_get_clean();
     }

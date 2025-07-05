@@ -128,6 +128,12 @@ class GetFormAjustesDatos {
             </form>
         </div>
         <script src="../../asset/js/ajuste.js"></script>
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat
+        delete window.habilitarPollingChat;
+        </Script>
         <?php
         return ob_get_clean();
     }

@@ -48,9 +48,17 @@
                             <span class="txt-span-header">CALENDARIO DE ACTIVIDADES</span>
                         </button>
                     </div>
-
                 </div>
-                
+
+                <!-- Offcanvas del calendario -->
+                <div id="calendarOffcanvas" class="offcanvas-calendar">
+                    <div class="container-mes-calendario d-flex align-items-center justify-content-center">
+                        <h5 class="text-center"><?=$_SESSION['mes']?></h5>
+                    </div>
+                    <div class="container mt-4">
+                        <p>Aquí se mostrará el calendario de actividades.</p>
+                    </div>
+                </div>
             </header>
         <?php
     }

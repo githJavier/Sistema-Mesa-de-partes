@@ -92,7 +92,7 @@ function validarTramite() {
   isValid &= validarCampoRequerido("ASUNTO", "asuntoError");
   isValid &= validarCampoRequerido("TIPO_DOCUMENTO", "tipoDocumentoError", "Seleccione un tipo de documento.");
   // Si se desea ampliar los prefijos admitidos usar lo siguiente: /^\d{4}-(EX|IN|DOC)\d{10}$/
-  isValid &= validarFormatoExpediente("NUMERO_TRAMITE", "numeroDocumentoError", /^\d{4}-(EX|IN)\d{10}$/, '2025-EX0000000001 o 2025-IN0000000001');
+  isValid &= validarFormatoExpediente("NUMERO_TRAMITE", "numeroDocumentoError", /^\d{4}-(DOC|IN)\d{10}$/, '2025-DOC0000000001 o 2025-IN0000000001');
   isValid &= validarArchivo("DOCUMENTO_VIRTUAL", "documentoVirtualError", 1000);
   isValid &= validarFolios("FOLIOS", "foliosError");
   isValid &= validarCampoRequerido("TIPO_TRAMITE", "tipoTramiteError", "Seleccione un tipo de trámite.");

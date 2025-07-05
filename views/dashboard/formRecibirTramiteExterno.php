@@ -284,6 +284,13 @@ class formRecibirTramitesExternos{
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/RecibirTramitesExternos.js"></script>
 
+        <script>
+        // Detener Polling de Mensajes
+        delete window.habilitarPollingMensajes;
+        // Detener Polling de Chat Admin
+        delete window.habilitarPollingChatAdmin;
+        </Script>
+
         <?php
         return ob_get_clean();
     }

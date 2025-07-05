@@ -1,4 +1,5 @@
 <?php 
+require_once __DIR__ . '/../../utils/log_config.php';
 class GetMenuAdmin{
     public function menuAdminShow(){
         ?>
@@ -69,27 +70,15 @@ class GetMenuAdmin{
                     </div>
                     
                 </div>
+                <?php if (isset($_SESSION['datos']['area']) && $_SESSION['datos']['area'] === 'JEFE DE SISTEMAS') : ?>
                 <hr class="separador-canva">
                 <span class="text-canva">AJUSTES</span>
                 <div class="container d-flex flex-column">
                     <button type="button" class="menu-item" id="botonMensaje">
                         <i class="fas fa-comments"></i><span class="menu-text">MENSAJES</span>
                     </button>
-
-                    <button type="button" class="menu-item" id="linkAjuste" data-bs-toggle="collapse" data-bs-target="#collapseUbicacion" aria-expanded="false">
-                        <i class="fas fa-cogs"></i><span class="menu-text">AJUSTE</span>
-                    </button>
-
-                    <!-- Contenido colapsable -->
-                    <div class="collapse collapse-Tramite ms-4" id="collapseUbicacion">
-                        <button type="button" class="menu-item sub-item menu-text" id="botonAjustes">
-                            <i class="fas fa-map-marker-alt"></i> DATOS
-                        </button>
-                    </div>
-                    <button type="button" class="menu-item" id="botonAyuda">
-                        <i class="fas fa-life-ring"></i><span class="menu-text">AYUDA</span>
-                    </button>
                 </div>
+                <?php endif; ?>
             </div>
         <?php
     }

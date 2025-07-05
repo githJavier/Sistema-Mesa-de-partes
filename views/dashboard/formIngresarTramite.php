@@ -142,6 +142,12 @@ class GetFormIngresarTramite {
       </form>
 
       <script src="../../asset/js/tramite.js"></script>
+      <script>
+      // Detener Polling de Mensajes
+      delete window.habilitarPollingMensajes;
+      // Detener Polling de Chat
+      delete window.habilitarPollingChat;
+      </Script>
     <?php
     return ob_get_clean();
   }
