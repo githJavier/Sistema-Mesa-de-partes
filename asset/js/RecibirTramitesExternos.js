@@ -173,11 +173,11 @@ function verDetalles(codigo, tipoDocumento, asunto, fechaRegistro, remitente, fl
     const btnRemitente = document.getElementById('btn-remitente');
 
     // Buscar archivos específicos
-    const archivoINI = archivoAdjunto.find(nombre => nombre.includes('_00INI00_'));
+    const archivoR00 = archivoAdjunto.find(nombre => nombre.includes('_00R00_'));
 
     // Botón Remitente
-    if (archivoINI) {
-        btnRemitente.href = rutaBase + archivoINI;
+    if (archivoR00) {
+        btnRemitente.href = rutaBase + archivoR00;
         btnRemitente.classList.remove('btn-secondary', 'disabled-link');
         btnRemitente.classList.add('btn-danger');
         btnRemitente.setAttribute('target', '_blank');

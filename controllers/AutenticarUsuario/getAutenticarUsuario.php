@@ -108,6 +108,22 @@ class GetAutenticarUsuario {
         $mesIngles = (new DateTime())->format('F'); // Obtiene el mes en inglés
         return $meses[$mesIngles];
     }
+
+    public function validarReCaptcha($recaptcha) {
+        $recaptchaSecret = '6LemDGIrAAAAAPH2lFslhmBwlihgfco-_QhnowqI';
+
+        if (empty($recaptcha)) {
+            $this->message = 'Verificación reCAPTCHA fallida. Inténtalo nuevamente.';
+            return false;
+        }
+
+        $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($recaptchaSecret) . "&response=" . urlencode($recaptcha));
+        $responseData = json_decode($verify);
+
+        return ($responseData && $responseData->success);
+    }
+
+
     
     
 }

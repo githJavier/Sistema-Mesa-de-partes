@@ -16,7 +16,7 @@ class panelPrincipal {
             <?php $getHead->headShow("home.css","formulariosHome.css"); ?>
             <body onload="initializeMenu()">
                 <?php 
-                $getMenu->menuAdminShow();
+                $getMenu->menuAdminShow($datos['tipo']);
                 ?>
                 <!-- Contenido principal -->
                 <div class="main-content">
@@ -26,6 +26,14 @@ class panelPrincipal {
                     <div class="container mt-4 container-dinamico" id="contenido-dinamico">
                         
                     </div>
+
+                    <!-- Spinner de carga oculto -->
+                    <div id="spinner-cargando" class="text-center my-5" style="display: none;">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
                 </div>
 
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

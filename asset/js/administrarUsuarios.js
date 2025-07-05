@@ -118,34 +118,7 @@ function validarFormulario() {
   return isValid;
 }
 
-function cerrarModalCrearUsuario() {
-  const modalEl = document.getElementById('crearUsuarioModal');
-  const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-  modalInstance.hide();
 
-  const form = document.getElementById('create-form');
-  if (!form) return;
-
-  // Limpiar todos los inputs
-  const inputs = form.querySelectorAll('input');
-  inputs.forEach(input => {
-    input.value = '';
-    input.removeAttribute('disabled');
-  });
-
-  // Resetear todos los selects (poner primer valor visible)
-  const selects = form.querySelectorAll('select');
-  selects.forEach(select => {
-    select.selectedIndex = 0;
-  });
-
-  // Ocultar todos los mensajes de error visibles
-  const errores = form.querySelectorAll('span.text-danger');
-  errores.forEach(span => {
-    span.style.display = 'none';
-    span.textContent = ''; // Limpia texto si fue modificado dinámicamente
-  });
-}
 
 function enviarForm() {
     if(validarFormulario()){

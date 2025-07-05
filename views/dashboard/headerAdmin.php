@@ -14,7 +14,7 @@
                     <div class="dropdown">
                         <button class="btn d-flex align-items-center" id="userDropdown" onclick="toggleUserMenu(event)">
                             <div class="profile-img me-2">
-                                <?php if ($tipo_usuario === 'PERSONA JURIDICA'): ?>
+                                <?php if ($tipo_usuario === 'ADMINISTRADOR'): ?>
                                 <i class="fas fa-building"></i>
                                 <?php else: ?>
                                 <i class="fas fa-user"></i>
@@ -25,7 +25,7 @@
                         <div id="userMenu" class="user-menu">
                             <div class="text-center">
                                 <div class="profile-img mx-auto">
-                                    <?php if ($tipo_usuario === 'PERSONA JURIDICA'): ?>
+                                    <?php if ($tipo_usuario === 'ADMINISTRADOR'): ?>
                                     <i class="fas fa-building"></i>
                                     <?php else: ?>
                                     <i class="fas fa-user"></i>

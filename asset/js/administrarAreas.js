@@ -114,29 +114,6 @@ function validarFormularioCreacion() {
   return esValido;
 }
 
-function cerrarModalCrearArea() {
-  const modalEl = document.getElementById('crearAreaModal');
-  const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-  modalInstance.hide();
-
-  const form = document.getElementById('create-area-form');
-  if (!form) return;
-
-  // Limpiar inputs
-  const inputs = form.querySelectorAll('input');
-  inputs.forEach(input => {
-    input.value = '';
-    input.removeAttribute('disabled');
-  });
-
-  // Ocultar mensaje de error
-  const errores = form.querySelectorAll('span.text-danger');
-  errores.forEach(span => {
-    span.style.display = 'none';
-    span.textContent = '';
-  });
-}
-
 function enviarFormCrear() {
   if (validarFormularioCreacion()) {
     const area = document.getElementById('crearNombreArea').value.trim();

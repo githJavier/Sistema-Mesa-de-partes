@@ -10,6 +10,16 @@ function toggleMenu() {
     }
 }
 
+function mostrarSpinner() {
+    $("#spinner-cargando").show();
+    $("#contenido-dinamico").hide();
+}
+
+function ocultarSpinner() {
+    $("#spinner-cargando").hide();
+    $("#contenido-dinamico").show();
+}
+
 function initializeMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     menu.classList.remove("open", "fixed");
@@ -37,7 +47,6 @@ function toggleUserMenu(event) {
 
 window.addEventListener("resize", initializeMenu);
 
-// ✅ Guardar contenido y vista en localStorage
 function guardarContenidoEnLocalStorage(html, vista) {
     localStorage.setItem("contenidoDinamico", html);
     if (vista) {
@@ -57,8 +66,6 @@ function guardarParametrosDerivarTramite(codigo, asunto, documento) {
     localStorage.setItem("derivar_documento", documento);
 }
 
-
-// ✅ Cargar contenido desde localStorage si existe
 function cargarDesdeLocalStorage() {
     const vista = localStorage.getItem("vistaActual");
     if (vista) {
@@ -87,11 +94,11 @@ function cargarDesdeLocalStorage() {
             case "recibirTramitesExternos":
                 cargarformularioRecibirTramitesExternos();
                 break;
+            case "recibirTramitesInternos":
+                cargarformularioRecibirTramitesInternos();
+                break;
             case "resolverTramites":
                 cargarformularioResolverTramites();
-                break;
-            case "ingresarTramite":
-                cargarformularioIngresarTramite();
                 break;
             case "archivarTramite":
                 const codigoA = localStorage.getItem("archivar_codigo");
@@ -99,232 +106,102 @@ function cargarDesdeLocalStorage() {
                 const documentoA = localStorage.getItem("archivar_documento");
                 if (codigoA && asuntoA && documentoA) {
                     cargarFormularioArchivarTramite(codigoA, asuntoA, documentoA);
-                } else {
-                    //console.warn("⚠️ Faltan parámetros para cargar archivarTramite.");
                 }
                 break;
-
             case "derivarTramite":
                 const codigoD = localStorage.getItem("derivar_codigo");
                 const asuntoD = localStorage.getItem("derivar_asunto");
                 const documentoD = localStorage.getItem("derivar_documento");
                 if (codigoD && asuntoD && documentoD) {
                     cargarFormularioDerivarTramite(codigoD, asuntoD, documentoD);
-                } else {
-                    //console.warn("⚠️ Faltan parámetros para cargar derivarTramite.");
                 }
                 break;
-
             default:
                 cargarHome();
         }
     } else {
-        cargarHome(); // por defecto
+        cargarHome();
     }
 }
 
-// Llamar al cargar la página
 cargarDesdeLocalStorage();
 
 function cargarHome() {
-
     verificarSesion(() => {
-        $("#contenido-dinamico").load("../../views/dashboard/principalAdmin.php", function() {
+        mostrarSpinner();
+        $("#contenido-dinamico").load("../../views/dashboard/principalAdmin.php", function () {
+            ocultarSpinner();
             guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
         });
     });
 }
 
-function cargarformularioAdministracionRemitentes() {
-
+function cargarformularioGenerico(url, vista, paginadorVarName) {
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
-            url: "../../controllers/Administracion/controlAdministracionRemitentes.php",
+            url: url,
             dataType: "json",
-            success: function(response) {
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
+            success: function (response) {
+                ocultarSpinner();
+                if (response.flag == 1 || response.formularioHTML) {
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, vista);
 
-                setTimeout(() => {
-                    if (typeof window.remitentesPagination !== "undefined") {
-                        window.remitentesPagination.init();
+                    if (paginadorVarName && typeof window[paginadorVarName] !== "undefined") {
+                        window[paginadorVarName].init();
                     }
-                }, 100);
+                }
             },
-            error: function(xhr, status, error) {
-                //console.error("Error al cargar el formulario de remitentes:", error);
+            error: function () {
+                ocultarSpinner();
             }
         });
     });
+}
+
+function cargarformularioAdministracionRemitentes() {
+    cargarformularioGenerico("../../controllers/Administracion/controlAdministracionRemitentes.php", "administracionRemitentes", "remitentesPagination");
 }
 
 function cargarformularioAdministracionUsuarios() {
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/Administracion/controlAdministracionUsuarios.php",
-            dataType: "json",
-            success: function(response) {
-                if (response.flag == 1) {
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
-
-                    setTimeout(() => {
-                        if (typeof window.usuariosPagination !== "undefined") {
-                            window.usuariosPagination.init();
-                        }
-                    }, 100);
-                }
-            },
-            error: function(xhr, status, error) {
-                //console.error("Error al cargar el formulario de usuarios:", error);
-            }
-        });
-    });
+    cargarformularioGenerico("../../controllers/Administracion/controlAdministracionUsuarios.php", "administracionUsuarios", "usuariosPagination");
 }
 
 function cargarformularioAdministracionAreas() {
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/Administracion/controlAdministracionAreas.php",
-            dataType: "json",
-            success: function(response) {
-                if (response.flag == 1) {
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionAreas");
-                    setTimeout(() => {
-                        if (typeof window.areasPagination !== "undefined") {
-                            window.areasPagination.init();
-                        }
-                    }, 100);
-                }
-            },
-            error: function(xhr, status, error) {
-                //console.error("Error al cargar el formulario de áreas:", error);
-            }
-        });
-    });
+    cargarformularioGenerico("../../controllers/Administracion/controlAdministracionAreas.php", "administracionAreas", "areasPagination");
 }
 
 function cargarformularioAdministracionDocumentos() {
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/Administracion/controlAdministracionDocumentos.php",
-            dataType: "json",
-            success: function(response) {
-                if (response.flag == 1) {
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "administracionDocumentos");
-                    setTimeout(() => {
-                        if (typeof window.tipoDocumentosPagination !== "undefined") {
-                            window.tipoDocumentosPagination.init();
-                        }
-                    }, 100);
-                }
-            },
-            error: function(xhr, status, error) {
-                //console.error("Error al cargar el formulario de documentos:", error);
-            }
-        });
-    });
+    cargarformularioGenerico("../../controllers/Administracion/controlAdministracionDocumentos.php", "administracionDocumentos", "tipoDocumentosPagination");
 }
 
-function cargarformularioConsultarTramitesArchivados(){
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/Consultar/controlFormConsultarTramitesArchivados.php",
-            dataType: "json",
-            success: function(response){
-                if(response.flag == 1){
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesArchivados");
-                }
-            }
-        })
-    });
+function cargarformularioConsultarTramitesArchivados() {
+    cargarformularioGenerico("../../controllers/Consultar/controlFormConsultarTramitesArchivados.php", "consultarTramitesArchivados");
 }
 
-function cargarformularioConsultarTramitesDerivados(){
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/Consultar/controlFormConsultarTramitesDerivados.php",
-            dataType: "json",
-            success: function(response){
-                if(response.flag == 1){
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesDerivados");
-                }
-            }
-        })
-    });
+function cargarformularioConsultarTramitesDerivados() {
+    cargarformularioGenerico("../../controllers/Consultar/controlFormConsultarTramitesDerivados.php", "consultarTramitesDerivados");
 }
 
-function cargarformularioRecibirTramitesExternos(){
-      
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/RecibirTramiteExterno/controlFormRecibirTramiteExterno.php",
-            dataType: "json",
-            success: function(response){
-                if(response.flag == 1){
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "recibirTramitesExternos");
-                }
-            }
-        })
-    });
+function cargarformularioRecibirTramitesExternos() {
+    cargarformularioGenerico("../../controllers/RecibirTramiteExterno/controlFormRecibirTramiteExterno.php", "recibirTramitesExternos");
 }
 
-function cargarformularioResolverTramites(){
-
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/ResolverTramite/controlFormResolverTramite.php",
-            dataType: "json",
-            success: function(response){
-                if(response.flag == 1){
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "resolverTramites");
-                }
-            }
-        })
-    });
+function cargarformularioRecibirTramitesInternos() {
+    cargarformularioGenerico("../../controllers/RecibirTramiteInterno/controlFormRecibirTramiteInterno.php", "recibirTramitesInternos");
 }
 
-function cargarformularioIngresarTramite(){
-    
-    verificarSesion(() => {
-        $.ajax({
-            type: "POST",
-            url: "../../controllers/IngresarTramiteUsuario/controlFormIngresarTramiteUsuario.php",
-            dataType: "json",
-            success: function(response){
-                if(response.flag == 1){
-                    $("#contenido-dinamico").html(response.formularioHTML);
-                    guardarContenidoEnLocalStorage(response.formularioHTML, "ingresarTramite");
-                }
-            }
-        })
-    });
+function cargarformularioResolverTramites() {
+    cargarformularioGenerico("../../controllers/ResolverTramite/controlFormResolverTramite.php", "resolverTramites");
 }
 
 $(document).on('click', '#AdministrarRemitentes', function() {
     cargarformularioAdministracionRemitentes();
 });
 $(document).on('click', '#AdministrarUsuarios', function() {
-    cargarformularioAdministracionUsuarios()
+    cargarformularioAdministracionUsuarios();
 });
 $(document).on('click', '#AdministrarAreas', function() {
     cargarformularioAdministracionAreas();
@@ -341,14 +218,13 @@ $(document).on('click', '#ConsultarTramitesDerivados', function() {
 $(document).on('click', '#RecibirTramitesExternos', function() {
     cargarformularioRecibirTramitesExternos();
 });
+$(document).on('click', '#RecibirTramitesInternos', function() {
+    cargarformularioRecibirTramitesInternos();
+});
 $(document).on('click', '#ResolverTramites', function() {
     cargarformularioResolverTramites();
 });
-$(document).on('click', '#IngresarTramite', function() {
-    cargarformularioIngresarTramite();
-});
 
-// ✅ Cierre de sesión: eliminar el contenido almacenado
 document.getElementById("cerrarSesion")?.addEventListener("click", function () {
     localStorage.removeItem("contenidoDinamico");
     localStorage.removeItem("vistaActual");
@@ -360,11 +236,7 @@ function verificarSesion(callback) {
         .then(data => {
             if (data.status === "active") {
                 if (typeof callback === "function") callback();
-            } else if (data.status === "no_session") {
-                // Redirección inmediata, sin modal
-                window.location.href = "../../index.php";
             } else {
-                // Para 'inactive', 'not_found', etc.
                 Swal.fire({
                     icon: 'warning',
                     title: 'Sesión cerrada',
@@ -375,8 +247,7 @@ function verificarSesion(callback) {
                 });
             }
         })
-        .catch(error => {
-            //console.error("Error al verificar sesión:", error);
+        .catch(() => {
             window.location.href = "../../index.php";
         });
 }

@@ -44,8 +44,7 @@ class GetCrearRemitente {
             return false;
         }
         if ($tipoDocumento == "DNI") {
-            // Solo se permiten letras (con tildes), espacios, comas y puntos, entre 2 y 250 caracteres
-            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,\.]{2,250}$/', $nombre)) {
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,250}$/', $nombre)) {
                 return false;
             }
         } elseif ($tipoDocumento == "RUC") {

@@ -1,11 +1,12 @@
 <?php 
-class formConsultarTramitesArchivados{
-    public function formConsultarTramitesArchivadosShow($tramites, $tiposDocumento){
+require_once __DIR__ . '/../../utils/log_config.php';
+class formRecibirTramitesInternos{
+    public function formRecibirTramitesInternosShow($tramites){
         ob_start();
-        //Formularios para los Tramites Archivados
+        //Formularios para los Tramites Internos
         ?>
             <div class="container mb-5">
-            <h3 class="mb-4 border-bottom pb-2 text-dark">CONSULTAR TRÁMITES ARCHIVADOS</h3>
+            <h3 class="mb-4 border-bottom pb-2 text-dark">TRAMITES POR RECIBIR (REMITENTES INTERNOS)</h3>
 
             <!-- Formulario de filtros -->
             <form id="form-filtros" class="row g-2 mb-4">
@@ -17,17 +18,16 @@ class formConsultarTramitesArchivados{
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
-                    <label class="form-text">TIPO DE DOCUMENTO</label>
+                    <label class="form-text">PRIORIDAD</label>
                     <div class="input-group">
-                    <label class="input-group-text span-input-tramite text-light" for="filtroTipo"><i class="fas fa-file-alt"></i></label>
-                    <select class="form-select" id="filtroTipo" name="tipo_documento">
-                        <option value="">Todos</option>
-                        <?php
-                            foreach ($tiposDocumento as $documento) {
-                                echo "<option value='" . $documento['tipodocumento'] . "'>" . strtoupper($documento['tipodocumento']) . "</option>";
-                            }
-                        ?>
-                    </select>
+                        <label class="input-group-text span-input-tramite text-light" for="filtroPrioridad">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </label>
+                        <select class="form-select" id="filtroPrioridad" name="prioridad">
+                            <option value="">Todos</option>
+                            <option value="SI">Urgente</option>
+                            <option value="NO">No urgente</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
@@ -53,8 +53,13 @@ class formConsultarTramitesArchivados{
 
             </form>
 
+            <!-- Cantidad de los expedientes presentes en la tabla -->
+            <div id="alert-expedientes" class="alert alert-secondary d-flex align-items-center justify-content-between px-4 py-2 rounded mb-3 shadow-sm">
+                <strong class="text-dark m-0">Usted tiene <span id="cantidad-expedientes"><?= count($tramites) ?></span> expediente(s) por recibir</strong>
+            </div>
+
             <!-- Control de cantidad -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <div class="d-flex align-items-center">
                     <label for="cst-items-per-page-top" class="form-text m-0 me-2">Mostrar</label>
                     <select id="cst-items-per-page-top" class="form-select w-auto">
@@ -76,41 +81,17 @@ class formConsultarTramitesArchivados{
                 <table class="table table-striped table-bordered mt-3" id="tramites-table">
                     <thead class="table-dark text-center">
                         <tr>
+                        <th>URGENTE</th>
                         <th>CÓDIGO DE EXPEDIENTE</th>
-                        <th>TIPO DE DOCUMENTO</th>
                         <th>FECHA</th>
                         <th>HORA</th>
                         <th>AREA DE ORIGEN</th>
                         <th>ESTADO</th>
+                        <th>AREA DE DESTINO</th>
+                        <th>ACCIONES</th>
                         <th>DETALLES</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaExpedientes" class="text-center">
-                    <?php foreach ($tramites as $tramite): ?>
-                        <tr>
-                            <td class="td-codigo"><?= strtoupper($tramite['dt_codigo_generado'] ?? 'NO DEFINIDO') ?></td>
-                            <td class="td-tipo"><?= strtoupper($tramite['t_tipodocumento'] ?? 'NO DEFINIDO') ?></td>
-                            <td class="td-fecha"><?= strtoupper($tramite['dt_fec_recep'] ?? 'NO DEFINIDO') ?></td>
-                            <td class="td-hora"><?= strtoupper($tramite['dt_hora_recep'] ?? 'NO DEFINIDO') ?></td>
-                            <td class="td-area"><?= strtoupper($tramite['dt_area_origen'] ?? 'NO DEFINIDO') ?></td>
-                            <td class="td-estado"><?= strtoupper($tramite['dt_estado'] ?? 'NO DEFINIDO') ?></td>
-                            <td>
-                            <button class="btn btn-all btn-sm"
-                                onclick="verDetalles(
-                                    '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                    '<?= addslashes($tramite['t_tipodocumento']) ?>',
-                                    '<?= addslashes($tramite['t_asunto']) ?>',
-                                    '<?= addslashes($tramite['t_fec_reg']) ?>',
-                                    '<?= addslashes($tramite['t_remitente']) ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['archivos']), ENT_QUOTES, 'UTF-8') ?>'
-                                )">
-                                <i class="fas fa-eye me-1"></i> Ver
-                            </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
                 </table>
                 <div id="no-results" class="text-center text-muted fst-italic py-3 d-none">
                     No hay ningún registro
@@ -121,7 +102,6 @@ class formConsultarTramitesArchivados{
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
                 <div id="pagination-info" class="form-text text-muted text-center text-md-start">
                 </div>
-                
             </div>
         </div>
 
@@ -245,7 +225,7 @@ class formConsultarTramitesArchivados{
             text-decoration: none;
             }
         </style>
-        
+
         <!-- html2canvas para capturar el contenido como imagen -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -253,7 +233,7 @@ class formConsultarTramitesArchivados{
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
         <!-- Tu archivo JavaScript personalizado -->
-        <script src="../../asset/js/ConsultarTramitesArchivados.js"></script>
+        <script src="../../asset/js/RecibirTramitesExternos.js"></script>
 
         <?php
         return ob_get_clean();

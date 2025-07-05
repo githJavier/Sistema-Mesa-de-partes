@@ -232,11 +232,11 @@ class formSeguimientoTramite{
                             </button>
                             <!-- Botón para ver archivo subido por remitente -->
                             <a id="btn-remitente" class="btn btn-danger btn-sm" target="_blank">
-                                <i class="bi bi-paperclip"></i> Documento inicial
+                                <i class="bi bi-paperclip"></i> Mi documento adjunto
                             </a>
                             <!-- Botón para ver archivo adjunto en la derivación -->
-                            <a id="btn-derivado" class="btn btn-danger btn-sm" target="_blank" style="display: none;" >
-                                <i class="bi bi-paperclip"></i> Documento(s) de derivación
+                            <a id="btn-derivado" class="btn btn-danger btn-sm" target="_blank" style="display: none;">
+                                <i class="bi bi-paperclip"></i> Documento de derivación
                             </a>
                         </div>
                     </div>
@@ -247,53 +247,6 @@ class formSeguimientoTramite{
             </div>
         </div>
         </div>
-
-        <!-- Modal para mostrar lista de documentos de derivación -->
-        <div id="modal-derivaciones" class="modal" tabindex="-1" style="display: none; background-color: rgba(0,0,0,0.6);">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Documentos de derivación</h5>
-                        <button type="button" class="btn-close" onclick="cerrarModalDerivacion()" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <ul id="lista-derivaciones" class="list-group">
-                            <!-- Aquí se insertarán enlaces dinámicamente -->
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <style>
-            #modal-derivaciones .modal-body {
-                overflow-y: auto;
-                transition: max-height 0.3s ease;
-            }
-
-            #modal-derivaciones .modal-header {
-                position: sticky;
-                top: 0;
-                background-color: white;
-                z-index: 10;
-                border-bottom: 1px solid #dee2e6;
-            }
-
-            #modal-derivaciones .modal-dialog {
-                max-height: 80vh;
-                overflow: hidden;
-            }
-
-            .nombre-archivo {
-                display: block;
-                max-width: 90%;
-                word-break: break-all;
-                white-space: normal;
-                overflow-wrap: break-word;
-                line-height: 1.2;
-                font-size: 0.875rem; /* opcional: ajusta el tamaño si quieres que quepa más */
-            }
-        </style>
 
         <style>
             .disabled-link {

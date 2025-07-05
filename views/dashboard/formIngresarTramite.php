@@ -110,7 +110,7 @@ class GetFormIngresarTramite {
               <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO*</label>
               <div class="input-group">
                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-file-alt"></i></span>
-                <input type="text" class="form-control input-readonly" name="NUMERO_DOCUMENTO" id="NUMERO_TRAMITE" value="<?php echo $ultimoTramite['codigo_externo']; ?>" readonly>
+                <input type="text" class="form-control input-readonly" name="NUMERO_DOCUMENTO" id="NUMERO_TRAMITE" value="<?php echo $ultimoTramite; ?>" readonly>
               </div>
               <span id="numeroDocumentoError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
             </div>

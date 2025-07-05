@@ -28,8 +28,8 @@ if (isset($_SESSION['usuario'])) {
 
       <!-- Selector de formulario -->
       <div class="nav nav-pills nav-justified mb-4">
-        <button class="nav-link active rounded-pill bg-dark text-white" onclick="mostrarFormularioRemitente()">Remitente</button>
-        <button class="nav-link rounded-pill bg-light text-dark" onclick="mostrarFormularioUsuario()">Funcionario</button>
+        <button class="nav-link active rounded-pill" onclick="mostrarFormularioRemitente()">Remitente</button>
+        <button class="nav-link rounded-pill" onclick="mostrarFormularioUsuario()">Funcionario</button>
       </div>
 
       <!-- FORMULARIO REMITENTE -->
@@ -49,7 +49,7 @@ if (isset($_SESSION['usuario'])) {
           <!-- Documento -->
           <div class="mb-4">
             <div class="input-group">
-              <span class="input-group-text bg-dark text-light"><i class="fas fa-id-card"></i></span>
+              <span class="input-group-text custom-style"><i class="fas fa-id-card"></i></span>
               <input type="text" class="form-control" id="documento" placeholder="DNI" maxlength="8" name="documento" />
             </div>
             <span id="documentoError" class="text-danger ms-5" style="display:none;"></span>
@@ -57,20 +57,24 @@ if (isset($_SESSION['usuario'])) {
           <!-- Contraseña -->
           <div class="mb-4">
             <div class="input-group">
-              <span class="input-group-text bg-dark text-light"><i class="fas fa-lock"></i></span>
+              <span class="input-group-text custom-style"><i class="fas fa-lock"></i></span>
               <input type="password" class="form-control" id="password" placeholder="Contraseña" name="contrasena" />
-              <button type="button" class="btn btn-outline-secondary" id="togglePassword"><i class="fa-solid fa-eye"></i></button>
+              <button type="button" class="btn btn-toggle-password" id="togglePassword"><i class="fa-solid fa-eye"></i></button>
             </div>
             <span id="passwordError" class="text-danger ms-5" style="display:none;"></span>
           </div>
+          <!--reCaptcha-->
+          <div class="d-flex justify-content-center mb-3">
+            <div class="g-recaptcha" id="recaptchaRemitente" data-sitekey="6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb"></div>
+          </div>
           <!-- Botón -->
           <div class="d-flex justify-content-center mb-3">
-            <button type="button" class="btn btn-dark w-75 rounded-pill" onclick="enviarForm()">Ingresar</button>
+            <button type="button" class="btn p-2 w-75 rounded-pill" onclick="enviarForm()">Ingresar</button>
           </div>
           <!-- Otras opciones -->
           <div class="d-flex justify-content-around mt-3 txt-small">
-            <small><a href="registro.php" class="text-decoration-none">Crear cuenta</a></small>
-            <small><a href="recuperar.php" class="text-decoration-none">Recuperar contraseña</a></small>
+            <small><a href="registro.php" class="txt-link-option">Crear cuenta</a></small>
+            <small><a href="recuperar.php" class="txt-link-option">Recuperar contraseña</a></small>
           </div>
         </form>
       </div>
@@ -84,16 +88,20 @@ if (isset($_SESSION['usuario'])) {
               <span class="input-group-text bg-dark text-light"><i class="fas fa-user-tie"></i></span>
               <input type="text" class="form-control" id="usuarioSistema" placeholder="Usuario" />
             </div>
-              <span id="usuarioSistemaError" class="text-danger ms-5" style="display:none;"></span>
+            <span id="usuarioSistemaError" class="text-danger ms-5" style="display:none;"></span>
           </div>
           <!-- Contraseña -->
           <div class="mb-4">
             <div class="input-group">
               <span class="input-group-text bg-dark text-light"><i class="fas fa-lock"></i></span>
               <input type="password" class="form-control" id="claveSistema" placeholder="Contraseña" />
-              <button type="button" class="btn btn-outline-secondary" id="toggleClaveSistema"><i class="fa-solid fa-eye"></i></button>
+              <button type="button" class="btn btn-toggle-password" id="toggleClaveSistema"><i class="fa-solid fa-eye"></i></button>
             </div>
-              <span id="claveSistemaError" class="text-danger ms-5" style="display:none;"></span>
+            <span id="claveSistemaError" class="text-danger ms-5" style="display:none;"></span>
+          </div>
+          <!--reCaptcha-->
+          <div class="d-flex justify-content-center mb-3">
+            <div class="g-recaptcha" id="recaptchaUsuario" data-sitekey="6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb"></div>
           </div>
           <!-- Botón -->
           <div class="d-flex justify-content-center mb-3">
@@ -106,12 +114,10 @@ if (isset($_SESSION['usuario'])) {
   </div>
 
   <style>
-    /* Eliminar el ícono automático de mostrar contraseña en Edge */
     input[type="password"]::-ms-reveal,
     input[type="password"]::-ms-clear {
       display: none;
     }
-    /* También para navegadores WebKit (aunque Chrome no lo usa aún) */
     input[type="password"]::-webkit-credentials-auto-fill-button {
       display: none !important;
     }
@@ -123,30 +129,70 @@ if (isset($_SESSION['usuario'])) {
   <script src="asset/js/login.js"></script>
 
   <script>
+    function limpiarFormulario(formId) {
+      const form = document.getElementById(formId);
+      if (form) {
+        form.reset();
+
+        // Ocultar mensajes de error
+        const errores = form.querySelectorAll(".text-danger");
+        errores.forEach(el => {
+          el.textContent = "";
+          el.style.display = "none";
+        });
+
+        // Resetear reCAPTCHA
+        if (typeof grecaptcha !== 'undefined') {
+          if (formId === "loginForm" && typeof widgetRemitente !== 'undefined') {
+            grecaptcha.reset(widgetRemitente);
+          }
+          if (formId === "loginUsuario" && typeof widgetUsuario !== 'undefined') {
+            grecaptcha.reset(widgetUsuario);
+          }
+        }
+
+        // Enfocar primer input visible
+        const primerCampo = form.querySelector("input:not([type='hidden']):not([disabled])");
+        if (primerCampo) primerCampo.focus();
+      }
+    }
+
     function mostrarFormularioUsuario() {
-    document.getElementById("formRemitente").classList.add("d-none");
-    document.getElementById("formUsuario").classList.remove("d-none");
+      document.getElementById("formRemitente").classList.add("d-none");
+      document.getElementById("formUsuario").classList.remove("d-none");
 
-    const botones = document.querySelectorAll(".nav-link");
-    botones[0].classList.remove("active", "bg-dark", "text-white");
-    botones[0].classList.add("bg-light", "text-dark");
+      const botones = document.querySelectorAll(".nav-link");
+      botones[0].classList.remove("active");
+      botones[1].classList.add("active");
 
-    botones[1].classList.add("active", "bg-dark", "text-white");
-    botones[1].classList.remove("bg-light", "text-dark");
+      limpiarFormulario("loginForm");
     }
 
     function mostrarFormularioRemitente() {
-    document.getElementById("formUsuario").classList.add("d-none");
-    document.getElementById("formRemitente").classList.remove("d-none");
+      document.getElementById("formUsuario").classList.add("d-none");
+      document.getElementById("formRemitente").classList.remove("d-none");
 
-    const botones = document.querySelectorAll(".nav-link");
-    botones[1].classList.remove("active", "bg-dark", "text-white");
-    botones[1].classList.add("bg-light", "text-dark");
+      const botones = document.querySelectorAll(".nav-link");
+      botones[1].classList.remove("active");
+      botones[0].classList.add("active");
 
-    botones[0].classList.add("active", "bg-dark", "text-white");
-    botones[0].classList.remove("bg-light", "text-dark");
+      limpiarFormulario("loginUsuario");
     }
+
+
+    let widgetRemitente, widgetUsuario;
+
+    var onloadCallback = function () {
+      widgetRemitente = grecaptcha.render('recaptchaRemitente', {
+        'sitekey': '6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb'
+      });
+      widgetUsuario = grecaptcha.render('recaptchaUsuario', {
+        'sitekey': '6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb'
+      });
+    };
   </script>
+
+  <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
 
 </body>
 </html>

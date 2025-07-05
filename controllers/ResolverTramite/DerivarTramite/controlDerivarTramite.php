@@ -31,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
         $tamanoBytes      = $documento['size'];
         $tipoArchivo      = $documento['type'];
 
+        // Carpeta de destino
+        $carpetaDestino   = "../../../uploads/tramites";
+
         // Convertir tamaño a kilobytes (KB)
         $tamanoKB         = $tamanoBytes / 1024;
 
@@ -39,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnDerivarTramite']))
         $nombreFinal       = str_replace(' ', '-', $nombreNormalizado);
 
         // Nombre base del archivo en el servidor
-        $tipo = "00DRV00"; // Es un código que hace referencia a archivo subido por usuario del sistema
+        $tipo = "00U00"; // Es un código que hace referencia a archivo subido por usuario del sistema
         $nombre_base = $numeroExpediente . "_" . $tipo . "_" . $nombreFinal;
         $nombre_final = $getTramite->limpiarNombreArchivo($nombre_base);
     } else {

@@ -145,7 +145,7 @@ class Administrador{
     public function obtenerDatosUsuario($usuario, $clave) {
         $conexion = Conexion::conectarBD();
 
-        $sql = 'SELECT u.cod_usuario, u.usuario, u.clave, u.tipo_doc, u.num_doc, u.ap_paterno, u.ap_materno, u.nombre, u.tipo, a.area, u.estado
+        $sql = 'SELECT u.usuario, u.clave, u.tipo_doc, u.num_doc, u.ap_paterno, u.ap_materno, u.nombre, u.tipo, a.area, u.estado
                 FROM usuario u
                 INNER JOIN area a ON u.cod_area = a.cod_area
                 WHERE usuario = ?
@@ -168,7 +168,6 @@ class Administrador{
             $clave = md5($clave);
             if ($clave === $dato['clave']) {
                 $datosUsuario = [
-                    'cod_usuario' => $dato['cod_usuario'],
                     'usuario' => $dato['usuario'],
                     'tipo_doc' => $dato['tipo_doc'],
                     'num_doc' => $dato['num_doc'],

@@ -148,7 +148,7 @@ class GetDerivarTramite{
             $area_origen = $_SESSION['datos']['area'];
 
             // Obtener orden
-            $orden = $getDerivarTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
+            $orden = $getDerivarTramite->obtenerSiguienteOrdenPorDocumento($num_documento);
             if ($orden === null) {
                 $this->message = "Error al obtener el orden del trámite.";
                 return false;
