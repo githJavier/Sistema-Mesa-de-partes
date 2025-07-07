@@ -1,12 +1,12 @@
 <?php 
 require_once __DIR__ . '/../../utils/log_config.php';
-class formResolverTramites{
-    public function formResolverTramitesShow($tramites){
+class formRecibirTramitesInternos{
+    public function formRecibirTramitesInternosShow($tramites){
         ob_start();
-        //Formularios para los Tramites Por Resolver
+        //Formularios para los Tramites Internos
         ?>
             <div class="container mb-5">
-            <h3 class="mb-4 border-bottom pb-2 text-dark">TRÁMITES POR RESOLVER</h3>
+            <h3 class="mb-4 border-bottom pb-2 text-dark">TRÁMITES INTERNOS POR RECIBIR</h3>
 
             <!-- Formulario de filtros -->
             <form id="form-filtros" class="row g-2 mb-4">
@@ -55,7 +55,7 @@ class formResolverTramites{
 
             <!-- Cantidad de los expedientes presentes en la tabla -->
             <div id="alert-expedientes" class="alert alert-secondary d-flex align-items-center justify-content-between px-4 py-2 rounded mb-3 shadow-sm">
-            <strong class="text-dark m-0">Usted tiene <span id="cantidad-expedientes"><?= count($tramites) ?></span> expediente(s) por resolver</strong>
+            <strong class="text-dark m-0">Usted tiene <span id="cantidad-expedientes"><?= count($tramites) ?></span> expediente(s) por recibir</strong>
             </div>
 
             <!-- Control de cantidad -->
@@ -103,35 +103,26 @@ class formResolverTramites{
                             <td class="td-estado"><?= strtoupper($tramite['dt_estado'] ?? 'NO DEFINIDO') ?></td>
                             <td class="td-area"><?= strtoupper($tramite['dt_area_destino'] ?? 'NO DEFINIDO') ?></td>
                             <td>
-                            <button class="btn btn-all btn-sm"
-                                id = "ArchivarTramites"
-                                onclick="cargarFormularioArchivarTramite(
-                                '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                '<?= addslashes($tramite['t_asunto']) ?>',
-                                '<?= addslashes($tramite['t_num_documento']) ?>'
+                            <button id="btnRecibirTramite" class="btn btn-all btn-sm"
+                                onclick="recibirTramiteInterno(
+                                    '<?= addslashes((string) ($tramite['t_codigo_generado'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['dt_area_origen'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['dt_area_destino'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_num_documento'] ?? '')) ?>'
                                 )">
-                                <i class="fas fa-folder-minus me-1"></i> Archivar
-                            </button>
-                            <button class="btn btn-all btn-sm"
-                                onclick="cargarFormularioDerivarTramite(
-                                '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                '<?= addslashes($tramite['t_asunto']) ?>',
-                                '<?= addslashes($tramite['t_num_documento']) ?>',
-                                '<?= addslashes($tramite['dt_cod_detalletramite']) ?>'
-                                )">
-                                <i class="fas fa-paper-plane me-1"></i> Derivar
+                                <i class="fas fa-inbox me-1"></i> Recibir
                             </button>
                             </td>
                             <td>
                             <button class="btn btn-all btn-sm"
                                 onclick="verDetalles(
-                                    '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                    '<?= addslashes($tramite['t_tipodocumento']) ?>',
-                                    '<?= addslashes($tramite['t_asunto']) ?>',
-                                    '<?= addslashes($tramite['t_fec_reg']) ?>',
-                                    '<?= addslashes($tramite['t_remitente']) ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['archivos']), ENT_QUOTES, 'UTF-8') ?>'
+                                    '<?= addslashes((string) ($tramite['t_codigo_generado'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_tipodocumento'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_asunto'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_fec_reg'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_remitente'] ?? '')) ?>',
+                                    '<?= htmlspecialchars(json_encode($tramite['flujo'] ?? []), ENT_QUOTES, 'UTF-8') ?>',
+                                    '<?= htmlspecialchars(json_encode($tramite['archivos'] ?? []), ENT_QUOTES, 'UTF-8') ?>'
                                 )">
                                 <i class="fas fa-eye me-1"></i> Ver
                             </button>
@@ -149,12 +140,10 @@ class formResolverTramites{
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
                 <div id="pagination-info" class="form-text text-muted text-center text-md-start">
                 </div>
-                
             </div>
         </div>
 
         <style>
-            
         /* Fondo del modal */
         .modal-fondo {
             position: fixed;
@@ -324,7 +313,7 @@ class formResolverTramites{
             cursor: not-allowed;         /* cursor de bloqueo */
             text-decoration: none;
             }
-            
+
             .btn {
             border-radius: 6px;
             font-weight: 500;
@@ -344,14 +333,15 @@ class formResolverTramites{
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
         <!-- Tu archivo JavaScript personalizado -->
-        <script src="../../asset/js/ResolverTramitesForms.js"></script>
-        <script src="../../asset/js/ResolverTramites.js"></script>
+        <script src="../../asset/js/RecibirTramitesInternos.js"></script>
+
         <script>
         // Detener Polling de Mensajes
         delete window.habilitarPollingMensajes;
         // Detener Polling de Chat Admin
         delete window.habilitarPollingChatAdmin;
         </Script>
+
         <?php
         return ob_get_clean();
     }

@@ -92,6 +92,9 @@ function cargarDesdeLocalStorage() {
             case "recibirTramitesExternos":
                 cargarformularioRecibirTramitesExternos();
                 break;
+            case "recibirTramitesInternos":
+                cargarformularioRecibirTramitesInternos();
+                break;
             case "resolverTramites":
                 cargarformularioResolverTramites();
                 break;
@@ -314,6 +317,23 @@ function cargarformularioRecibirTramitesExternos(){
     });
 }
 
+function cargarformularioRecibirTramitesInternos(){
+      
+    verificarSesion(() => {
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/RecibirTramiteInterno/controlFormRecibirTramiteInterno.php",
+            dataType: "json",
+            success: function(response){
+                if(response.flag == 1){
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "recibirTramitesInternos");
+                }
+            }
+        })
+    });
+}
+
 function cargarformularioResolverTramites(){
 
     verificarSesion(() => {
@@ -387,6 +407,9 @@ $(document).on('click', '#ConsultarTramitesDerivados', function() {
 });
 $(document).on('click', '#RecibirTramitesExternos', function() {
     cargarformularioRecibirTramitesExternos();
+});
+$(document).on('click', '#RecibirTramitesInternos', function() {
+    cargarformularioRecibirTramitesInternos();
 });
 $(document).on('click', '#ResolverTramites', function() {
     cargarformularioResolverTramites();

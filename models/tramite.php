@@ -997,6 +997,158 @@ public function obtenerTramitesRegistradosRemitenteExterno() {
     return $tramites;
 }
 
+// Método: obtenerTramitesRegistradosRemitenteInterno
+public function obtenerTramitesRegistradosRemitenteInterno($area) {
+    $conexion = Conexion::conectarBD();
+    $tramites = [];
+
+    try {
+        // 1. Obtener trámites derivados por área
+        $sql = "SELECT 
+                    dt.cod_detalletramite AS dt_cod_detalletramite,
+                    e.estado AS dt_estado,
+                    dt.urgente AS dt_urgente,
+                    dt.area_origen AS dt_area_origen,
+                    dt.area_destino AS dt_area_destino,
+                    dt.codigo_generado AS dt_codigo_generado,
+                    dt.fec_recep AS dt_fec_recep,
+                    dt.hora_recep AS dt_hora_recep
+                FROM detalletramite dt
+                INNER JOIN estado e ON dt.idestadode = e.idestado
+                WHERE e.estado = 'Derivado' AND dt.area_destino = ?
+                ORDER BY 
+                    dt.fec_recep DESC,
+                    (
+                        CASE
+                            WHEN INSTR(dt.hora_recep, 'am') > 0 THEN
+                                CASE
+                                    WHEN CAST(SUBSTRING_INDEX(dt.hora_recep, ':', 1) AS UNSIGNED) = 12 THEN 0
+                                    ELSE
+                                        CAST(SUBSTRING_INDEX(dt.hora_recep, ':', 1) AS UNSIGNED) * 60 +
+                                        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(dt.hora_recep, '-', 1), ':', -1) AS UNSIGNED)
+                                END
+                            ELSE
+                                CASE
+                                    WHEN CAST(SUBSTRING_INDEX(dt.hora_recep, ':', 1) AS UNSIGNED) = 12 THEN
+                                        12 * 60 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(dt.hora_recep, '-', 1), ':', -1) AS UNSIGNED)
+                                    ELSE
+                                        (CAST(SUBSTRING_INDEX(dt.hora_recep, ':', 1) AS UNSIGNED) + 12) * 60 +
+                                        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(dt.hora_recep, '-', 1), ':', -1) AS UNSIGNED)
+                                END
+                        END
+                    ) DESC;";
+        $stmt1 = $conexion->prepare($sql);
+        $stmt1->bind_param("s", $area);
+        $stmt1->execute();
+        $data_detalle_tramite = $stmt1->get_result();
+
+        if ($data_detalle_tramite->num_rows === 0) {
+            return [];
+        }
+
+        // 2. Procesar trámites
+        while ($row = $data_detalle_tramite->fetch_assoc()) {
+            $codigo_generado = $row['dt_codigo_generado'];
+            $cod_detalletramite = $row['dt_cod_detalletramite'];
+            $detalle = $row;
+
+            // 2.1 Obtener datos del trámite principal
+            $sql_tramite = "SELECT 
+                                td.tipodocumento as t_tipodocumento,
+                                t.fec_reg as t_fec_reg,
+                                t.asunto as t_asunto,
+                                t.remitente as t_remitente,
+                                t.codigo_generado as t_codigo_generado,
+                                t.num_documento as t_num_documento
+                            FROM tramite t
+                            INNER JOIN tipodocumento td ON t.cod_tipodocumento = td.cod_tipodocumento
+                            WHERE t.codigo_generado = ?";
+            $stmt2 = $conexion->prepare($sql_tramite);
+            $stmt2->bind_param("s", $codigo_generado);
+            $stmt2->execute();
+            $data_tramite = $stmt2->get_result();
+
+            if ($row_tramite = $data_tramite->fetch_assoc()) {
+                $detalle = array_merge($detalle, $row_tramite);
+            } else {
+            }
+
+            // 2.2 Obtener historial del flujo del trámite
+            $sql_flujo = "SELECT 
+                            e.estado as f_estado,
+                            f.area_origen as f_area_origen,
+                            f.area_destino as f_area_destino,
+                            f.comentario as f_comentario,
+                            f.folio as f_folio,
+                            f.hora_recep as f_hora_recep,
+                            f.fec_recep as f_fec_recep,
+                            f.codigo_generado as f_codigo_generado,
+                            f.idflujo as f_idflujo
+                        FROM flujo f
+                        INNER JOIN estado e ON f.idestadoflujo = e.idestado
+                        WHERE f.codigo_generado = ?
+                        ORDER BY f.orden DESC";
+            $stmt3 = $conexion->prepare($sql_flujo);
+            $stmt3->bind_param("s", $codigo_generado);
+            $stmt3->execute();
+            $data_flujo = $stmt3->get_result();
+
+            $flujo = [];
+            while ($detalle_flujo = $data_flujo->fetch_assoc()) {
+                $flujo[] = $detalle_flujo;
+            }
+
+            // 2.3 Buscar archivos asociados al trámite
+            $sql_adjuntos = "SELECT 
+                            a.file as a_file
+                            FROM adjunto a
+                            WHERE iddetalletramite = ?";
+            $stmt4 = $conexion->prepare($sql_adjuntos);
+            $stmt4->bind_param("i", $cod_detalletramite);
+            $stmt4->execute();
+            $data_archivo = $stmt4->get_result();
+
+            $archivos = [];
+            while ($row = $data_archivo->fetch_assoc()) {
+                $archivos[] = $row['a_file'];
+            }
+
+            // 2.4 Construcción final del trámite
+            $tramites[] = [
+                'dt_cod_detalletramite'  => $detalle['dt_cod_detalletramite'],
+                'dt_estado'           => $detalle['dt_estado'],
+                'dt_urgente'          => $detalle['dt_urgente'],
+                'dt_area_origen'      => $detalle['dt_area_origen'],
+                'dt_area_destino'     => $detalle['dt_area_destino'],
+                'dt_codigo_generado'  => $detalle['dt_codigo_generado'],
+                'dt_fec_recep'        => $detalle['dt_fec_recep'],
+                'dt_hora_recep'       => $detalle['dt_hora_recep'],
+                't_tipodocumento'     => $detalle['t_tipodocumento'] ?? null,
+                't_fec_reg'           => $detalle['t_fec_reg'] ?? null,
+                't_asunto'            => $detalle['t_asunto'] ?? null,
+                't_remitente'         => $detalle['t_remitente'] ?? null,
+                't_num_documento'     => $detalle['t_num_documento'] ?? null,
+                't_codigo_generado'   => $detalle['t_codigo_generado'] ?? $codigo_generado,
+                'flujo'               => $flujo,
+                'archivos'            => $archivos,
+            ];
+        }
+
+    } catch (Exception $e) {
+        return [];
+    } finally {
+        // Cierre de conexiones
+        if (isset($stmt0)) $stmt0->close();
+        if (isset($stmt1)) $stmt1->close();
+        if (isset($stmt2)) $stmt2->close();
+        if (isset($stmt3)) $stmt3->close();
+        if (isset($stmt4)) $stmt4->close();
+        Conexion::desconectarBD();
+    }
+
+    return $tramites;
+}
+
 // Método: obtenerNuevoOrden
 public function obtenerNuevoOrden(int $numDocumento): int {
     $conexion = Conexion::conectarBD();
@@ -1026,6 +1178,59 @@ public function obtenerNuevoOrden(int $numDocumento): int {
 
 // Método: RecibirTramiteExterno
 public function RecibirTramiteExterno($codigo_generado, $fecha, $hora, $area_origen, $area_destino, $num_documento, $orden)
+{
+    $conexion = Conexion::conectarBD();
+
+    try {
+        // Iniciar transacción
+        $conexion->begin_transaction();
+
+        // 1. Insertar registro en la tabla 'flujo'
+        $sql = "INSERT INTO flujo (
+                    codigo_generado, fec_recep, hora_recep, folio,
+                    idestadoflujo, comentario, area_origen, area_destino,
+                    num_documento, orden
+                ) VALUES (?, ?, ?, '0', '14', '', ?, '', ?, ?)";
+        $stmt1 = $conexion->prepare($sql);
+        if (!$stmt1) {
+            throw new Exception("Error preparando INSERT en flujo: " . $conexion->error);
+        }
+
+        $stmt1->bind_param("ssssii", $codigo_generado, $fecha, $hora, $area_destino, $num_documento, $orden);
+        $stmt1->execute();
+
+        // 2. Actualizar la tabla 'detalletramite'
+        $sql1 = "UPDATE detalletramite
+                 SET area_origen = ?, area_destino = ?, fec_recep = ?, hora_recep = ?,
+                     idestadode = '14', comentario = ''
+                 WHERE codigo_generado = ?";
+        $stmt2 = $conexion->prepare($sql1);
+        if (!$stmt2) {
+            throw new Exception("Error preparando UPDATE en detalletramite: " . $conexion->error);
+        }
+
+        $stmt2->bind_param("sssss", $area_origen, $area_destino, $fecha, $hora, $codigo_generado);
+        $stmt2->execute();
+
+        // Confirmar transacción
+        $conexion->commit();
+
+    } catch (Exception $e) {
+        // Revertir cambios en caso de error
+        $conexion->rollback();
+        return false;
+    } finally {
+        // Cierre de sentencias y conexión
+        if (isset($stmt1)) $stmt1->close();
+        if (isset($stmt2)) $stmt2->close();
+        Conexion::desconectarBD();
+    }
+
+    return true;
+}
+
+// Método: RecibirTramiteInterno
+public function RecibirTramiteInterno($codigo_generado, $fecha, $hora, $area_origen, $area_destino, $num_documento, $orden)
 {
     $conexion = Conexion::conectarBD();
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../utils/log_config.php';
 class GetFormIngresarTramiteUsuario {
   public function formIngresarTramiteUsuarioShow($ultimoTramite, $tipoDocumento, $remitentes, $unidadesOrganicas) {
     ob_start();

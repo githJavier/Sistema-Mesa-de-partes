@@ -1,6 +1,6 @@
 <?php 
-include_once("getRecibirTramiteExterno.php");
-include_once("../../views/dashboard/formRecibirTramiteExterno.php");
+require_once __DIR__ . '/getRecibirTramiteExterno.php';
+require_once __DIR__ . '/../../views/dashboard/formRecibirTramiteExterno.php';
 
 $getRecibirTramiteExterno = new GetRecibirTramiteExterno;
 $tramitesExternos = $getRecibirTramiteExterno->obtenerTramitesExternos();

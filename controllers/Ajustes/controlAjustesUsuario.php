@@ -3,8 +3,11 @@ include_once("getAjustes.php");
 include_once("../../models/area.php");
 include_once("../../models/usuario.php");
 include_once("../../models/tipoDocumento.php");
+session_start();
 
 header('Content-Type: application/json');
+
+$miArea = $_SESSION['datos']['area'];
 
 $getAjustes = new GetAjustes();
 $areaModel = new Area();
@@ -12,6 +15,11 @@ $usuarioModel = new Usuario();
 $tipoDocumentoModel = new TipoDocumento();
 
 $listaAreas = $areaModel->obtenerAreas();
+$areasFiltradas = array_filter($listaAreas, function($area) use ($miArea) {
+    return $area['area'] !== $miArea;
+});
+$areasFiltradas = array_values($areasFiltradas); // <- Reindexa para que sea un array puro
+
 $listaTiposUsuario = $usuarioModel->obtenerTiposUsuario();
 $listaTiposDocumento = $tipoDocumentoModel->obtenerTipoDocumento();
 
@@ -24,7 +32,7 @@ if (isset($_GET['id'])) {
             'success' => true,
             'data' => [
                 'usuario' => $usuarioData,
-                'areas' => $listaAreas,
+                'areas' => $areasFiltradas,
                 'tipos_usuario' => $listaTiposUsuario,
                 'tipos_documento' => $listaTiposDocumento
             ]
@@ -34,7 +42,7 @@ if (isset($_GET['id'])) {
             'success' => false,
             'message' => 'No se encontró usuario',
             'data' => [
-                'areas' => $listaAreas,
+                'areas' => $areasFiltradas,
                 'tipos_usuario' => $listaTiposUsuario,
                 'tipos_documento' => $listaTiposDocumento
             ]
@@ -45,7 +53,7 @@ if (isset($_GET['id'])) {
     echo json_encode([
         'success' => true,
         'data' => [
-            'areas' => $listaAreas,
+            'areas' => $areasFiltradas,
             'tipos_usuario' => $listaTiposUsuario,
             'tipos_documento' => $listaTiposDocumento
         ]

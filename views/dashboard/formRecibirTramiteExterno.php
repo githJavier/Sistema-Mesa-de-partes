@@ -6,7 +6,7 @@ class formRecibirTramitesExternos{
         //Formularios para los Tramites Externos
         ?>
             <div class="container mb-5">
-            <h3 class="mb-4 border-bottom pb-2 text-dark">TRAMITES POR RECIBIR (REMITENTES EXTERNOS)</h3>
+            <h3 class="mb-4 border-bottom pb-2 text-dark">TRÁMITES EXTERNOS POR RECIBIR</h3>
 
             <!-- Formulario de filtros -->
             <form id="form-filtros" class="row g-2 mb-4">
@@ -105,10 +105,10 @@ class formRecibirTramitesExternos{
                             <td>
                             <button id="btnRecibirTramite" class="btn btn-all btn-sm"
                                 onclick="recibirTramiteExterno(
-                                '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                '<?= addslashes($tramite['dt_area_origen']) ?>',
-                                '<?= addslashes($tramite['dt_area_destino']) ?>',
-                                '<?= addslashes($tramite['t_num_documento']) ?>'
+                                    '<?= addslashes((string) ($tramite['t_codigo_generado'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['dt_area_origen'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['dt_area_destino'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_num_documento'] ?? '')) ?>'
                                 )">
                                 <i class="fas fa-inbox me-1"></i> Recibir
                             </button>
@@ -116,13 +116,13 @@ class formRecibirTramitesExternos{
                             <td>
                             <button class="btn btn-all btn-sm"
                                 onclick="verDetalles(
-                                    '<?= addslashes($tramite['t_codigo_generado']) ?>',
-                                    '<?= addslashes($tramite['t_tipodocumento']) ?>',
-                                    '<?= addslashes($tramite['t_asunto']) ?>',
-                                    '<?= addslashes($tramite['t_fec_reg']) ?>',
-                                    '<?= addslashes($tramite['t_remitente']) ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['flujo']), ENT_QUOTES, 'UTF-8') ?>',
-                                    '<?= htmlspecialchars(json_encode($tramite['archivos']), ENT_QUOTES, 'UTF-8') ?>'
+                                    '<?= addslashes((string) ($tramite['t_codigo_generado'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_tipodocumento'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_asunto'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_fec_reg'] ?? '')) ?>',
+                                    '<?= addslashes((string) ($tramite['t_remitente'] ?? '')) ?>',
+                                    '<?= htmlspecialchars(json_encode($tramite['flujo'] ?? []), ENT_QUOTES, 'UTF-8') ?>',
+                                    '<?= htmlspecialchars(json_encode($tramite['archivos'] ?? []), ENT_QUOTES, 'UTF-8') ?>'
                                 )">
                                 <i class="fas fa-eye me-1"></i> Ver
                             </button>

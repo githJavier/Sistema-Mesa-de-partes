@@ -19,11 +19,16 @@ class GetMenuAdmin{
 
                     <!-- Contenido colapsable -->
                     <div class="collapse collapse-tramite ms-4" id="collapseBandeja">
+                        <?php if (isset($_SESSION['datos']['area']) && $_SESSION['datos']['area'] === 'OFICINA TRAMITE DOCUMENTARIO') : ?>
                         <button type="button" class="menu-item sub-item menu-text" id="RecibirTramitesExternos">
-                            <i class="fas fa-file-import"></i>TRAMITES POR RECIBIR (EXT.)
+                            <i class="fas fa-file-import"></i>TRÁMITES POR RECIBIR (EXT.)
+                        </button>
+                        <?php endif; ?>
+                        <button type="button" class="menu-item sub-item menu-text" id="RecibirTramitesInternos">
+                            <i class="fas fa-file-import" style="transform: scaleX(-1);"></i></i>TRÁMITES POR RECIBIR (INT.)
                         </button>
                         <button type="button" class="menu-item sub-item menu-text" id="ResolverTramites">
-                            <i class="fas fa-tasks"></i>TRAMITES POR RESOLVER
+                            <i class="fas fa-tasks"></i>TRÁMITES POR RESOLVER
                         </button>
                     </div>
 
@@ -32,9 +37,10 @@ class GetMenuAdmin{
                     </button>
 
                     <button type="button" class="menu-item d-none" id="botonMensaje">
-                        <i class="fas fa-paper-plane"></i><span class="menu-text">TRAMITE</span>
+                        <i class="fas fa-paper-plane"></i><span class="menu-text">TRÁMITE</span>
                     </button>
 
+                    <?php if (isset($_SESSION['datos']['area']) && $_SESSION['datos']['area'] === 'JEFE DE SISTEMAS') : ?>
                     <button type="button" class="menu-item" id="linkTramite" data-bs-toggle="collapse" data-bs-target="#collapseAdministracion" aria-expanded="false">
                         <i class="fas fa-user-cog"></i><span class="menu-text">ADMINISTRACIÓN</span>
                     </button>
@@ -54,6 +60,7 @@ class GetMenuAdmin{
                             <i class="fas fa-file-alt"></i>TIPO DOCUMENTOS
                         </button>
                     </div>
+                    <?php endif; ?>
 
                     <button type="button" class="menu-item" id="linkTramite" data-bs-toggle="collapse" data-bs-target="#collapseConsultar" aria-expanded="false">
                         <i class="fas fa-search"></i><span class="menu-text">CONSULTAR</span>
@@ -62,10 +69,10 @@ class GetMenuAdmin{
                     <!-- Contenido colapsable -->
                     <div class="collapse collapse-tramite ms-4" id="collapseConsultar">
                         <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesArchivados" onclick="cargarformularioConsultarTramitesArchivados()">
-                            <i class="fas fa-archive"></i>TRAMITES ARCHIVADOS
+                            <i class="fas fa-archive"></i>TRÁMITES ARCHIVADOS
                         </button>
                         <button type="button" class="menu-item sub-item menu-text" id="ConsultarTramitesDerivados" onclick="cargarformularioConsultarTramitesDerivados()">
-                            <i class="fas fa-share-square"></i>TRAMITES DERIVADOS
+                            <i class="fas fa-share-square"></i>TRÁMITES DERIVADOS
                         </button>
                     </div>
                     

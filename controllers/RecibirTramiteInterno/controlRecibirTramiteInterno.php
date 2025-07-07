@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/getRecibirTramiteExterno.php';
+require_once __DIR__ . '/getRecibirTramiteInterno.php';
 
 header('Content-Type: application/json');
 
-$getRecibirTramiteExterno = new GetRecibirTramiteExterno();
+$getRecibirTramiteInterno = new GetRecibirTramiteInterno();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnRecibir00'])) {
     $codigo_tramite = $_POST['codigo_tramite'] ?? '';
@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnRecibir00'])) {
         default => 'Formato no válido'
     };
 
-    if ($getRecibirTramiteExterno->validarBoton("btnRecibir00")) {
-        if ($getRecibirTramiteExterno->RecibirTramiteExterno(
+    if ($getRecibirTramiteInterno->validarBoton("btnRecibir00")) {
+        if ($getRecibirTramiteInterno->RecibirTramiteInterno(
             $codigo_tramite, $area_origen, $area_destino, $num_documento, $horaRegistro, $fechaRegistro
         )) {
             echo json_encode([
                 'flag'     => 1,
-                'message'  => $getRecibirTramiteExterno->message,
+                'message'  => $getRecibirTramiteInterno->message,
                 'redirect' => 'homeAdmin.php'
             ]);
             exit;
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnRecibir00'])) {
 
         echo json_encode([
             'flag'    => 0,
-            'message' => $getRecibirTramiteExterno->message
+            'message' => $getRecibirTramiteInterno->message
         ]);
         exit;
     }

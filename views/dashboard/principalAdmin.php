@@ -26,7 +26,7 @@ session_start();
         </div>
 
         <!-- Trámites externos por recibir -->
-        <?php if (!isset($_SESSION['datos']['area']) || $_SESSION['datos']['area'] !== 'JEFE DE SISTEMAS') : ?>
+        <?php if (!isset($_SESSION['datos']['area']) || $_SESSION['datos']['area'] === 'OFICINA TRAMITE DOCUMENTARIO') : ?>
         <div class="col d-flex align-items-stretch justify-content-center">
             <div class="card mx-auto text-center" style="width: 100%; max-width: 18rem; min-height: 420px;">
                 <img src="../../asset/img/tramitesExternos.jpg" class="card-img-top img-fluid"
