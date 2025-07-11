@@ -87,7 +87,7 @@ function validarTramite() {
 
     isValid &= validarCampoRequerido("ASUNTO", "asuntoError");
     isValid &= validarCampoRequerido("TIPO_DOCUMENTO", "tipoDocumentoError");
-    isValid &= validarFormatoExpediente("NUMERO_TRAMITE", "numeroDocumentoError", /^\d{4}-EX\d{10}$/, '2025-EX0000000001');
+    isValid &= validarFormatoExpediente("NUMERO_TRAMITE", "numeroDocumentoError", /^\d{4}-DOC\d{10}$/, '2025-DOC0000000001');
     isValid &= validarArchivo("DOCUMENTO_VIRTUAL", "documentoVirtualError", 1000);
     isValid &= validarFolios("FOLIOS", "foliosError");
 
