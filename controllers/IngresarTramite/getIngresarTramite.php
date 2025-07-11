@@ -140,6 +140,14 @@ class GetIngresarTramite {
         return true;
     }
 
+    public function verificarDisponibilidadCodigoTramite($codigoTramite) {
+        $existe = $this->objTramite->codigoTramiteExiste($codigoTramite);
+        if ($existe) {
+            return false;
+        }
+        return true;
+    }
+
     public function validarFolios($folios) {
         if (!isset($folios) || trim($folios) === "") {
             $this->message = "El número de folios es obligatorio.";
@@ -204,26 +212,53 @@ class GetIngresarTramite {
     }
 
     public function insertarTramite(
-        $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
-        $remitente, $asunto, $folios, $area_origen, $area_destino,
-        $final_file, $file_type, $new_size
-    ) {
-        $getTramite         = new Tramite();
-        $num_documento      = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
-        $orden              = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
+    $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
+    $remitente, $asunto, $folios, $area_origen, $area_destino,
+    $final_file, $file_type, $new_size
+) {
+    $getTramite = new Tramite();
+    $intentos = 0;
+    $maxIntentos = 3;
+    $respuesta = false;
+
+    while ($intentos < $maxIntentos && !$respuesta) {
+        $num_documento = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
+        $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
         $id_detalle_tramite = $getTramite->obtenerNuevoIdDetalleTramite();
 
-        $respuesta = $this->objTramite->ingresarTramite(
-            $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento,
-            $horaReg, $fecReg, $remitente, $asunto, $folios,
-            $area_origen, $area_destino, $num_documento, $orden,
-            $id_detalle_tramite, $final_file, $file_type, $new_size
-        );
+        try {
+            $respuesta = $this->objTramite->ingresarTramite(
+                $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento,
+                $horaReg, $fecReg, $remitente, $asunto, $folios,
+                $area_origen, $area_destino, $num_documento, $orden,
+                $id_detalle_tramite, $final_file, $file_type, $new_size
+            );
 
-        $this->message = $respuesta
-            ? "Trámite ingresado correctamente"
-            : "Ocurrió un problema al ingresar el trámite";
+            if (!$respuesta) {
+                // Puede agregar log aquí si quiere
+                break; // si falla por otro motivo no intentar más
+            }
 
-        return $respuesta;
+        } catch (Exception $e) {
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                error_log("⚠️ Código duplicado detectado: $codigoGenerado. Reintentando...");
+                // Generar un nuevo código
+                $nuevoCodigo = $this->asignarNumeroTramite();
+                $codigoGenerado = $nuevoCodigo['codigo_externo'];
+                $intentos++;
+                continue;
+            } else {
+                // Otro error no esperado
+                throw $e;
+            }
+        }
     }
+
+    $this->message = $respuesta
+        ? "Trámite ingresado correctamente"
+        : "No se pudo ingresar el trámite luego de $maxIntentos intentos por código duplicado.";
+
+    return $respuesta;
+}
+
 }

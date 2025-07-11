@@ -41,7 +41,7 @@ class GetFormIngresarTramiteUsuario {
             <span id="tipoTramiteError" class="text-danger ms-5" style="display:none;">Este campo es obligatorio.</span>
           </div>
           <div class="col-md-6">
-            <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO*</label>
+            <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (referencial, sujeto a cambio)</label>
             <div class="input-group">
               <span class="input-group-text span-input-tramite text-light"><i class="fas fa-file-alt"></i></span>
               <input type="text" class="form-control input-readonly" name="numero_documento" id="NUMERO_TRAMITE" readonly>

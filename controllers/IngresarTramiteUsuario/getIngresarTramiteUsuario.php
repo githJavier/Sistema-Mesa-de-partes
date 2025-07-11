@@ -190,6 +190,14 @@ class GetIngresarTramiteUsuario {
         return true;
     }
 
+    public function verificarDisponibilidadCodigoTramite($codigoTramite) {
+        $existe = $this->objTramite->codigoTramiteExiste($codigoTramite);
+        if ($existe) {
+            return false;
+        }
+        return true;
+    }
+
     public function validarAreaDestino($areaDestino) {
         if (!isset($areaDestino) || trim($areaDestino) === "") {
             $this->message = "Debe seleccionar un área de destino.";

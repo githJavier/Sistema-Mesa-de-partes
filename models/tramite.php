@@ -67,6 +67,29 @@ class Tramite{
         return $resultado !== null ? (int)$resultado + 1 : 1;
     }
 
+// Método: codigoTramiteExiste
+    public function codigoTramiteExiste($codigoTramite) {
+        $conexion = Conexion::conectarBD();
+        $sql = "SELECT 1 FROM tramite WHERE codigo_generado = ? LIMIT 1;";
+        $stmt = $conexion->prepare($sql);
+
+        if (!$stmt) {
+            Conexion::desconectarBD();
+            return false; // En caso de error, asumimos que no existe
+        }
+
+        $stmt->bind_param("s", $codigoTramite);
+        $stmt->execute();
+        $stmt->store_result();
+
+        $existe = $stmt->num_rows > 0;
+
+        $stmt->close();
+        Conexion::desconectarBD();
+
+        return $existe; // true si existe, false si no
+    }
+
 // Método: obtenerSiguienteOrdenPorDocumento
     public function obtenerSiguienteOrdenPorDocumento(int $numDocu, string $codigoDocumento): int {
         $conexion = Conexion::conectarBD();

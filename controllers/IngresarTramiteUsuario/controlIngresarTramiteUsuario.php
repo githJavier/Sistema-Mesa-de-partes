@@ -34,11 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramiteUsuar
     $new_file_name     = strtolower($file);
     $final_file        = str_replace(' ', '-', $new_file_name);
 
-    // Construcción del nombre final del archivo
-    $tipo              = "00INI00"; // Código fijo que representa usuario
-    $nombre_base       = $numeroTramite . "_" . $tipo . "_" . $final_file;
-    $nombre_final      = $getTramite->limpiarNombreArchivo($nombre_base);
-
     // Preparación de fecha y hora de registro
     date_default_timezone_set('America/Lima');
     $anio              = date('Y');
@@ -58,6 +53,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramiteUsuar
         if ($getTramite->validarAsunto($asunto)) {
             if ($getTramite->validarTipoTramite($tipoTramite)) {
                 if ($getTramite->validarNumeroTramite($numeroTramite)) {
+                    if (!$getTramite->verificarDisponibilidadCodigoTramite($numeroTramite)) {
+                        do {
+                            $ultimoTramite = $getTramite->asignarNumeroTramite();
+                            if($tipoTramite === 'INTERNO'){
+                                $numeroTramite = $ultimoTramite['codigo_interno'];
+                            } else {
+                                $numeroTramite = $ultimoTramite['codigo_externo'];
+                            }
+                            $disponible = $getTramite->verificarDisponibilidadCodigoTramite($numeroTramite);
+                        } while (!$disponible);
+                    }
+                    // Construcción del nombre final del archivo
+                    $tipo              = "00INI00"; // Código fijo que representa usuario
+                    $nombre_base       = $numeroTramite . "_" . $tipo . "_" . $final_file;
+                    $nombre_final      = $getTramite->limpiarNombreArchivo($nombre_base);
                     if ($getTramite->validarAreaDestino($area_destino)) {
                         if ($getTramite->validarTipoDocumento($tipoDocumento)) {
                             if ($getTramite->validarArchivo($documento)) {

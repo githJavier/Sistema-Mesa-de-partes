@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../utils/log_config.php';
 include_once("getIngresarTramite.php");
 
 // Validar método y botón
@@ -32,11 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
     $new_file     = strtolower($file);
     $final_file   = str_replace(' ', '-', $new_file);
 
-    // Construcción del nombre final del archivo
-    $tipo          = "00INI00"; // Código para remitente
-    $nombre_base   = $numeroTramite . "_" . $tipo . "_" . $final_file;
-    $nombre_final  = $getTramite->limpiarNombreArchivo($nombre_base);
-
     // Configurar zona horaria y obtener fecha/hora
     date_default_timezone_set('America/Lima');
     $anio           = date('Y');
@@ -57,6 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
         if ($getTramite->validarAsunto($asunto)) {
             if ($getTramite->validarTipoDocumento($tipoDocumento)) {
                 if ($getTramite->validarNumeroTramite($numeroTramite)) {
+                    if (!$getTramite->verificarDisponibilidadCodigoTramite($numeroTramite)) {
+                        do {
+                            $ultimoTramite = $getTramite->asignarNumeroTramite();
+                            $numeroTramite = $ultimoTramite['codigo_externo'];
+                            $disponible = $getTramite->verificarDisponibilidadCodigoTramite($numeroTramite);
+                        } while (!$disponible);
+                    }
+                    // Construcción del nombre final del archivo
+                    $tipo          = "00INI00"; // Código para remitente
+                    $nombre_base   = $numeroTramite . "_" . $tipo . "_" . $final_file;
+                    $nombre_final  = $getTramite->limpiarNombreArchivo($nombre_base);
                     if ($getTramite->validarArchivo($documento)) {
                         if ($getTramite->validarFolios($folios)) {
                             if ($getTramite->moverArchivo($documento, $nombre_final)) {
@@ -84,35 +91,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramite'])) 
                                     ]);
                                     exit;
                                 } else {
-                                    echo json_encode(['flag' => 0, 'message' => '8'.$getTramite->message]);
+                                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                     exit;
                                 }
                             } else {
-                                echo json_encode(['flag' => 0, 'message' => '7'.$getTramite->message]);
+                                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                                 exit;
                             }
                         } else {
-                            echo json_encode(['flag' => 0, 'message' => '6'.$getTramite->message]);
+                            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                             exit;
                         }
                     } else {
-                        echo json_encode(['flag' => 0, 'message' => '5'.$getTramite->message]);
+                        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                         exit;
                     }
                 } else {
-                    echo json_encode(['flag' => 0, 'message' => '4'.$getTramite->message]);
+                    echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                     exit;
                 }
             } else {
-                echo json_encode(['flag' => 0, 'message' => '3'.$getTramite->message]);
+                echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
                 exit;
             }
         } else {
-            echo json_encode(['flag' => 0, 'message' => '2'.$getTramite->message]);
+            echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
             exit;
         }
     } else {
-        echo json_encode(['flag' => 0, 'message' => '1'.$getTramite->message]);
+        echo json_encode(['flag' => 0, 'message' => $getTramite->message]);
         exit;
     }
 }

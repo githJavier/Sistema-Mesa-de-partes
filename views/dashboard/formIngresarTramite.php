@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../utils/log_config.php';
 class GetFormIngresarTramite {
   public function formIngresarTramiteShow($ultimoTramite, $tipoDocumento, $datosRemitente) {
     ob_start();
@@ -107,7 +108,7 @@ class GetFormIngresarTramite {
             </div>
 
             <div class="col-md-6">
-              <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO*</label>
+              <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (referencial, sujeto a cambio)</label>
               <div class="input-group">
                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-file-alt"></i></span>
                 <input type="text" class="form-control input-readonly" name="NUMERO_DOCUMENTO" id="NUMERO_TRAMITE" value="<?php echo $ultimoTramite['codigo_externo']; ?>" readonly>
