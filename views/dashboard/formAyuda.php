@@ -48,8 +48,14 @@ class formAyuda {
                         <div class="col-12">
                             <label for="asunto" class="form-text">ASUNTO</label>
                             <div class="input-group">
-                                <span class="input-group-text span-input-tramite text-light"><i class="fas fa-tag"></i></span>
-                                <input type="text" class="form-control" id="asunto" name="asunto" placeholder="Consulta sobre trámite, error en el sistema, etc.">
+                                <span class="input-group-text span-input-tramite text-light">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                                <input type="text" class="form-control" id="asunto" name="asunto" maxlength="100"
+                                    placeholder="Consulta sobre trámite, error en el sistema, etc.">
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <small id="asuntoCounter" class="text-muted">0 / 100</small>
                             </div>
                             <span id="asuntoError" class="text-danger ms-2" style="display:none;">Este campo es obligatorio.</span>
                         </div>
@@ -59,8 +65,14 @@ class formAyuda {
                         <div class="col-12">
                             <label for="mensaje" class="form-text">MENSAJE O DETALLES DE LA CONSULTA</label>
                             <div class="input-group">
-                                <span class="input-group-text span-input-tramite text-light"><i class="fas fa-comment-dots"></i></span>
-                                <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Describe aquí tu problema o solicitud con el mayor detalle posible..."></textarea>
+                                <span class="input-group-text span-input-tramite text-light">
+                                    <i class="fas fa-comment-dots"></i>
+                                </span>
+                                <textarea class="form-control" id="mensaje" name="mensaje" rows="4" maxlength="650"
+                                        placeholder="Describe aquí tu problema o solicitud con el mayor detalle posible..."></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <small id="mensajeCounter" class="text-muted">0 / 650</small>
                             </div>
                             <span id="mensajeError" class="text-danger ms-2" style="display:none;">Este campo es obligatorio.</span>
                         </div>

@@ -1,3 +1,18 @@
+// Actualiza en tiempo real el contador de caracteres del campo ASUNTO
+const inputAsuntoTramite = document.getElementById("ASUNTO");
+const contadorAsuntoTramite = document.getElementById("asuntoContadorTramite");
+
+function actualizarContadorAsunto() {
+  const longitud = inputAsuntoTramite.value.length;
+  contadorAsuntoTramite.textContent = `${longitud} / 100`;
+}
+
+// Escucha los cambios en el campo ASUNTO y actualiza el contador
+inputAsuntoTramite.addEventListener("input", actualizarContadorAsunto);
+
+// Inicializa el contador al cargar la página (útil si hay texto precargado)
+actualizarContadorAsunto();
+
 // Función genérica para mostrar u ocultar errores
 function validarCampoRequerido(inputId, errorId, mensaje = 'Este campo es obligatorio.') {
     const input = document.getElementById(inputId);
@@ -77,6 +92,16 @@ function validarFolios(inputId, errorId) {
     error.style.display = "none";
     return true;
 }
+
+document.getElementById('FOLIOS').addEventListener('input', function(e) {
+    // Eliminar cualquier carácter que no sea dígito
+    this.value = this.value.replace(/\D/g, '');
+
+    // Limitar a máximo 10 caracteres
+    if (this.value.length > 5) {
+        this.value = this.value.slice(0, 5);
+    }
+});
 
 // -----------------------------
 // VALIDACIONES POR FORMULARIO

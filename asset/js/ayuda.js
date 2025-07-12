@@ -1,3 +1,20 @@
+// Actualiza en tiempo real y al cargar los contadores de caracteres para los campos "asunto" y "mensaje".
+const asuntoInput = document.getElementById("asunto");
+const mensajeTextarea = document.getElementById("mensaje");
+const asuntoCounter = document.getElementById("asuntoCounter");
+const mensajeCounter = document.getElementById("mensajeCounter");
+function actualizarContador(input, counterElement, max) {
+    const longitud = input.value.length;
+    counterElement.textContent = `${longitud} / ${max}`;
+}
+
+asuntoInput.addEventListener("input", () => actualizarContador(asuntoInput, asuntoCounter, 100));
+mensajeTextarea.addEventListener("input", () => actualizarContador(mensajeTextarea, mensajeCounter, 650));
+
+// Inicializa contadores al cargar
+actualizarContador(asuntoInput, asuntoCounter, 100);
+actualizarContador(mensajeTextarea, mensajeCounter, 650);
+
 function validarAyuda() {
     let isValid = true;
 

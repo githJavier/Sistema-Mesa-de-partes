@@ -111,7 +111,7 @@ class GetFormAjustesDatos {
                             <label for="DIRECCION" class="form-text">DOMICILIO</label>
                             <div class="input-group">
                                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-map-marker-alt"></i></span>
-                                <input type="text" class="form-control" name="DOMICILIO" id="DIRECCION" value="<?=$datosRemitente['direccion']?>">
+                                <input type="text" class="form-control" name="DOMICILIO" id="DIRECCION" value="<?= $datosRemitente['direccion'] ?>" maxlength="120" placeholder="Ingrese su dirección">
                             </div>
                             <span id="domicilioError" class="text-danger ms-2" style="display:none;">Este campo es obligatorio.</span>
                         </div>

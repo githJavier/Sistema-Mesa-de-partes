@@ -84,6 +84,11 @@ class GetAjustes {
             $this->message = "El campo dirección es obligatorio.";
             return false;
         }
+        $longitud = mb_strlen($direccion);
+        if ($longitud > 120) {
+            $this->message = "La dirección no debe exceder los 120 caracteres. Ha escrito {$longitud} caracteres.";
+            return false;
+        }
         return true;
     }
 

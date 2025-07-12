@@ -13,7 +13,7 @@ class FormMensaje {
             <form id="ma-form-filtros" class="row g-2 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="ma-filtro-asunto">Buscar por asunto</label>
-                    <input type="text" class="form-control" id="ma-filtro-asunto" placeholder="Ingrese asunto...">
+                    <input type="text" class="form-control" id="ma-filtro-asunto" placeholder="Ingrese asunto..." maxlength="100">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="ma-filtro-estado">Filtrar por estado</label>

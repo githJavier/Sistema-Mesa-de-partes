@@ -149,6 +149,10 @@ class GetIngresarTramite {
     }
 
     public function validarFolios($folios) {
+        // Límite lógico de páginas y caracteres
+        $maxFolios = 10000;         // Por ejemplo, 10 mil páginas máximo permitidas
+        $maxCaracteres = 5;         // Máximo 5 dígitos (99999)
+
         if (!isset($folios) || trim($folios) === "") {
             $this->message = "El número de folios es obligatorio.";
             return false;
@@ -156,6 +160,16 @@ class GetIngresarTramite {
 
         if (!ctype_digit($folios) || (int) $folios <= 0) {
             $this->message = "El número de folios debe ser un número entero positivo.";
+            return false;
+        }
+
+        if (strlen($folios) > $maxCaracteres) {
+            $this->message = "El número de folios no debe exceder los $maxCaracteres caracteres.";
+            return false;
+        }
+
+        if ((int)$folios > $maxFolios) {
+            $this->message = "El número de folios no debe superar los $maxFolios páginas.";
             return false;
         }
 
@@ -212,53 +226,27 @@ class GetIngresarTramite {
     }
 
     public function insertarTramite(
-    $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
-    $remitente, $asunto, $folios, $area_origen, $area_destino,
-    $final_file, $file_type, $new_size
-) {
-    $getTramite = new Tramite();
-    $intentos = 0;
-    $maxIntentos = 3;
-    $respuesta = false;
-
-    while ($intentos < $maxIntentos && !$respuesta) {
-        $num_documento = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
-        $orden = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
+        $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento, $horaReg, $fecReg,
+        $remitente, $asunto, $folios, $area_origen, $area_destino,
+        $final_file, $file_type, $new_size
+    ) {
+        $getTramite         = new Tramite();
+        $num_documento      = $getTramite->obtenerNuevoNumeroDocumento($tipoTramite);
+        $orden              = $getTramite->obtenerSiguienteOrdenPorDocumento($num_documento, $codigoGenerado);
         $id_detalle_tramite = $getTramite->obtenerNuevoIdDetalleTramite();
 
-        try {
-            $respuesta = $this->objTramite->ingresarTramite(
-                $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento,
-                $horaReg, $fecReg, $remitente, $asunto, $folios,
-                $area_origen, $area_destino, $num_documento, $orden,
-                $id_detalle_tramite, $final_file, $file_type, $new_size
-            );
+        $respuesta = $this->objTramite->ingresarTramite(
+            $tipoTramite, $anio, $codigoGenerado, $codTipoDocumento,
+            $horaReg, $fecReg, $remitente, $asunto, $folios,
+            $area_origen, $area_destino, $num_documento, $orden,
+            $id_detalle_tramite, $final_file, $file_type, $new_size
+        );
 
-            if (!$respuesta) {
-                // Puede agregar log aquí si quiere
-                break; // si falla por otro motivo no intentar más
-            }
+        $this->message = $respuesta
+            ? "Trámite ingresado correctamente"
+            : "Ocurrió un problema al ingresar el trámite";
 
-        } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                error_log("⚠️ Código duplicado detectado: $codigoGenerado. Reintentando...");
-                // Generar un nuevo código
-                $nuevoCodigo = $this->asignarNumeroTramite();
-                $codigoGenerado = $nuevoCodigo['codigo_externo'];
-                $intentos++;
-                continue;
-            } else {
-                // Otro error no esperado
-                throw $e;
-            }
-        }
+        return $respuesta;
     }
-
-    $this->message = $respuesta
-        ? "Trámite ingresado correctamente"
-        : "No se pudo ingresar el trámite luego de $maxIntentos intentos por código duplicado.";
-
-    return $respuesta;
-}
 
 }

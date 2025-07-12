@@ -59,12 +59,22 @@ class GetAyuda{
             $this->message = "El asunto es obligatorio.";
             return false;
         }
+        $longitud = mb_strlen($asunto);
+        if ($longitud > 100) {
+            $this->message = "El asunto no debe exceder los 100 caracteres. Ha escrito {$longitud} caracteres.";
+            return false;
+        }
         return true;
     }
 
     public function validarMensaje($mensaje){
         if (!isset($mensaje) || trim($mensaje) === "") {
             $this->message = "El mensaje es obligatorio.";
+            return false;
+        }
+        $longitud = mb_strlen($mensaje);
+        if ($longitud > 650) {
+            $this->message = "El mensaje no debe exceder los 650 caracteres. Ha escrito {$longitud} caracteres.";
             return false;
         }
         return true;

@@ -85,7 +85,10 @@ class GetFormIngresarTramite {
               <label for="ASUNTO" class="form-text">ASUNTO*</label>
               <div class="input-group">
                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-edit"></i></span>
-                <input type="text" class="form-control" name="ASUNTO" id="ASUNTO" placeholder="Ingrese el asunto del trámite">
+                <input type="text" class="form-control" name="ASUNTO" id="ASUNTO" maxlength="100" placeholder="Ingrese el asunto del trámite">
+              </div>
+              <div class="d-flex justify-content-end">
+                <small id="asuntoContadorTramite" class="text-muted">0 / 100</small>
               </div>
               <span id="asuntoError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
             </div>
@@ -108,7 +111,7 @@ class GetFormIngresarTramite {
             </div>
 
             <div class="col-md-6">
-              <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (referencial, sujeto a cambio)</label>
+              <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (Referencial, sujeto a cambio)</label>
               <div class="input-group">
                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-file-alt"></i></span>
                 <input type="text" class="form-control input-readonly" name="NUMERO_DOCUMENTO" id="NUMERO_TRAMITE" value="<?php echo $ultimoTramite['codigo_externo']; ?>" readonly>
@@ -126,7 +129,7 @@ class GetFormIngresarTramite {
               <span id="documentoVirtualError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
             </div>
             <div class="col-md-6">
-              <label for="FOLIOS" class="form-text">FOLIOS*</label>
+              <label for="FOLIOS" class="form-text">FOLIOS* (Cantidad de páginas)</label>
               <div class="input-group">
                 <span class="input-group-text span-input-tramite text-light"><i class="fas fa-edit"></i></span>
                 <input type="text" class="form-control" name="FOLIOS" id="FOLIOS" placeholder="Ingrese la cantidad de folios">
