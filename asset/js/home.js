@@ -1,5 +1,14 @@
 window.sonidoHabilitado = false;
+function mostrarSpinner() {
+    $("#spinner-cargando").fadeIn(100);
+    $("#contenido-dinamico").hide();
+}
 
+function ocultarSpinner() {
+    $("#spinner-cargando").fadeOut(100, function () {
+        $("#contenido-dinamico").fadeIn(100);
+    });
+}
 function toggleMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     let isSmallScreen = window.innerWidth < 992;
@@ -16,6 +25,7 @@ function initializeMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     menu.classList.remove("open", "fixed");
 }
+
 
 document.addEventListener("click", function(event) {
     let menu = document.getElementById("offcanvasScrolling");
@@ -56,9 +66,7 @@ function cargarDesdeLocalStorage() {
     const vista = localStorage.getItem("vistaActual");
     if (vista) {
         switch (vista) {
-            case "home":
-                cargarHome();
-                break;
+            case "home": cargarHome(); break;
             case "tramite":
                 cargarFormularioTramite();
                 break;
@@ -114,9 +122,11 @@ function guardarContenidoEnLocalStorage(html, vista) {
 }
 
 function cargarHome() {
-
+    
     verificarSesionRemitente(() => {
+        mostrarSpinner();
         $("#contenido-dinamico").load("../../views/dashboard/principal.php", function() {
+            ocultarSpinner();
             guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
         });
     });
@@ -125,11 +135,13 @@ function cargarHome() {
 function cargarFormularioTramite() {
 
     verificarSesionRemitente(() => {
+         mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/IngresarTramite/controlFormIngresarTramite.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     if(response.message){
                         Swal.fire({
@@ -156,13 +168,15 @@ function cargarFormularioTramite() {
 }
 
 function cargarformularioAyuda(){
-
+    
     verificarSesionRemitente(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Ayuda/controlFormAyuda.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     if(response.message){
                         Swal.fire({
@@ -192,25 +206,28 @@ function cargarformularioAyuda(){
 function cargarFormularioSeguimiento(){
 
     verificarSesionRemitente(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/SeguimientoTramite/controlFormSeguimientoTramite.php",
             dataType: "json",
             success: function(response) {
-            if (response.flag == 1) {
-                $("#contenido-dinamico").html(response.formularioHTML);
-                guardarContenidoEnLocalStorage(response.formularioHTML, "seguimiento");
-                // Esperar brevemente a que el DOM procese el nuevo HTML
-                setTimeout(() => {
-                inicializarModalEstadosTramite();
-                }, 100);
-            } else {
-                alert("Ocurrió un problema al cargar el formulario.");
-            }
+                ocultarSpinner();
+                if (response.flag == 1) {
+                    $("#contenido-dinamico").html(response.formularioHTML);
+                    guardarContenidoEnLocalStorage(response.formularioHTML, "seguimiento");
+                    // Esperar brevemente a que el DOM procese el nuevo HTML
+                    setTimeout(() => {
+                    inicializarModalEstadosTramite();
+                    }, 100);
+                } else {
+                    alert("Ocurrió un problema al cargar el formulario.");
+                }
             },
             error: function(xhr, status, error) {
-            //console.error("Error en AJAX: ", error);
-            alert("Error en la comunicación con el servidor.");
+                ocultarSpinner();
+                //console.error("Error en AJAX: ", error);
+                alert("Error en la comunicación con el servidor.");
             }
         });
     });
@@ -219,11 +236,13 @@ function cargarFormularioSeguimiento(){
 function cargarAjustesDatos() {
 
     verificarSesionRemitente(() => {
+         mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Ajustes/controlFormAjustarDatos.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "ajustes");
@@ -241,18 +260,21 @@ function cargarAjustesDatos() {
 function cargarformularioMensaje(){
 
     verificarSesionRemitente(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Mensaje/controlFormMensaje.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     window.MensajesPagination.init();
                     guardarContenidoEnLocalStorage(response.formularioHTML, "mensajes");
                 }
-            }
-        })
+            },
+            error: ocultarSpinner
+        });
     });
 }
 

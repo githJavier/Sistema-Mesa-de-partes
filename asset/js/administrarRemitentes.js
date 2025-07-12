@@ -427,14 +427,13 @@ function enviarFormEditar() {
 }
 
 function cargarDatosEliminar(id) {
-    document.getElementById('eliminarUsuarioId').value = id;
+    document.getElementById('eliminarRemitenteId').value = id;
     const eliminarModal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
     eliminarModal.show();
 }
 
 function enviarFormEliminar() {
     const id = document.getElementById('eliminarRemitenteId').value;
-
     if (!id) {
         Swal.fire({
             icon: 'error',

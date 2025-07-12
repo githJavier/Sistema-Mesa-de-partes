@@ -1,5 +1,16 @@
 window.sonidoHabilitado = false;
 
+function mostrarSpinner() {
+    $("#spinner-cargando").fadeIn(100);
+    $("#contenido-dinamico").hide();
+}
+
+function ocultarSpinner() {
+    $("#spinner-cargando").fadeOut(100, function () {
+        $("#contenido-dinamico").fadeIn(100);
+    });
+}
+
 function toggleMenu() {
     let menu = document.getElementById("offcanvasScrolling");
     let isSmallScreen = window.innerWidth < 992;
@@ -160,7 +171,9 @@ cargarDesdeLocalStorage();
 function cargarHome() {
 
     verificarSesion(() => {
+        mostrarSpinner();
         $("#contenido-dinamico").load("../../views/dashboard/principalAdmin.php", function() {
+            ocultarSpinner();
             guardarContenidoEnLocalStorage($("#contenido-dinamico").html(), "home");
         });
     });
@@ -169,11 +182,13 @@ function cargarHome() {
 function cargarformularioAdministracionRemitentes() {
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Administracion/controlAdministracionRemitentes.php",
             dataType: "json",
             success: function(response) {
+                ocultarSpinner();
                 $("#contenido-dinamico").html(response.formularioHTML);
                 guardarContenidoEnLocalStorage(response.formularioHTML, "administracionRemitentes");
 
@@ -183,7 +198,7 @@ function cargarformularioAdministracionRemitentes() {
                     }
                 }, 100);
             },
-            error: function(xhr, status, error) {
+            error: function(xhr, status, error){
                 //console.error("Error al cargar el formulario de remitentes:", error);
             }
         });
@@ -193,11 +208,13 @@ function cargarformularioAdministracionRemitentes() {
 function cargarformularioAdministracionUsuarios() {
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Administracion/controlAdministracionUsuarios.php",
             dataType: "json",
             success: function(response) {
+                ocultarSpinner();
                 if (response.flag == 1) {
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "administracionUsuarios");
@@ -219,11 +236,13 @@ function cargarformularioAdministracionUsuarios() {
 function cargarformularioAdministracionAreas() {
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Administracion/controlAdministracionAreas.php",
             dataType: "json",
             success: function(response) {
+                ocultarSpinner();
                 if (response.flag == 1) {
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "administracionAreas");
@@ -244,11 +263,13 @@ function cargarformularioAdministracionAreas() {
 function cargarformularioAdministracionDocumentos() {
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Administracion/controlAdministracionDocumentos.php",
             dataType: "json",
             success: function(response) {
+                ocultarSpinner();
                 if (response.flag == 1) {
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "administracionDocumentos");
@@ -269,11 +290,13 @@ function cargarformularioAdministracionDocumentos() {
 function cargarformularioConsultarTramitesArchivados(){
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Consultar/controlFormConsultarTramitesArchivados.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesArchivados");
@@ -286,11 +309,13 @@ function cargarformularioConsultarTramitesArchivados(){
 function cargarformularioConsultarTramitesDerivados(){
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Consultar/controlFormConsultarTramitesDerivados.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "consultarTramitesDerivados");
@@ -303,11 +328,13 @@ function cargarformularioConsultarTramitesDerivados(){
 function cargarformularioRecibirTramitesExternos(){
       
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/RecibirTramiteExterno/controlFormRecibirTramiteExterno.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "recibirTramitesExternos");
@@ -320,11 +347,13 @@ function cargarformularioRecibirTramitesExternos(){
 function cargarformularioRecibirTramitesInternos(){
       
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/RecibirTramiteInterno/controlFormRecibirTramiteInterno.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "recibirTramitesInternos");
@@ -337,11 +366,13 @@ function cargarformularioRecibirTramitesInternos(){
 function cargarformularioResolverTramites(){
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/ResolverTramite/controlFormResolverTramite.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "resolverTramites");
@@ -354,11 +385,13 @@ function cargarformularioResolverTramites(){
 function cargarformularioIngresarTramite(){
     
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/IngresarTramiteUsuario/controlFormIngresarTramiteUsuario.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     guardarContenidoEnLocalStorage(response.formularioHTML, "ingresarTramite");
@@ -371,11 +404,13 @@ function cargarformularioIngresarTramite(){
 function cargarformularioMensaje(){
 
     verificarSesion(() => {
+        mostrarSpinner();
         $.ajax({
             type: "POST",
             url: "../../controllers/Mensaje/controlFormMensajeAdmin.php",
             dataType: "json",
             success: function(response){
+                ocultarSpinner();
                 if(response.flag == 1){
                     $("#contenido-dinamico").html(response.formularioHTML);
                     window.MensajesPagination.init();
