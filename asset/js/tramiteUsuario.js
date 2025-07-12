@@ -1,3 +1,34 @@
+// Obtener elementos
+const inputAsuntoTramite = document.getElementById("ASUNTO");
+const contadorAsuntoTramite = document.getElementById("asuntoContadorTramite");
+
+// Función para actualizar el contador
+function actualizarContadorAsunto() {
+  const longitud = inputAsuntoTramite.value.length;
+  contadorAsuntoTramite.textContent = `${longitud} / 100`;
+}
+
+// Escuchar cambios en el input
+inputAsuntoTramite.addEventListener("input", actualizarContadorAsunto);
+
+// Inicializar contador al cargar (por si ya viene con texto)
+actualizarContadorAsunto();
+
+// Contador dinámico para campo OBSERVACIÓN
+const inputObservacion = document.getElementById("OBSERVACION");
+const contadorObservacion = document.getElementById("observacionContador");
+
+function actualizarContadorObservacion() {
+  const longitud = inputObservacion.value.length;
+  contadorObservacion.textContent = `${longitud} / 100`;
+}
+
+// Escuchar cambios
+inputObservacion.addEventListener("input", actualizarContadorObservacion);
+
+// Inicializar contador por si ya viene con texto
+actualizarContadorObservacion();
+
 // ----------------------------
 // VALIDACIONES GENÉRICAS
 // ----------------------------
@@ -81,6 +112,16 @@ function validarFolios(inputId, errorId) {
   error.style.display = "none";
   return true;
 }
+
+document.getElementById('FOLIOS').addEventListener('input', function (e) {
+  // Eliminar cualquier carácter no numérico
+  this.value = this.value.replace(/\D/g, '');
+
+  // Limitar a máximo 5 caracteres
+  if (this.value.length > 5) {
+    this.value = this.value.slice(0, 5);
+  }
+});
 
 // ----------------------------
 // VALIDAR FORMULARIO COMPLETO

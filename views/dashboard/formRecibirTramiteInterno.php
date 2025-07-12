@@ -14,7 +14,7 @@ class formRecibirTramitesInternos{
                     <label for="search" class="form-text">CÓDIGO DE EXPEDIENTE</label>
                     <div class="input-group">
                     <span class="input-group-text span-input-tramite text-light"><i class="fas fa-barcode"></i></span>
-                    <input type="text" class="form-control" id="search" placeholder="Ingrese código...">
+                    <input type="text" class="form-control" id="search" placeholder="Ingrese código..." maxlength="25">
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">

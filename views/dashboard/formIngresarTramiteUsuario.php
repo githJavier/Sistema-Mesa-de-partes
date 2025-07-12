@@ -18,7 +18,10 @@ class GetFormIngresarTramiteUsuario {
             <label for="ASUNTO" class="form-text">ASUNTO*</label>
             <div class="input-group">
               <span class="input-group-text span-input-tramite text-light"><i class="fas fa-edit"></i></span>
-              <input type="text" class="form-control" name="asunto" id="ASUNTO" placeholder="Ingrese el asunto del trámite">
+              <input type="text" class="form-control" name="asunto" id="ASUNTO" maxlength="100" placeholder="Ingrese el asunto del trámite">
+            </div>
+            <div class="d-flex justify-content-end">
+              <small id="asuntoContadorTramite" class="text-muted">0 / 100</small>
             </div>
             <span id="asuntoError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
           </div>
@@ -41,7 +44,7 @@ class GetFormIngresarTramiteUsuario {
             <span id="tipoTramiteError" class="text-danger ms-5" style="display:none;">Este campo es obligatorio.</span>
           </div>
           <div class="col-md-6">
-            <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (referencial, sujeto a cambio)</label>
+            <label for="NUMERO_TRAMITE" class="form-text">NÚMERO DE DOCUMENTO* (Referencial, sujeto a cambio)</label>
             <div class="input-group">
               <span class="input-group-text span-input-tramite text-light"><i class="fas fa-file-alt"></i></span>
               <input type="text" class="form-control input-readonly" name="numero_documento" id="NUMERO_TRAMITE" readonly>
@@ -91,7 +94,7 @@ class GetFormIngresarTramiteUsuario {
             <span id="documentoVirtualError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
           </div>
           <div class="col-md-6">
-            <label for="FOLIOS" class="form-text">FOLIOS*</label>
+            <label for="FOLIOS" class="form-text">FOLIOS* (Cantidad de páginas)</label>
             <div class="input-group">
               <span class="input-group-text span-input-tramite text-light"><i class="fas fa-edit"></i></span>
               <input type="text" class="form-control" name="folios" id="FOLIOS" placeholder="Ingrese la cantidad de folios">
@@ -181,7 +184,10 @@ class GetFormIngresarTramiteUsuario {
             <label for="OBSERVACION" class="form-text">OBSERVACIÓN</label>
             <div class="input-group">
               <span class="input-group-text span-input-tramite text-light"><i class="fas fa-comment-dots"></i></span>
-              <textarea class="form-control" name="observacion" id="OBSERVACION" rows="3" placeholder="Observaciones adicionales..."></textarea>
+              <textarea class="form-control" name="observacion" id="OBSERVACION" rows="3" maxlength="100" placeholder="Observaciones adicionales..."></textarea>
+            </div>
+            <div class="d-flex justify-content-end">
+              <small id="observacionContador" class="text-muted">0 / 100</small>
             </div>
             <span id="observacionError" class="text-danger ms-5" style="display:none;">ESTE CAMPO ES OBLIGATORIO.</span>
           </div>
