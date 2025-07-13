@@ -101,7 +101,7 @@ if (isset($_SESSION['usuario'])) {
           </div>
           <!--reCaptcha-->
           <div class="d-flex justify-content-center mb-3">
-            <div class="g-recaptcha" id="recaptchaUsuario" data-sitekey="6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb"></div>
+            <div class="g-recaptcha" id="recaptchaUsuario" data-sitekey="6LeQRYErAAAAAMt5NS_R2xVyqenVnvsFM9aO2v1k"></div>
           </div>
           <!-- Botón -->
           <div class="d-flex justify-content-center mb-3">
@@ -184,10 +184,10 @@ if (isset($_SESSION['usuario'])) {
 
     var onloadCallback = function () {
       widgetRemitente = grecaptcha.render('recaptchaRemitente', {
-        'sitekey': '6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb'
+        'sitekey': '6LeQRYErAAAAAMt5NS_R2xVyqenVnvsFM9aO2v1k'
       });
       widgetUsuario = grecaptcha.render('recaptchaUsuario', {
-        'sitekey': '6LemDGIrAAAAAGRT4wx5u-sqye7tpF4ZMUdHwsOb'
+        'sitekey': '6LeQRYErAAAAAMt5NS_R2xVyqenVnvsFM9aO2v1k'
       });
     };
   </script>
