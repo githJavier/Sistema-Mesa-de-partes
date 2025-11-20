@@ -1,11 +1,10 @@
 services:
   web:
-    build: .
+    build: ./backend
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
-      - ./logs:/var/www/html/logs
+      - ./backend:/var/www/html
     env_file:
       - .env
     depends_on:
