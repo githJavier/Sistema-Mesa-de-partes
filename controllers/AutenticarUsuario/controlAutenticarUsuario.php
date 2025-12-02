@@ -1,9 +1,11 @@
 <?php 
 session_start();
 include_once("getAutenticarUsuario.php");
+require_once("../../utils/AuthSystem/AuthFacade.php");
 
 
 $getAutenticarUsuario = new GetAutenticarUsuario();
+$auth = new AuthFacade();
 
 if ($getAutenticarUsuario->validarBoton("btnLogin")) {
     $documento = $_POST['documento'];
@@ -16,9 +18,7 @@ if ($getAutenticarUsuario->validarBoton("btnLogin")) {
                     if($getAutenticarUsuario->validarContrasena($documento,$contrasena)){
                         $mes = $getAutenticarUsuario->obtenerMes();
                         $datos = $getAutenticarUsuario->obtenerDatosRemitente($documento, $contrasena);
-                        $_SESSION['usuario'] = $documento;
-                        $_SESSION['datos'] = $datos;
-                        $_SESSION['mes'] = $mes;
+                        $auth->loginExitoso($documento, $datos, $mes);
                         echo json_encode([
                             'flag' => 1,
                             'message' => "Inicio de sesión exitoso",

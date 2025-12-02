@@ -1,39 +1,31 @@
 <?php
-session_start();
-require_once __DIR__ . '/../utils/log_config.php';
-require_once __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../utils/AuthSystem/AuthFacade.php';
 
 header('Content-Type: application/json');
 
-$conn = Conexion::conectarBD();
+$auth = new AuthFacade();
+$status = $auth->verificarAccesoAdmin();
 
-if (!isset($_SESSION['datos']['estado'])) {
-    error_log('Sesión no iniciada o inválida');
-    session_destroy();
-    echo json_encode(['status' => 'no_session']);
-    exit;
-}
-
-$num_doc = $_SESSION['datos']['num_doc'];
-$sql = "SELECT estado FROM usuario WHERE num_doc = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $num_doc);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($row = $result->fetch_assoc()) {
-    if ($row['estado'] != 1) {
+switch ($status) {
+    case 'no_session':
+        error_log('Sesión no iniciada o inválida');
+        $auth->logout(); // La fachada también maneja limpieza si falla
+        echo json_encode(['status' => 'no_session']);
+        break;
+    case 'inactive':
         error_log('Usuario inactivo o eliminado');
-        session_destroy();
+        $auth->logout();
         echo json_encode(['status' => 'inactive']);
-        exit;
-    } else {
+        break;
+    case 'not_found':
+        error_log('Usuario no encontrado');
+        $auth->logout();
+        echo json_encode(['status' => 'not_found']);
+        break;
+    case 'active':
         echo json_encode(['status' => 'active']);
-        exit;
-    }
-} else {
-    error_log('Usuario no encontrado');
-    session_destroy();
-    echo json_encode(['status' => 'not_found']);
-    exit;
+        break;
 }
+exit;
+
+?>

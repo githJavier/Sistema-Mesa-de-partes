@@ -1,8 +1,8 @@
 <?php
-session_start();
-if (isset($_SESSION['usuario'])) {
-    session_destroy();
-}
+require_once 'utils/AuthSystem/AuthFacade.php';
+
+$auth = new AuthFacade();
+$auth->logout();
 ?>
 <!DOCTYPE html>
 <html lang="es">

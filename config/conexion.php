@@ -1,11 +1,17 @@
 <?php
 class Conexion
 {
-    private static $conexion;
+    private static $conexion = null;
+
+    private function __construct()
+    {
+        // Se deja vacío y privado intencionalmente para evitar que 
+        // se creen múltiples instancias con 'new Conexion()'.
+    }
 
     public static function conectarBD()
     {
-        if (!self::$conexion) {
+        if (self::$conexion === null) {
             // Obtener los datos desde variables de entorno
             $host = getenv('DB_HOST');
             $user = getenv('DB_USER');
