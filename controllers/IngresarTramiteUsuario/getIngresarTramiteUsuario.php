@@ -6,6 +6,8 @@ include_once("../../models/area.php");
 include_once("../../utils/supabaseUploader.php");
 include_once("../../utils/log_config.php");
 
+require_once("../../utils/Strategies/GeneradorEstandar.php");
+
 class GetIngresarTramiteUsuario {
     public $message = "";
 
@@ -21,6 +23,7 @@ class GetIngresarTramiteUsuario {
         $this->objTipoDocumento = new TipoDocumento();
         $this->objRemitente = new Usuario();
         $this->uploader = new SupabaseUploader();
+        $this->generadorCodigo = new GeneradorEstandar();
     }
 
     public function validarBoton($nombreBoton) {
@@ -57,20 +60,10 @@ class GetIngresarTramiteUsuario {
         ];
 
         $ultimoExterno = $this->obtenerUltimoTramiteExterno();
-        if ($ultimoExterno === false || !preg_match('/(\d{4}-DOC)(\d{10})/', $ultimoExterno, $matchesEx)) {
-            $codigo['codigo_externo'] = $anio . "-DOC" . str_pad(1, 10, "0", STR_PAD_LEFT);
-        } else {
-            $numeroEx = (int) $matchesEx[2] + 1;
-            $codigo['codigo_externo'] = $anio . "-DOC" . str_pad($numeroEx, 10, "0", STR_PAD_LEFT);
-        }
+        $codigo['codigo_externo'] = $this->generadorCodigo->generarSiguiente($ultimoExterno, $anio, "DOC");
 
         $ultimoInterno = $this->obtenerUltimoTramiteInterno();
-        if ($ultimoInterno === false || !preg_match('/(\d{4}-IN)(\d{10})/', $ultimoInterno, $matchesIn)) {
-            $codigo['codigo_interno'] = $anio . "-IN" . str_pad(1, 10, "0", STR_PAD_LEFT);
-        } else {
-            $numeroIn = (int) $matchesIn[2] + 1;
-            $codigo['codigo_interno'] = $anio . "-IN" . str_pad($numeroIn, 10, "0", STR_PAD_LEFT);
-        }
+        $codigo['codigo_interno'] = $this->generadorCodigo->generarSiguiente($ultimoInterno, $anio, "IN");
 
         return $codigo;
     }
