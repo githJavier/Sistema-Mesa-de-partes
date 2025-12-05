@@ -2,6 +2,7 @@
 require_once('getIngresarTramiteUsuario.php');
 require_once('../Administracion/getAdministracion.php');
 require_once('../../views/dashboard/formIngresarTramiteUsuario.php');
+
 session_start();
 
 $miArea = $_SESSION['datos']['area'];

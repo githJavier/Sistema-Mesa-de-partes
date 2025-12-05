@@ -3,6 +3,9 @@
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../utils/log_config.php';
 include_once("getIngresarTramiteUsuario.php");
+require_once('../../patterns/ChainOfResponsibility/validarDatosHandler.php');
+require_once('../../patterns/ChainOfResponsibility/validarDatosHandler.php');
+require_once('../../patterns/Observer/tramitesSubject.php');
 session_start();
 
 // Validar que sea una solicitud POST válida y que se haya presionado el botón
@@ -20,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramiteUsuar
     $remitente         = $_POST['remitente'] ?? null;
     $urgente           = $_POST['urgente'] ?? null;
     $observacion       = $_POST['observacion'] ?? null;
+    $descripcion       = $_POST['descripcion'] ?? null;
 
     $area_origen       = $_SESSION['datos']['area'];
     $area_destino      = $_POST['unidad_organica_destino'] ?? null;
@@ -50,62 +54,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramiteUsuar
         $horaRegistro = 'Formato no válido';
     }
 
-    // Validaciones encadenadas (tipo cascada)
-    if ($getTramite->validarBoton($btnEnviarTramite)) {
-        if ($getTramite->validarAsunto($asunto)) {
-            if ($getTramite->validarTipoTramite($tipoTramite)) {
-                if ($getTramite->validarNumeroTramite($numeroTramite)) {
-                    if (!$getTramite->verificarDisponibilidadCodigoTramite($numeroTramite)) {
-                        do {
-                            $ultimoTramite = $getTramite->asignarNumeroTramite();
-                            if($tipoTramite === 'INTERNO'){
-                                $numeroTramite = $ultimoTramite['codigo_interno'];
-                            } else {
-                                $numeroTramite = $ultimoTramite['codigo_externo'];
+    //ChainOfResponsibility
+    $validarUsuarioHandler = new ValidarUsuarioHandler();
+    if($validarUsuarioHandler->handle($_SESSION['usuario_id'])){
+        $validarDatosHandler = new ValidarDatosHandler();
+        if($validarDatosHandler->handle([$asunto]) && $validarDatosHandler->handle([$descripcion])){
+            // Validaciones encadenadas (tipo cascada)
+            if ($getTramite->validarBoton($btnEnviarTramite)) {
+                if ($getTramite->validarAsunto($asunto)) {
+                    if ($getTramite->validarTipoTramite($tipoTramite)) {
+                        if ($getTramite->validarNumeroTramite($numeroTramite)) {
+                            if (!$getTramite->verificarDisponibilidadCodigoTramite($numeroTramite)) {
+                                do {
+                                    $ultimoTramite = $getTramite->asignarNumeroTramite();
+                                    if($tipoTramite === 'INTERNO'){
+                                        $numeroTramite = $ultimoTramite['codigo_interno'];
+                                    } else {
+                                        $numeroTramite = $ultimoTramite['codigo_externo'];
+                                    }
+                                    $disponible = $getTramite->verificarDisponibilidadCodigoTramite($numeroTramite);
+                                } while (!$disponible);
                             }
-                            $disponible = $getTramite->verificarDisponibilidadCodigoTramite($numeroTramite);
-                        } while (!$disponible);
-                    }
-                    // Construcción del nombre final del archivo
-                    $tipo              = "00INI00"; // Código fijo que representa usuario
-                    $nombre_base       = $numeroTramite . "_" . $tipo . "_" . $final_file;
-                    $nombre_final      = $getTramite->limpiarNombreArchivo($nombre_base);
-                    if ($getTramite->validarAreaDestino($area_destino)) {
-                        if ($getTramite->validarTipoDocumento($tipoDocumento)) {
-                            if ($getTramite->validarArchivo($documento)) {
-                                if ($getTramite->validarFolios($folios)) {
-                                    if ($getTramite->validarRemitente($remitente)) {
-                                        if ($getTramite->validarUrgencia($urgente)) {
-                                            if ($getTramite->validarObservacion($observacion)) {
-                                                if ($getTramite->moverArchivo($documento, $nombre_final)) {
-                                                    // Registro del trámite en base de datos
-                                                    if (
-                                                        $getTramite->insertarTramiteUsuario(
-                                                            $tipoTramite,
-                                                            $anio,
-                                                            $numeroTramite,
-                                                            $tipoDocumento,
-                                                            $horaRegistro,
-                                                            $fechaRegistro,
-                                                            $remitente,
-                                                            $asunto,
-                                                            $folios,
-                                                            $observacion,
-                                                            $area_origen,
-                                                            $area_destino,
-                                                            $cod_usuario,
-                                                            $urgente,
-                                                            $nombre_final,
-                                                            $file_type,
-                                                            $new_size
-                                                        )
-                                                    ) {
-                                                        echo json_encode([
-                                                            'flag'     => 1,
-                                                            'message'  => "Trámite registrado y archivo subido correctamente.",
-                                                            'redirect' => "../../views/redireccion/homeAdmin.php"
-                                                        ]);
-                                                        exit;
+                            // Construcción del nombre final del archivo
+                            $tipo              = "00INI00"; // Código fijo que representa usuario
+                            $nombre_base       = $numeroTramite . "_" . $tipo . "_" . $final_file;
+                            $nombre_final      = $getTramite->limpiarNombreArchivo($nombre_base);
+                            if ($getTramite->validarAreaDestino($area_destino)) {
+                                if ($getTramite->validarTipoDocumento($tipoDocumento)) {
+                                    if ($getTramite->validarArchivo($documento)) {
+                                        if ($getTramite->validarFolios($folios)) {
+                                            if ($getTramite->validarRemitente($remitente)) {
+                                                if ($getTramite->validarUrgencia($urgente)) {
+                                                    $TramiteEnvioObserver = new TramiteSubject();
+                                                    if ($TramiteEnvioObserver->attach($observacion)) {
+                                                        if ($getTramite->moverArchivo($documento, $nombre_final)) {
+                                                            // Registro del trámite en base de datos
+                                                            if (
+                                                                $getTramite->insertarTramiteUsuario(
+                                                                    $tipoTramite,
+                                                                    $anio,
+                                                                    $numeroTramite,
+                                                                    $tipoDocumento,
+                                                                    $horaRegistro,
+                                                                    $fechaRegistro,
+                                                                    $remitente,
+                                                                    $asunto,
+                                                                    $folios,
+                                                                    "",
+                                                                    $area_origen,
+                                                                    $area_destino,
+                                                                    $cod_usuario,
+                                                                    $urgente,
+                                                                    $nombre_final,
+                                                                    $file_type,
+                                                                    $new_size
+                                                                )
+                                                            ) {
+                                                                echo json_encode([
+                                                                    'flag'     => 1,
+                                                                    'message'  => "Trámite registrado y archivo subido correctamente.",
+                                                                    'redirect' => "../../views/redireccion/homeAdmin.php"
+                                                                ]);
+                                                                exit;
+                                                            } else {
+                                                                echo json_encode([
+                                                                    'flag'    => 0,
+                                                                    'message' => $getTramite->message
+                                                                ]);
+                                                                exit;
+                                                            }
+                                                        } else {
+                                                            echo json_encode([
+                                                                'flag'    => 0,
+                                                                'message' => $getTramite->message
+                                                            ]);
+                                                            exit;
+                                                        }
                                                     } else {
                                                         echo json_encode([
                                                             'flag'    => 0,
@@ -183,19 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnEnviarTramiteUsuar
                 ]);
                 exit;
             }
-        } else {
-            echo json_encode([
-                'flag'    => 0,
-                'message' => $getTramite->message
-            ]);
-            exit;
         }
-    } else {
-        echo json_encode([
-            'flag'    => 0,
-            'message' => $getTramite->message
-        ]);
-        exit;
     }
 }
 
