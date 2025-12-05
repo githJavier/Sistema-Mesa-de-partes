@@ -16,6 +16,7 @@ class GetIngresarTramiteUsuario {
     private $objTipoDocumento;
     private $objRemitente;
     private $uploader;
+    private $generadorCodigo;
 
     public function __construct() {
         $this->objTramite = new Tramite();

@@ -1,4 +1,6 @@
 <?php
+// Agrega esto JUSTO después de <?php
+header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../utils/log_config.php';
 include_once("getIngresarTramiteUsuario.php");
 session_start();

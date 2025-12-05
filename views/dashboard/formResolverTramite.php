@@ -343,6 +343,27 @@ class formResolverTramites{
         <!-- jsPDF para generar el PDF -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+        <!-- Agrega esto ANTES de tus scripts -->
+        <script>
+        // Protección contra el error addEventListener
+        function safeAddEventListener(elementId, eventType, callback) {
+            var element = document.getElementById(elementId);
+            if (element) {
+                element.addEventListener(eventType, callback);
+            } else {
+                console.warn('Elemento no encontrado:', elementId);
+            }
+        }
+
+        // Sobrescribir addEventListener para prevenir errores
+        var originalAddEventListener = Element.prototype.addEventListener;
+        Element.prototype.addEventListener = function(type, listener, options) {
+            if (this) {
+                return originalAddEventListener.call(this, type, listener, options);
+            }
+        };
+        </script>
+
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/ResolverTramitesForms.js"></script>
         <script src="../../asset/js/ResolverTramites.js"></script>
