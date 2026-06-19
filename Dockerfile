@@ -1,8 +1,11 @@
-FROM php@sha256:f8816038aecbd2bcd2f29c662687cccb1151f9ee588f61e331be1fb12ad787d9
+FROM php:8.2-apache
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-RUN a2enmod rewrite
+# Asegura un único MPM activo (prefork) — evita "More than one MPM loaded"
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true && \
+    a2enmod mpm_prefork && \
+    a2enmod rewrite
 
 COPY .docker/apache/vhost.conf /etc/apache2/sites-available/000-default.conf
 
