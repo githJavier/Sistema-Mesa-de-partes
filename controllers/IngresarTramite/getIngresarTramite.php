@@ -12,6 +12,7 @@ class GetIngresarTramite {
     private $objTramite;
     private $uploader;
     private $objTipoDocumento;
+    private $generadorCodigo;
 
     public function __construct() {
         $this->objTramite         = new Tramite();            // Para lógica de trámites
