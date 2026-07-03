@@ -281,6 +281,9 @@ class formRecibirTramitesExternos{
         <!-- jsPDF para generar el PDF -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+        <!-- Configuración de variables de entorno -->
+        <script src="../../config/env-config.php"></script>
+
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/RecibirTramitesExternos.js"></script>
 

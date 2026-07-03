@@ -364,6 +364,9 @@ class formResolverTramites{
         };
         </script>
 
+        <!-- Configuración de variables de entorno -->
+        <script src="../../config/env-config.php"></script>
+
         <!-- Tu archivo JavaScript personalizado -->
         <script src="../../asset/js/ResolverTramitesForms.js"></script>
         <script src="../../asset/js/ResolverTramites.js"></script>
